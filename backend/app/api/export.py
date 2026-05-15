@@ -41,17 +41,17 @@ async def export_to_excel(data: dict):
     if crossref_file_id and column_mapping:
         crossref_result = (
             supabase.table("crossref_files")
-            .select("data,columns")
+            .select("name")
             .eq("id", crossref_file_id)
             .execute()
         )
         if not crossref_result.data:
             raise HTTPException(404, "Archivo de cruce no encontrado")
 
-        crossref_data = crossref_result.data[0]
+        full_data = crossref_service.load_file_data(crossref_result.data[0]["name"])
         merged_rows = crossref_service.merge_data(
             rows=consolidated_rows,
-            crossref_rows=crossref_data["data"],
+            crossref_rows=full_data,
             match_column=column_mapping["match_column"],
             crossref_match_column=column_mapping["crossref_match_column"],
             output_columns=column_mapping["output_columns"],

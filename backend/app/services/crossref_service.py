@@ -162,6 +162,11 @@ class CrossrefService:
 
         return columns, rows
 
+    def load_file_data(self, file_name: str) -> list[dict]:
+        file_path = self.upload_dir / file_name
+        _, data = self.parse_file(str(file_path))
+        return data
+
     def merge_data(
         self,
         rows: list[dict],

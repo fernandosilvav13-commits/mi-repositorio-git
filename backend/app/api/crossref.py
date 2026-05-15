@@ -11,6 +11,8 @@ crossref_service = CrossrefService()
 upload_dir = Path("uploads/crossref")
 upload_dir.mkdir(parents=True, exist_ok=True)
 
+PREVIEW_MAX_ROWS = 100
+
 
 @router.post("/upload")
 async def upload_crossref(file: UploadFile = File(...)):
@@ -33,7 +35,7 @@ async def upload_crossref(file: UploadFile = File(...)):
             "name": safe_name,
             "file_type": ext,
             "columns": columns,
-            "data": data,
+            "data": data[:PREVIEW_MAX_ROWS],
             "row_count": len(data),
             "status": "unmatched",
         }).execute()
