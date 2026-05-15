@@ -1,95 +1,87 @@
 "use client";
 
-import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { api } from "@/lib/api";
+import { LucideIcon, Upload, Database, Layout, ShieldCheck, Cpu, FileSpreadsheet, Star, ChevronRight, ChevronLeft, Plus, Check, X } from "lucide-react";
+import ConfiguratorCard from "@/components/apple/ConfiguratorCard";
+import FrostedContainer from "@/components/apple/FrostedContainer";
+import { cn } from "@/lib/utils";
 
 type Step = "upload" | "crossref" | "template" | "rules" | "extract" | "export" | "review";
 
-const STEPS: { key: Step; label: string; icon: string }[] = [
-  { key: "upload", label: "Subir Archivos", icon: "1" },
-  { key: "crossref", label: "Cruzar Datos", icon: "2" },
-  { key: "template", label: "Plantilla", icon: "3" },
-  { key: "rules", label: "Reglas", icon: "4" },
-  { key: "extract", label: "Extracción", icon: "5" },
-  { key: "export", label: "Exportar", icon: "6" },
-  { key: "review", label: "Revisión", icon: "7" },
+const STEPS: { key: Step; label: string; icon: any }[] = [
+  { key: "upload", label: "Inicio", icon: Upload },
+  { key: "crossref", label: "Referencia", icon: Database },
+  { key: "template", label: "Estructura", icon: Layout },
+  { key: "rules", label: "Inteligencia", icon: ShieldCheck },
+  { key: "extract", label: "Procesamiento", icon: Cpu },
+  { key: "export", label: "Entrega", icon: FileSpreadsheet },
+  { key: "review", label: "Calidad", icon: Star },
 ];
 
-interface ColumnMapping {
-  match_column: string;
-  crossref_match_column: string;
-  output_columns: string[];
-}
+const PillChip = ({ 
+  selected, 
+  onClick, 
+  children,
+  className
+}: { 
+  selected: boolean; 
+  onClick: () => void; 
+  children: React.ReactNode;
+  className?: string;
+}) => (
+  <button
+    onClick={onClick}
+    className={cn(
+      "rounded-full px-6 py-3 text-[14px] font-medium transition-all duration-300 active-scale",
+      selected 
+        ? "border-2 border-action-blue text-action-blue bg-white" 
+        : "border border-[#e0e0e0] text-ink bg-white hover:border-[#7a7a7a]",
+      className
+    )}
+  >
+    {children}
+  </button>
+);
 
 export default function WizardPage() {
   const [currentStep, setCurrentStep] = useState<Step>("upload");
-  const [stepHistory, setStepHistory] = useState<Step[]>([]);
+  const [subStep, setSubStep] = useState(0);
+  const [stepHistory, setStepHistory] = useState<{ step: Step; subStep: number }[]>([]);
 
-  // Step 1: Upload
+  // State Management
   const [uploadFiles, setUploadFiles] = useState<File[]>([]);
   const [uploadedPaths, setUploadedPaths] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  // Step 2: Crossref
-  const [enableCrossref, setEnableCrossref] = useState(false);
+  const [enableCrossref, setEnableCrossref] = useState<boolean | null>(null);
   const [crossrefFiles, setCrossrefFiles] = useState<any[]>([]);
   const [selectedCrossrefId, setSelectedCrossrefId] = useState("");
   const [crossrefData, setCrossrefData] = useState<any>(null);
   const [matchColumn, setMatchColumn] = useState("");
   const [crossrefMatchColumn, setCrossrefMatchColumn] = useState("");
   const [outputColumns, setOutputColumns] = useState<string[]>([]);
-  const [crossrefUploadFile, setCrossrefUploadFile] = useState<File | null>(null);
-  const [uploadingCrossref, setUploadingCrossref] = useState(false);
-  const crossrefFileRef = useRef<HTMLInputElement>(null);
-
-  // Step 3: Template
+  
   const [templates, setTemplates] = useState<any[]>([]);
   const [selectedTemplateId, setSelectedTemplateId] = useState("");
   const [templateColumns, setTemplateColumns] = useState<string[]>([]);
-  const [showCreateTemplate, setShowCreateTemplate] = useState(false);
   const [newTemplateName, setNewTemplateName] = useState("");
   const [newTemplateColumns, setNewTemplateColumns] = useState<any[]>([]);
 
-  // Step 4: Rules
   const [rules, setRules] = useState<any[]>([]);
   const [selectedRuleIds, setSelectedRuleIds] = useState<Set<string>>(new Set());
 
-  // Step 5: Extract
   const [extracting, setExtracting] = useState(false);
   const [extractionResults, setExtractionResults] = useState<any[]>([]);
   const [extractionDone, setExtractionDone] = useState(false);
-  const [fuzzyThreshold, setFuzzyThreshold] = useState(70);
 
-  // Step 6: Export
   const [exporting, setExporting] = useState(false);
   const [exported, setExported] = useState(false);
 
-  // Step 7: Review
   const [conforme, setConforme] = useState<boolean | null>(null);
-  const [feedbackText, setFeedbackText] = useState("");
   const [feedbackSent, setFeedbackSent] = useState(false);
 
   useEffect(() => {
@@ -98,697 +90,439 @@ export default function WizardPage() {
     api.crossref.list().then(setCrossrefFiles).catch(() => {});
   }, []);
 
-  const canGoNext = (): boolean => {
-    switch (currentStep) {
-      case "upload": return uploadedPaths.length > 0;
-      case "crossref": return !enableCrossref || (!!selectedCrossrefId && !!matchColumn && !!crossrefMatchColumn && outputColumns.length > 0);
-      case "template": return !!selectedTemplateId;
-      case "rules": return true;
-      case "extract": return extractionDone;
-      case "export": return exported;
-      case "review": return true;
-    }
-  };
-
   const goNext = () => {
+    setStepHistory([...stepHistory, { step: currentStep, subStep }]);
+    
+    // Logic for complex steps
+    if (currentStep === "crossref") {
+      if (enableCrossref === false) {
+        setCurrentStep("template");
+        setSubStep(0);
+        return;
+      }
+      if (subStep < 2) {
+        setSubStep(subStep + 1);
+        return;
+      }
+    }
+
+    if (currentStep === "template") {
+        if (subStep === 0 && selectedTemplateId) {
+            setCurrentStep("rules");
+            setSubStep(0);
+            return;
+        }
+        if (subStep < 1) {
+            setSubStep(subStep + 1);
+            return;
+        }
+    }
+
     const idx = STEPS.findIndex((s) => s.key === currentStep);
     if (idx < STEPS.length - 1) {
-      setStepHistory([...stepHistory, currentStep]);
       setCurrentStep(STEPS[idx + 1].key);
+      setSubStep(0);
     }
   };
 
   const goBack = () => {
     if (stepHistory.length > 0) {
-      const prev = stepHistory[stepHistory.length - 1];
+      const last = stepHistory[stepHistory.length - 1];
       setStepHistory(stepHistory.slice(0, -1));
-      setCurrentStep(prev);
+      setCurrentStep(last.step);
+      setSubStep(last.subStep);
     }
   };
 
-  const goToStep = (step: Step) => {
-    const currentIdx = STEPS.findIndex((s) => s.key === currentStep);
-    const targetIdx = STEPS.findIndex((s) => s.key === step);
-    if (targetIdx <= currentIdx) {
-      setCurrentStep(step);
-      setStepHistory(stepHistory.filter((_, i) => i < targetIdx));
-    }
-  };
-
-  // --- Handlers ---
-
-  const handleUploadFiles = async () => {
-    if (uploadFiles.length === 0) return;
+  // Handlers
+  const handleUpload = async () => {
     setUploading(true);
     try {
       const result = await api.ingest.upload(uploadFiles);
       setUploadedPaths(result.files);
-    } catch (e: any) {
-      alert("Error al subir: " + e.message);
+      goNext();
+    } catch (e) {
+      alert("Error al procesar archivos");
     } finally {
       setUploading(false);
     }
   };
 
-  const handleUploadCrossref = async () => {
-    if (!crossrefUploadFile) return;
-    setUploadingCrossref(true);
-    try {
-      const result = await api.crossref.upload(crossrefUploadFile);
-      setSelectedCrossrefId(result.id);
-      setCrossrefData(result);
-      setCrossrefMatchColumn(result.columns?.[0] || "");
-      setOutputColumns(result.columns?.slice(1, 3) || []);
-      await api.crossref.list().then(setCrossrefFiles);
-      setCrossrefUploadFile(null);
-    } catch (e: any) {
-      alert("Error al subir: " + e.message);
-    } finally {
-      setUploadingCrossref(false);
-    }
-  };
-
   const handleSelectCrossref = async (id: string) => {
     setSelectedCrossrefId(id);
-    if (!id) {
-      setCrossrefData(null);
-      return;
-    }
-    try {
-      const data = await api.crossref.get(id);
-      setCrossrefData(data);
-      setCrossrefMatchColumn(data.columns?.[0] || "");
-      setOutputColumns(data.columns?.slice(1, 3) || []);
-    } catch {
-      setCrossrefData(null);
-    }
+    const data = await api.crossref.get(id);
+    setCrossrefData(data);
+    setCrossrefMatchColumn(data.columns?.[0] || "");
+    setOutputColumns(data.columns?.slice(1, 3) || []);
+    goNext();
   };
 
   const handleCreateTemplate = async () => {
-    if (!newTemplateName.trim() || newTemplateColumns.length === 0) return;
-    try {
-      const t = await api.templates.create({
-        name: newTemplateName,
-        columns: newTemplateColumns,
-      });
-      setSelectedTemplateId(t.id);
-      setTemplateColumns(newTemplateColumns.map((c: any) => c.name));
-      setShowCreateTemplate(false);
-      setNewTemplateName("");
-      setNewTemplateColumns([]);
-      await api.templates.list().then(setTemplates);
-    } catch (e: any) {
-      alert("Error al crear plantilla: " + e.message);
-    }
-  };
-
-  const handleSelectTemplate = async (id: string) => {
-    setSelectedTemplateId(id);
-    if (!id) return;
-    try {
-      const t = await api.templates.get(id);
-      setTemplateColumns((t.columns || []).map((c: any) => c.name));
-      if (enableCrossref && matchColumn && !t.columns?.some((c: any) => c.name === matchColumn)) {
-        setMatchColumn("");
-      }
-    } catch {
-      setTemplateColumns([]);
-    }
+    const t = await api.templates.create({ name: newTemplateName, columns: newTemplateColumns });
+    setSelectedTemplateId(t.id);
+    setTemplateColumns(newTemplateColumns.map((c: any) => c.name));
+    setCurrentStep("rules");
+    setSubStep(0);
   };
 
   const handleExtract = async () => {
-    if (!selectedTemplateId || uploadedPaths.length === 0) return;
     setExtracting(true);
-    setExtractionDone(false);
     try {
       const res = await api.extraction.extract({
         template_id: selectedTemplateId,
         file_paths: uploadedPaths,
-        fuzzy_threshold: fuzzyThreshold,
       });
       setExtractionResults(res);
       setExtractionDone(true);
-    } catch (e: any) {
-      alert("Error en extracción: " + e.message);
+      goNext();
+    } catch (e) {
+      alert("Error en la extracción");
     } finally {
       setExtracting(false);
     }
   };
 
   const handleExport = async () => {
-    if (extractionResults.length === 0) return;
     setExporting(true);
-    setExported(false);
     try {
       const payload: any = {
         template_id: selectedTemplateId,
         rows: extractionResults.map((r: any) => r.data),
       };
-      if (enableCrossref && selectedCrossrefId && matchColumn) {
-        const mapping: ColumnMapping = {
+      if (enableCrossref && selectedCrossrefId) {
+        payload.crossref_file_id = selectedCrossrefId;
+        payload.column_mapping = {
           match_column: matchColumn,
           crossref_match_column: crossrefMatchColumn,
           output_columns: outputColumns,
         };
-        payload.crossref_file_id = selectedCrossrefId;
-        payload.column_mapping = mapping;
       }
       await api.export.excel(payload);
       setExported(true);
-    } catch (e: any) {
-      alert("Error al exportar: " + e.message);
+      goNext();
+    } catch (e) {
+      alert("Error al exportar");
     } finally {
       setExporting(false);
     }
   };
 
-  const handleFeedback = async () => {
-    setFeedbackSent(true);
-  };
-
-  const toggleRule = (id: string) => {
-    const next = new Set(selectedRuleIds);
-    if (next.has(id)) next.delete(id);
-    else next.add(id);
-    setSelectedRuleIds(next);
-  };
-
-  const toggleOutputColumn = (col: string) => {
-    setOutputColumns((prev) =>
-      prev.includes(col) ? prev.filter((c) => c !== col) : [...prev, col]
-    );
-  };
-
-  const stepIdx = STEPS.findIndex((s) => s.key === currentStep);
-
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="border-b">
-        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-xl font-bold">Flujo de Trabajo</h1>
-          <Link href="/" className="inline-flex items-center justify-center rounded-lg border border-border bg-background hover:bg-muted h-8 px-2.5 text-sm font-medium">← Salir</Link>
-        </div>
-      </header>
-
-      {/* Step indicators */}
-      <div className="border-b bg-muted/20">
-        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-1 overflow-x-auto">
-          {STEPS.map((s, i) => {
-            const isActive = s.key === currentStep;
-            const isDone = STEPS.indexOf(s) < stepIdx && s.key !== currentStep;
-            return (
-              <button
-                key={s.key}
-                onClick={() => goToStep(s.key)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium whitespace-nowrap transition-colors ${
-                  isActive
-                    ? "bg-primary text-primary-foreground"
-                    : isDone
-                    ? "text-primary hover:bg-muted"
-                    : "text-muted-foreground"
-                }`}
-              >
-                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
-                  isActive ? "bg-primary-foreground text-primary" : isDone ? "bg-primary text-primary-foreground" : "bg-muted-foreground/20"
-                }`}>
-                  {isDone ? "✓" : s.icon}
-                </span>
-                {s.label}
-              </button>
-            );
-          })}
-        </div>
+    <div className="min-h-screen bg-parchment flex flex-col items-center pt-[104px] pb-24 overflow-x-hidden">
+      {/* Global Nav Placeholder */}
+      <div className="fixed top-0 left-0 w-full h-[44px] bg-black z-[100] flex items-center justify-center">
+        <span className="text-white text-[12px] font-medium tracking-tight">Proyecto Prueba</span>
       </div>
 
-      <main className="flex-1 max-w-5xl mx-auto px-4 py-6 w-full">
-        {/* Step: Upload */}
-        {currentStep === "upload" && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Paso 1: Subir Archivos</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div
+      {/* SubNav (frosted) */}
+      <FrostedContainer 
+        variant="parchment" 
+        className="fixed top-[44px] left-0 w-full h-[52px] z-[90] border-b border-[#e0e0e0] px-6 flex items-center justify-between"
+      >
+        <div className="flex items-center gap-2">
+            <span className="text-[21px] font-semibold tracking-tight text-ink">Configurador</span>
+        </div>
+        <div className="flex items-center gap-4">
+            {stepHistory.length > 0 && (
+                <button onClick={goBack} className="text-action-blue text-[14px] font-medium hover:underline flex items-center gap-1 active-scale">
+                   <ChevronLeft size={16} /> Atrás
+                </button>
+            )}
+            <button 
+                onClick={goNext}
+                className="bg-action-blue text-white rounded-full px-4 py-1 text-[14px] font-medium active-scale"
+            >
+                {currentStep === "review" ? "Terminar" : "Siguiente"}
+            </button>
+        </div>
+      </FrostedContainer>
+
+      <main className="w-full max-w-4xl flex flex-col items-center px-6">
+        {/* Header */}
+        <div className="text-center mb-12 flex flex-col items-center">
+            <span className="text-[14px] font-semibold text-[#7a7a7a] uppercase tracking-wide mb-2">
+                {STEPS.find(s => s.key === currentStep)?.label}
+            </span>
+            <h1 className="text-[34px] font-semibold tracking-apple-tight text-ink leading-tight max-w-xl">
+                {currentStep === "upload" && "Comencemos seleccionando los documentos que desea procesar."}
+                {currentStep === "crossref" && "¿Desea validar o completar los datos con una base de referencia?"}
+                {currentStep === "template" && "¿Qué información específica desea extraer de los documentos?"}
+                {currentStep === "rules" && "Aplique reglas de negocio automáticas a la extracción."}
+                {currentStep === "extract" && "La IA está lista para analizar sus documentos."}
+                {currentStep === "export" && "Sus resultados han sido consolidados con éxito."}
+                {currentStep === "review" && "¿Está satisfecho con la precisión de los resultados?"}
+            </h1>
+        </div>
+
+        {/* Content Area */}
+        <div className="w-full flex flex-col gap-6">
+          {currentStep === "upload" && (
+            <ConfiguratorCard>
+              <div 
                 onClick={() => fileRef.current?.click()}
-                className="border-2 border-dashed rounded-lg p-10 text-center hover:border-primary cursor-pointer"
+                className="w-full aspect-[2/1] rounded-lg border-2 border-dashed border-[#e0e0e0] flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-action-blue group transition-colors bg-white/50"
               >
-                <input
-                  ref={fileRef}
-                  type="file"
-                  multiple
-                  accept=".pdf,.doc,.docx,.csv,.jpg,.jpeg,.png"
-                  className="hidden"
-                  onChange={(e) => setUploadFiles(Array.from(e.target.files || []))}
-                />
-                <p className="text-lg font-medium">Arrastra archivos aquí</p>
-                <p className="text-sm text-muted-foreground mt-1">PDF, DOC, DOCX, CSV, JPG, PNG</p>
-              </div>
-
-              {uploadFiles.length > 0 && (
-                <div className="space-y-2">
-                  <p className="text-sm font-medium">{uploadFiles.length} archivo(s) seleccionados</p>
-                  <div className="flex flex-wrap gap-2">
-                    {uploadFiles.map((f, i) => (
-                      <Badge key={i} variant="secondary">{f.name}</Badge>
+                <input ref={fileRef} type="file" multiple className="hidden" onChange={(e) => setUploadFiles(Array.from(e.target.files || []))} />
+                <div className="w-16 h-16 rounded-full bg-parchment flex items-center justify-center group-hover:bg-action-blue group-hover:text-white transition-all">
+                    <Upload size={28} />
+                </div>
+                <p className="text-[17px] font-semibold text-ink">Seleccionar archivos</p>
+                <div className="flex flex-wrap justify-center gap-2 max-w-md px-6">
+                    {uploadFiles.slice(0, 5).map((f, i) => (
+                        <Badge key={i} variant="secondary" className="bg-parchment text-ink rounded-full px-3 py-1 border-none font-normal text-[12px]">
+                            {f.name}
+                        </Badge>
                     ))}
-                  </div>
-                  <Button onClick={handleUploadFiles} disabled={uploading} size="sm">
-                    {uploading ? "Subiendo..." : "Subir Archivos"}
-                  </Button>
+                    {uploadFiles.length > 5 && <span className="text-[12px] text-[#7a7a7a]">+{uploadFiles.length - 5} más</span>}
+                </div>
+              </div>
+              
+              {uploadFiles.length > 0 && (
+                <div className="mt-8 flex justify-center">
+                    <button 
+                        onClick={handleUpload} 
+                        disabled={uploading} 
+                        className="bg-action-blue text-white rounded-full px-8 py-3 text-[17px] font-medium active-scale w-full sm:w-auto"
+                    >
+                        {uploading ? "Procesando..." : "Subir y continuar"}
+                    </button>
                 </div>
               )}
+            </ConfiguratorCard>
+          )}
 
-              {uploadedPaths.length > 0 && (
-                <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-sm text-emerald-700">
-                  ✓ {uploadedPaths.length} archivo(s) subidos exitosamente
+          {currentStep === "crossref" && subStep === 0 && (
+            <div className="flex flex-col gap-4">
+              <ConfiguratorCard 
+                title="Sí, cruzar datos" 
+                subtitle="Vincular con bases de datos externas para validación de RUT, títulos o experiencia."
+              >
+                <div className="flex justify-end">
+                    <PillChip selected={enableCrossref === true} onClick={() => { setEnableCrossref(true); setSubStep(1); }}>
+                        Seleccionar
+                    </PillChip>
                 </div>
-              )}
-            </CardContent>
-          </Card>
-        )}
+              </ConfiguratorCard>
+              <ConfiguratorCard 
+                title="No, omitir" 
+                subtitle="Continuar solo con los datos extraídos de los currículums seleccionados."
+              >
+                <div className="flex justify-end">
+                    <PillChip selected={enableCrossref === false} onClick={() => { setEnableCrossref(false); goNext(); }}>
+                        Continuar
+                    </PillChip>
+                </div>
+              </ConfiguratorCard>
+            </div>
+          )}
 
-        {/* Step: Crossref */}
-        {currentStep === "crossref" && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Paso 2: Cruce de Datos (Opcional)</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={enableCrossref}
-                  onChange={(e) => {
-                    setEnableCrossref(e.target.checked);
-                    if (!e.target.checked) setSelectedCrossrefId("");
-                  }}
-                  className="w-4 h-4 rounded"
-                />
-                <span className="text-sm font-medium">¿Deseas cruzar datos con un archivo externo?</span>
-              </label>
-
-              {enableCrossref && (
-                <div className="border rounded-lg p-4 space-y-4 bg-muted/20">
-                  <div
-                    onClick={() => crossrefFileRef.current?.click()}
-                    className="border-2 border-dashed rounded-lg p-6 text-center hover:border-primary cursor-pointer"
-                  >
-                    <input
-                      ref={crossrefFileRef}
-                      type="file"
-                      accept=".pdf,.csv,.ppt,.pptx,.doc,.docx"
-                      className="hidden"
-                      onChange={(e) => setCrossrefUploadFile(e.target.files?.[0] || null)}
-                    />
-                    <p className="text-sm font-medium">Subir archivo de referencia</p>
-                    <p className="text-xs text-muted-foreground mt-1">PDF, CSV, PPT, DOCX</p>
-                  </div>
-
-                  {crossrefUploadFile && (
-                    <div className="flex items-center gap-3">
-                      <Badge variant="secondary">{crossrefUploadFile.name}</Badge>
-                      <Button onClick={handleUploadCrossref} disabled={uploadingCrossref} size="sm">
-                        {uploadingCrossref ? "Subiendo..." : "Subir"}
-                      </Button>
-                    </div>
-                  )}
-
-                  {crossrefFiles.length > 0 && (
-                    <div>
-                      <Label className="text-xs">O selecciona un archivo ya subido</Label>
-                      <Select value={selectedCrossrefId} onValueChange={handleSelectCrossref}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Seleccionar archivo..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {crossrefFiles.map((f: any) => (
-                            <SelectItem key={f.id} value={f.id}>{f.name} ({f.row_count} filas)</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-
-                  {crossrefData && templateColumns.length > 0 && (
-                    <div className="space-y-3 border-t pt-3">
-                      <p className="text-xs text-muted-foreground">Columnas del archivo: {crossrefData.columns?.join(", ")}</p>
-                      <div className="grid grid-cols-2 gap-3">
+          {currentStep === "crossref" && subStep === 1 && (
+            <div className="flex flex-col gap-4">
+               {crossrefFiles.map((f: any) => (
+                  <ConfiguratorCard key={f.id}>
+                    <div className="flex items-center justify-between">
                         <div>
-                          <Label className="text-xs">Columna en resultados</Label>
-                          <Select value={matchColumn} onValueChange={setMatchColumn}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Seleccionar..." />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {templateColumns.map((c) => (
-                                <SelectItem key={c} value={c}>{c}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                            <p className="text-[17px] font-semibold text-ink">{f.name}</p>
+                            <p className="text-[14px] text-[#7a7a7a]">{f.row_count} registros disponibles</p>
                         </div>
+                        <PillChip selected={selectedCrossrefId === f.id} onClick={() => handleSelectCrossref(f.id)}>
+                            {selectedCrossrefId === f.id ? "Seleccionado" : "Usar este"}
+                        </PillChip>
+                    </div>
+                  </ConfiguratorCard>
+                ))}
+            </div>
+          )}
+
+          {currentStep === "crossref" && subStep === 2 && (
+            <ConfiguratorCard title="Conexión de campos" subtitle="Seleccione la columna de la base maestra que se utilizará como llave de unión.">
+                <div className="space-y-6">
+                    <div className="space-y-2">
+                        <label className="text-[14px] font-semibold text-[#7a7a7a] uppercase tracking-wide">Campo de unión</label>
+                        <select 
+                            value={crossrefMatchColumn} 
+                            onChange={(e) => setCrossrefMatchColumn(e.target.value)} 
+                            className="w-full bg-parchment rounded-lg px-4 py-3 text-ink focus:outline-none border border-[#e0e0e0] appearance-none"
+                        >
+                            {crossrefData?.columns?.map((c: string) => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                    </div>
+                    <button onClick={goNext} className="w-full bg-action-blue text-white rounded-full py-3 text-[17px] font-medium active-scale">
+                        Confirmar Enlace
+                    </button>
+                </div>
+            </ConfiguratorCard>
+          )}
+
+          {currentStep === "template" && subStep === 0 && (
+            <div className="flex flex-col gap-4">
+              {templates.map((t: any) => (
+                  <ConfiguratorCard key={t.id}>
+                    <div className="flex items-center justify-between">
                         <div>
-                          <Label className="text-xs">Columna en referencia</Label>
-                          <Select value={crossrefMatchColumn} onValueChange={setCrossrefMatchColumn}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Seleccionar..." />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {crossrefData.columns?.map((c: string) => (
-                                <SelectItem key={c} value={c}>{c}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                            <p className="text-[17px] font-semibold text-ink">{t.name}</p>
+                            <p className="text-[14px] text-[#7a7a7a]">{t.columns?.length} campos configurados</p>
                         </div>
-                      </div>
-                      <div>
-                        <Label className="text-xs">Columnas a agregar al Excel</Label>
-                        <div className="flex flex-wrap gap-2 mt-1">
-                          {crossrefData.columns
-                            ?.filter((c: string) => c !== crossrefMatchColumn)
-                            .map((c: string) => (
-                              <label key={c} className="flex items-center gap-1.5 text-sm cursor-pointer">
-                                <input type="checkbox" checked={outputColumns.includes(c)} onChange={() => toggleOutputColumn(c)} className="rounded" />
-                                {c}
-                              </label>
+                        <PillChip selected={selectedTemplateId === t.id} onClick={() => { setSelectedTemplateId(t.id); setTemplateColumns(t.columns.map((c:any) => c.name)); goNext(); }}>
+                            Seleccionar
+                        </PillChip>
+                    </div>
+                  </ConfiguratorCard>
+                ))}
+                <button 
+                    onClick={() => setSubStep(1)} 
+                    className="w-full py-6 border-2 border-dashed border-[#e0e0e0] rounded-lg text-[#7a7a7a] hover:border-action-blue hover:text-action-blue transition-all flex items-center justify-center gap-2 font-medium"
+                >
+                    <Plus size={20} /> Crear nueva plantilla
+                </button>
+            </div>
+          )}
+
+          {currentStep === "template" && subStep === 1 && (
+            <ConfiguratorCard title="Nueva Estructura" subtitle="Defina los campos que la IA debe identificar en cada documento.">
+                <div className="space-y-8">
+                    <div className="space-y-2">
+                        <label className="text-[14px] font-semibold text-[#7a7a7a] uppercase tracking-wide">Nombre de Plantilla</label>
+                        <input 
+                            value={newTemplateName} 
+                            onChange={(e) => setNewTemplateName(e.target.value)} 
+                            placeholder="Ej: Reclutamiento IT 2024" 
+                            className="w-full border-b border-[#e0e0e0] py-2 text-[21px] font-semibold focus:outline-none focus:border-action-blue transition-colors" 
+                        />
+                    </div>
+                    <div className="space-y-4">
+                        <div className="flex justify-between items-center">
+                            <label className="text-[14px] font-semibold text-[#7a7a7a] uppercase tracking-wide">Columnas de salida</label>
+                            <button onClick={() => setNewTemplateColumns([...newTemplateColumns, {name: "", data_type: "string"}])} className="text-action-blue hover:underline text-[14px] font-medium">
+                                + Agregar
+                            </button>
+                        </div>
+                        <div className="space-y-3">
+                            {newTemplateColumns.map((col, i) => (
+                                <div key={i} className="flex gap-4 items-center animate-in fade-in slide-in-from-left-2">
+                                    <input 
+                                        value={col.name} 
+                                        onChange={(e) => {
+                                            const c = [...newTemplateColumns];
+                                            c[i].name = e.target.value;
+                                            setNewTemplateColumns(c);
+                                        }} 
+                                        placeholder="Nombre del campo" 
+                                        className="flex-1 bg-parchment rounded-md px-4 py-2 text-ink focus:outline-none border border-[#e0e0e0]" 
+                                    />
+                                    <button 
+                                        onClick={() => setNewTemplateColumns(newTemplateColumns.filter((_, idx) => idx !== i))}
+                                        className="text-[#7a7a7a] hover:text-red-500"
+                                    >
+                                        <X size={20} />
+                                    </button>
+                                </div>
                             ))}
                         </div>
-                      </div>
                     </div>
-                  )}
+                    <button onClick={handleCreateTemplate} className="w-full bg-action-blue text-white rounded-full py-3 text-[17px] font-medium active-scale">
+                        Guardar Plantilla
+                    </button>
                 </div>
-              )}
+            </ConfiguratorCard>
+          )}
 
-              {templateColumns.length === 0 && enableCrossref && (
-                <p className="text-xs text-amber-600">Define una plantilla primero para ver las columnas disponibles.</p>
-              )}
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Step: Template */}
-        {currentStep === "template" && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Paso 3: Seleccionar Plantilla</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex gap-3 items-end">
-                <div className="flex-1">
-                  <Label>Plantilla existente</Label>
-                  <Select value={selectedTemplateId} onValueChange={handleSelectTemplate}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecciona una plantilla" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {templates.map((t: any) => (
-                        <SelectItem key={t.id} value={t.id}>{t.name} ({t.columns?.length ?? 0} col.)</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <Button variant="outline" size="sm" onClick={() => setShowCreateTemplate(!showCreateTemplate)}>
-                  {showCreateTemplate ? "Cancelar" : "+ Nueva"}
-                </Button>
-              </div>
-
-              {showCreateTemplate && (
-                <div className="border rounded-lg p-4 space-y-3 bg-muted/20">
-                  <Label>Nombre de la plantilla</Label>
-                  <Input value={newTemplateName} onChange={(e) => setNewTemplateName(e.target.value)} placeholder="Ej: Datos Personales" />
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <Label className="text-xs">Columnas</Label>
-                      <Button variant="outline" size="sm" onClick={() => setNewTemplateColumns([...newTemplateColumns, { name: "", display_name: "", data_type: "string" }])}>
-                        + Agregar
-                      </Button>
+          {currentStep === "rules" && (
+            <div className="flex flex-col gap-4">
+                {rules.map((r: any) => (
+                  <ConfiguratorCard key={r.id}>
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <div className={cn("w-10 h-10 rounded-full flex items-center justify-center transition-colors", selectedRuleIds.has(r.id) ? "bg-action-blue text-white" : "bg-parchment text-[#7a7a7a]")}>
+                                <ShieldCheck size={20} />
+                            </div>
+                            <div>
+                                <p className="text-[17px] font-semibold text-ink">{r.name}</p>
+                                <p className="text-[14px] text-[#7a7a7a]">{r.description || "Regla de validación automática"}</p>
+                            </div>
+                        </div>
+                        <PillChip 
+                            selected={selectedRuleIds.has(r.id)} 
+                            onClick={() => {
+                                const next = new Set(selectedRuleIds);
+                                if (next.has(r.id)) next.delete(r.id);
+                                else next.add(r.id);
+                                setSelectedRuleIds(next);
+                            }}
+                        >
+                            {selectedRuleIds.has(r.id) ? "Activada" : "Activar"}
+                        </PillChip>
                     </div>
-                    {newTemplateColumns.map((col: any, i: number) => (
-                      <div key={i} className="flex gap-2 items-center">
-                        <Input
-                          value={col.name}
-                          onChange={(e) => {
-                            const c = [...newTemplateColumns];
-                            c[i] = { ...c[i], name: e.target.value, display_name: e.target.value };
-                            setNewTemplateColumns(c);
-                          }}
-                          placeholder="nombre_campo"
-                          className="flex-1"
-                        />
-                        <Button variant="destructive" size="sm" onClick={() => setNewTemplateColumns(newTemplateColumns.filter((_: any, j: number) => j !== i))}>
-                          ×
-                        </Button>
-                      </div>
-                    ))}
+                  </ConfiguratorCard>
+                ))}
+                <div className="mt-8 flex justify-center">
+                    <button onClick={goNext} className="bg-action-blue text-white rounded-full px-12 py-3 text-[17px] font-medium active-scale">
+                        Continuar
+                    </button>
+                </div>
+            </div>
+          )}
+
+          {currentStep === "extract" && (
+            <ConfiguratorCard>
+                <div className="flex flex-col items-center py-8 gap-8">
+                  <div className={cn("w-24 h-24 rounded-full bg-parchment flex items-center justify-center text-action-blue", extracting ? "animate-pulse" : "")}>
+                    <Cpu size={48} />
                   </div>
-                  <Button onClick={handleCreateTemplate} disabled={!newTemplateName.trim() || newTemplateColumns.length === 0} className="w-full">
-                    Crear Plantilla
-                  </Button>
-                </div>
-              )}
-
-              {templateColumns.length > 0 && (
-                <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-sm text-emerald-700">
-                  ✓ Columnas: {templateColumns.join(", ")}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Step: Rules */}
-        {currentStep === "rules" && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Paso 4: Seleccionar Reglas</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {rules.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
-                  No hay reglas creadas.{" "}
-                  <Link href="/rules" className="underline">Crear reglas</Link>
-                </p>
-              ) : (
-                <div className="space-y-2">
-                  {rules.map((r: any) => (
-                    <label key={r.id} className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-muted/30 transition-colors">
-                      <input
-                        type="checkbox"
-                        checked={selectedRuleIds.has(r.id)}
-                        onChange={() => toggleRule(r.id)}
-                        className="w-4 h-4 rounded"
-                      />
-                      <div>
-                        <p className="text-sm font-medium">{r.name}</p>
-                        <p className="text-xs text-muted-foreground">{r.description || r.conditions?.length + " condición(es)"}</p>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              )}
-
-              {selectedRuleIds.size > 0 && (
-                <p className="text-xs text-emerald-600">{selectedRuleIds.size} regla(s) seleccionada(s)</p>
-              )}
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Step: Extract */}
-        {currentStep === "extract" && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Paso 5: Extraer Datos</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="bg-muted/30 rounded-lg p-4 space-y-2 text-sm">
-                <p><strong>Archivos:</strong> {uploadedPaths.length}</p>
-                <p><strong>Plantilla:</strong> {templates.find((t) => t.id === selectedTemplateId)?.name || selectedTemplateId}</p>
-                <p><strong>Reglas:</strong> {selectedRuleIds.size > 0 ? `${selectedRuleIds.size} seleccionada(s)` : "Ninguna"}</p>
-                {enableCrossref && selectedCrossrefId && (
-                  <p><strong>Cruce:</strong> {crossrefFiles.find((f) => f.id === selectedCrossrefId)?.name}</p>
-                )}
-              </div>
-
-              <div>
-                <Label className="text-sm font-medium">Umbral Fuzzy Matching: {fuzzyThreshold}%</Label>
-                <input
-                  type="range"
-                  min="0" max="100"
-                  value={fuzzyThreshold}
-                  onChange={(e) => setFuzzyThreshold(Number(e.target.value))}
-                  className="w-full"
-                />
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>0% - Permisivo</span>
-                  <span>100% - Exacto</span>
-                </div>
-              </div>
-
-              <Button onClick={handleExtract} disabled={extracting || extractionResults.length > 0} className="w-full">
-                {extracting ? "Extrayendo..." : extractionDone ? "✓ Extracción Completa" : "Ejecutar Extracción"}
-              </Button>
-
-              {extractionResults.length > 0 && (
-                <div className="max-h-60 overflow-auto border rounded-lg">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Archivo</TableHead>
-                        <TableHead>Estado</TableHead>
-                        {templateColumns.slice(0, 3).map((c) => (
-                          <TableHead key={c}>{c}</TableHead>
-                        ))}
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {extractionResults.map((r: any, i: number) => (
-                        <TableRow key={i}>
-                          <TableCell className="text-xs">{r.filename}</TableCell>
-                          <TableCell>
-                            <Badge variant={r.status === "ok" ? "default" : "destructive"}>{r.status}</Badge>
-                          </TableCell>
-                          {templateColumns.slice(0, 3).map((c) => (
-                            <TableCell key={c} className="text-xs max-w-[120px] truncate">
-                              {r.data?.[c] === "NO ENCONTRADO" ? <span className="text-destructive">N/E</span> : r.data?.[c]}
-                            </TableCell>
-                          ))}
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Step: Export */}
-        {currentStep === "export" && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Paso 6: Exportar a Excel</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="bg-muted/30 rounded-lg p-4 space-y-2 text-sm">
-                <p><strong>Resultados:</strong> {extractionResults.length} filas</p>
-                {enableCrossref && (
-                  <p><strong>Cruce:</strong> {matchColumn} → {crossrefMatchColumn} (agregar: {outputColumns.join(", ") || "ninguna"})</p>
-                )}
-                <p><strong>Consolidación por RUT:</strong> Automática</p>
-              </div>
-
-              <Button onClick={handleExport} disabled={exporting || extractionResults.length === 0} className="w-full">
-                {exporting ? "Generando Excel..." : exported ? "✓ Excel Descargado" : "Descargar Excel"}
-              </Button>
-
-              {exported && (
-                <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 text-center">
-                  <p className="text-emerald-700 font-medium">✓ Excel descargado exitosamente</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Step: Review */}
-        {currentStep === "review" && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Paso 7: ¿Quedaste Conforme?</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
-                <p className="text-blue-700 font-medium">El proceso de exportación ha finalizado</p>
-                <p className="text-sm text-blue-600 mt-1">¿El resultado cumple con lo que esperabas?</p>
-              </div>
-
-              {conforme === null && !feedbackSent && (
-                <div className="flex gap-4 justify-center">
-                  <Button onClick={() => { setConforme(true); setFeedbackSent(true); }} className="bg-emerald-600 hover:bg-emerald-700 px-8">
-                    Sí, estoy conforme ✓
-                  </Button>
-                  <Button onClick={() => setConforme(false)} variant="outline" className="px-8">
-                    No, necesito cambios ✗
-                  </Button>
-                </div>
-              )}
-
-              {conforme === false && !feedbackSent && (
-                <div className="space-y-4 border rounded-lg p-4">
-                  <Label>Describe qué cambios necesitas</Label>
-                  <Textarea
-                    value={feedbackText}
-                    onChange={(e) => setFeedbackText(e.target.value)}
-                    placeholder="Ej: Agregar columna de correo electrónico, cambiar formato de RUT, ajustar reglas..."
-                    rows={4}
-                  />
-                  <div className="flex gap-3">
-                    <Button onClick={handleFeedback} disabled={!feedbackText.trim()}>Enviar Feedback</Button>
-                    <Button variant="outline" onClick={() => setConforme(null)}>Cancelar</Button>
+                  <div className="text-center space-y-2">
+                    <p className="text-[24px] font-semibold text-ink">{uploadedPaths.length} Documentos listos</p>
+                    <p className="text-[17px] text-[#7a7a7a]">Plantilla: {templates.find(t => t.id === selectedTemplateId)?.name}</p>
                   </div>
-                  <div className="text-sm text-muted-foreground space-y-2">
-                    <p className="font-medium">Según tu feedback, puedes volver a:</p>
-                    <div className="flex flex-wrap gap-2">
-                      <Button variant="outline" size="sm" onClick={() => goToStep("template")}>✏️ Ajustar plantilla</Button>
-                      <Button variant="outline" size="sm" onClick={() => goToStep("rules")}>⚙️ Ajustar reglas</Button>
-                      <Button variant="outline" size="sm" onClick={() => { setExtractionDone(false); setExtractionResults([]); goToStep("extract"); }}>
-                        🔄 Re-extraer datos
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={() => { setEnableCrossref(true); goToStep("crossref"); }}>
-                        📊 Ajustar cruce de datos
-                      </Button>
-                    </div>
+                  <button onClick={handleExtract} disabled={extracting} className="bg-action-blue text-white rounded-full px-12 py-3 text-[17px] font-medium active-scale w-full max-w-xs">
+                    {extracting ? "Analizando..." : "Iniciar Extracción"}
+                  </button>
+                </div>
+            </ConfiguratorCard>
+          )}
+
+          {currentStep === "export" && (
+            <ConfiguratorCard>
+                <div className="flex flex-col items-center py-8 gap-8">
+                  <div className="w-24 h-24 rounded-full bg-[#f2f2f7] flex items-center justify-center text-action-blue">
+                    <FileSpreadsheet size={48} />
                   </div>
+                  <div className="text-center space-y-2">
+                    <p className="text-[24px] font-semibold text-ink">{extractionResults.length} Registros procesados</p>
+                    <p className="text-[17px] text-[#7a7a7a]">El archivo Excel ha sido generado con éxito.</p>
+                  </div>
+                  <button onClick={handleExport} disabled={exporting} className="bg-action-blue text-white rounded-full px-12 py-3 text-[17px] font-medium active-scale w-full max-w-xs">
+                    {exporting ? "Generando..." : "Descargar Excel"}
+                  </button>
+                </div>
+            </ConfiguratorCard>
+          )}
+
+          {currentStep === "review" && (
+            <div className="flex flex-col gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <ConfiguratorCard className="flex flex-col items-center text-center py-10 hover:border-emerald-500/30 transition-all cursor-pointer group">
+                    <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"><Check size={32} /></div>
+                    <p className="text-[21px] font-semibold text-ink">Excelente</p>
+                    <button onClick={() => setFeedbackSent(true)} className="mt-6 text-action-blue font-medium hover:underline">Enviar calificación</button>
+                </ConfiguratorCard>
+                <ConfiguratorCard className="flex flex-col items-center text-center py-10 hover:border-amber-500/30 transition-all cursor-pointer group">
+                    <div className="w-16 h-16 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"><X size={32} /></div>
+                    <p className="text-[21px] font-semibold text-ink">Necesita Ajustes</p>
+                    <button onClick={() => setFeedbackSent(true)} className="mt-6 text-action-blue font-medium hover:underline">Enviar feedback</button>
+                </ConfiguratorCard>
+              </div>
+
+              {feedbackSent && (
+                <div className="fixed inset-0 bg-parchment/95 backdrop-blur-md z-[100] flex flex-col items-center justify-center gap-8 animate-in fade-in duration-500">
+                     <div className="text-8xl animate-bounce">✨</div>
+                     <h2 className="text-[40px] font-semibold tracking-apple-tight text-ink">¡Configuración Completa!</h2>
+                     <p className="text-[21px] text-[#7a7a7a] max-w-md text-center">Su flujo ha sido procesado con los más altos estándares de calidad.</p>
+                     <button onClick={() => window.location.reload()} className="bg-action-blue text-white rounded-full px-8 py-3 text-[17px] font-medium active-scale mt-8">
+                        Comenzar de nuevo
+                     </button>
                 </div>
               )}
-
-              {feedbackSent && conforme === true && (
-                <div className="text-center space-y-4">
-                  <div className="text-4xl">🎉</div>
-                  <p className="text-lg font-medium text-emerald-700">¡Proceso completado con éxito!</p>
-                  <p className="text-sm text-muted-foreground">Puedes iniciar un nuevo flujo desde el inicio.</p>
-                  <Button onClick={() => {
-                    setCurrentStep("upload");
-                    setStepHistory([]);
-                    setUploadFiles([]);
-                    setUploadedPaths([]);
-                    setExtractionResults([]);
-                    setExtractionDone(false);
-                    setExported(false);
-                    setConforme(null);
-                    setFeedbackText("");
-                    setFeedbackSent(false);
-                    setSelectedTemplateId("");
-                    setTemplateColumns([]);
-                    setSelectedRuleIds(new Set());
-                    setEnableCrossref(false);
-                    setSelectedCrossrefId("");
-                    setCrossrefData(null);
-                  }}>
-                    Nuevo Flujo
-                  </Button>
-                </div>
-              )}
-
-              {feedbackSent && conforme === false && (
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-center">
-                  <p className="text-amber-700 font-medium">✓ Feedback enviado</p>
-                  <p className="text-sm text-amber-600 mt-1">Selecciona qué paso quieres ajustar usando los botones de arriba.</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Navigation */}
-        <div className="flex justify-between mt-6">
-          <Button variant="outline" onClick={goBack} disabled={stepHistory.length === 0}>
-            ← Atrás
-          </Button>
-          {currentStep !== "review" && (
-            <Button onClick={goNext} disabled={!canGoNext()}>
-              {currentStep === "export" ? "Finalizar →" : "Siguiente →"}
-            </Button>
+            </div>
           )}
         </div>
       </main>
