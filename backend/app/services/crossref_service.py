@@ -171,21 +171,33 @@ class CrossrefService:
         self,
         rows: list[dict],
         crossref_rows: list[dict],
-        match_column: str,
-        crossref_match_column: str,
+        match_keys: list[Any],
         output_columns: list[str],
     ) -> list[dict]:
-        lookup: dict[str, dict] = {}
+        # Normalizar match_keys a lista de dicts
+        keys_list = []
+        for m in match_keys:
+            if hasattr(m, "model_dump"):
+                keys_list.append(m.model_dump())
+            elif hasattr(m, "dict"):
+                keys_list.append(m.dict())
+            else:
+                keys_list.append(m)
+
+        ext_keys = [m["extractionKey"] for m in keys_list]
+        ref_keys = [m["crossrefKey"] for m in keys_list]
+
+        lookup: dict[tuple, dict] = {}
         for cr_row in crossref_rows:
-            key = str(cr_row.get(crossref_match_column, "")).strip().lower()
-            if key:
+            key = tuple(str(cr_row.get(k, "")).strip().lower() for k in ref_keys)
+            if any(key):
                 lookup[key] = cr_row
 
         merged: list[dict] = []
         for row in rows:
             new_row = dict(row)
-            match_val = str(row.get(match_column, "")).strip().lower()
-            matched = lookup.get(match_val)
+            row_key = tuple(str(row.get(k, "")).strip().lower() for k in ext_keys)
+            matched = lookup.get(row_key)
             if matched:
                 for col in output_columns:
                     new_row[col] = matched.get(col, "")

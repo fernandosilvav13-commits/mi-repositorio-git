@@ -20,11 +20,7 @@ def test_schema():
     assert mapping.output_columns == ["col1"]
 
 def test_merge_data_compound_keys(service):
-    """
-    Test merging data using multiple columns as match keys.
-    Currently, merge_data only supports a single match_column.
-    This test is expected to fail or need adjustment once compound keys are supported.
-    """
+    """Test merging data using multiple columns as match keys."""
     rows = [
         {"Nombre": "Juan", "Apellido": "Perez", "ID": "1"},
         {"Nombre": "Maria", "Apellido": "Garcia", "ID": "2"},
@@ -34,34 +30,50 @@ def test_merge_data_compound_keys(service):
         {"First": "Maria", "Last": "Garcia", "Email": "maria@example.com"},
     ]
     
-    # This represents the desired new API structure (to be implemented)
     match_keys = [
-        {"local": "Nombre", "remote": "First"},
-        {"local": "Apellido", "remote": "Last"}
+        {"extractionKey": "Nombre", "crossrefKey": "First"},
+        {"extractionKey": "Apellido", "crossrefKey": "Last"}
     ]
     output_columns = ["Email"]
     
-    # Expecting to fail because the current merge_data doesn't take match_keys list
-    with pytest.raises(TypeError):
-        service.merge_data(
-            rows=rows,
-            crossref_rows=crossref_rows,
-            match_keys=match_keys,
-            output_columns=output_columns
-        )
+    merged = service.merge_data(
+        rows=rows,
+        crossref_rows=crossref_rows,
+        match_keys=match_keys,
+        output_columns=output_columns
+    )
+    
+    assert merged[0]["Email"] == "juan@example.com"
+    assert merged[1]["Email"] == "maria@example.com"
 
 def test_merge_data_normalization(service):
     """Test that matching is case-insensitive and ignores extra whitespace."""
     rows = [{"RUT": " 12.345.678-9 "}]
     crossref_rows = [{"rut_ref": "12.345.678-9", "Data": "Found"}]
     
-    # Current single column API
+    match_keys = [{"extractionKey": "RUT", "crossrefKey": "rut_ref"}]
+    
     merged = service.merge_data(
         rows=rows,
         crossref_rows=crossref_rows,
-        match_column="RUT",
-        crossref_match_column="rut_ref",
+        match_keys=match_keys,
         output_columns=["Data"]
     )
     
     assert merged[0]["Data"] == "Found"
+
+def test_merge_data_unmatched(service):
+    """Test that unmatched rows have 'NO ENCONTRADO' in output columns."""
+    rows = [{"RUT": "1-1"}]
+    crossref_rows = [{"rut_ref": "2-2", "Data": "Other"}]
+    
+    match_keys = [{"extractionKey": "RUT", "crossrefKey": "rut_ref"}]
+    
+    merged = service.merge_data(
+        rows=rows,
+        crossref_rows=crossref_rows,
+        match_keys=match_keys,
+        output_columns=["Data"]
+    )
+    
+    assert merged[0]["Data"] == "NO ENCONTRADO"
