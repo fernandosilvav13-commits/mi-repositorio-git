@@ -13,16 +13,19 @@ upload_dir = Path(settings.UPLOAD_DIR) if hasattr(settings, 'UPLOAD_DIR') else P
 upload_dir.mkdir(exist_ok=True)
 
 
-@router.post("/")
-async def upload_file(file: UploadFile = File(...)):
-    ext = Path(file.filename).suffix.lower()
-    content = await file.read()
-    validate_upload(content, file.filename)
-    safe_name = sanitize_filename(file.filename)
-    file_path = upload_dir / safe_name
-    async with aiofiles.open(str(file_path), "wb") as buffer:
-        await buffer.write(content)
-    return {"files": [str(file_path)], "count": 1}
+@router.post("/upload")
+async def upload_files(files: list[UploadFile] = File(...)):
+    saved = []
+    for file in files:
+        ext = Path(file.filename).suffix.lower()
+        content = await file.read()
+        validate_upload(content, file.filename)
+        safe_name = sanitize_filename(file.filename)
+        file_path = upload_dir / safe_name
+        async with aiofiles.open(str(file_path), "wb") as buffer:
+            await buffer.write(content)
+        saved.append(str(file_path))
+    return {"files": saved, "count": len(saved)}
 
 
 @router.post("/process")
