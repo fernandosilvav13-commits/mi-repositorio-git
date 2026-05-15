@@ -16,7 +16,7 @@ Requirements for v1.1 Cross-Reference Integration. Each maps to roadmap phases.
 
 - [ ] **WIZ-01**: User can upload a cross-reference file as a step in the Wizard flow
 - [ ] **WIZ-02**: User can configure column mapping between extraction results and cross-reference fields in the Wizard
-- [ ] **WIZ-03**: User can preview matched vs unmatched results within the Wizard before finalizing export
+- [x] **WIZ-03**: User can preview matched vs unmatched results within the Wizard before finalizing export
 
 ### Export with Cross-Reference
 
@@ -49,7 +49,7 @@ Deferred to future release.
 | CRSS-02 | Phase 02 | Complete |
 | WIZ-01 | Phase 03 | Pending |
 | WIZ-02 | Phase 03 | Pending |
-| WIZ-03 | Phase 03 | Pending |
+| WIZ-03 | Phase 03 | Complete |
 | EXP-01 | Phase 04 | Pending |
 | EXP-02 | Phase 04 | Pending |
 
