@@ -3,9 +3,18 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { api } from "@/lib/api";
 import { LucideIcon, Upload, Database, Layout, ShieldCheck, Cpu, FileSpreadsheet, Star, ChevronRight, ChevronLeft, Plus, Check, X } from "lucide-react";
+import { toast } from "sonner";
 import ConfiguratorCard from "@/components/apple/ConfiguratorCard";
+import PillChip from "@/components/apple/PillChip";
 import FrostedContainer from "@/components/apple/FrostedContainer";
 import { cn } from "@/lib/utils";
 
@@ -20,31 +29,6 @@ const STEPS: { key: Step; label: string; icon: any }[] = [
   { key: "export", label: "Entrega", icon: FileSpreadsheet },
   { key: "review", label: "Calidad", icon: Star },
 ];
-
-const PillChip = ({ 
-  selected, 
-  onClick, 
-  children,
-  className
-}: { 
-  selected: boolean; 
-  onClick: () => void; 
-  children: React.ReactNode;
-  className?: string;
-}) => (
-  <button
-    onClick={onClick}
-    className={cn(
-      "rounded-full px-6 py-3 text-[14px] font-medium transition-all duration-300 active-scale",
-      selected 
-        ? "border-2 border-action-blue text-action-blue bg-white" 
-        : "border border-[#e0e0e0] text-ink bg-white hover:border-[#7a7a7a]",
-      className
-    )}
-  >
-    {children}
-  </button>
-);
 
 export default function WizardPage() {
   const [currentStep, setCurrentStep] = useState<Step>("upload");
@@ -142,7 +126,7 @@ export default function WizardPage() {
       setUploadedPaths(result.files);
       goNext();
     } catch (e) {
-      alert("Error al procesar archivos");
+      toast.error("Error al procesar archivos");
     } finally {
       setUploading(false);
     }
@@ -176,7 +160,7 @@ export default function WizardPage() {
       setExtractionDone(true);
       goNext();
     } catch (e) {
-      alert("Error en la extracción");
+      toast.error("Error en la extracción");
     } finally {
       setExtracting(false);
     }
@@ -201,7 +185,7 @@ export default function WizardPage() {
       setExported(true);
       goNext();
     } catch (e) {
-      alert("Error al exportar");
+      toast.error("Error al exportar");
     } finally {
       setExporting(false);
     }
@@ -211,7 +195,7 @@ export default function WizardPage() {
     <div className="min-h-screen bg-parchment flex flex-col items-center pt-[104px] pb-24 overflow-x-hidden">
       {/* Global Nav Placeholder */}
       <div className="fixed top-0 left-0 w-full h-[44px] bg-black z-[100] flex items-center justify-center">
-        <span className="text-white text-[12px] font-medium tracking-tight">Proyecto Prueba</span>
+        <span className="text-white text-[12px] font-medium tracking-tight">CicloAI</span>
       </div>
 
       {/* SubNav (frosted) */}
@@ -308,7 +292,12 @@ export default function WizardPage() {
                 subtitle="Continuar solo con los datos extraídos de los currículums seleccionados."
               >
                 <div className="flex justify-end">
-                    <PillChip selected={enableCrossref === false} onClick={() => { setEnableCrossref(false); goNext(); }}>
+                    <PillChip selected={enableCrossref === false} onClick={() => {
+                        setEnableCrossref(false);
+                        setStepHistory((prev) => [...prev, { step: currentStep, subStep }]);
+                        setCurrentStep("template");
+                        setSubStep(0);
+                    }}>
                         Continuar
                     </PillChip>
                 </div>
@@ -318,7 +307,18 @@ export default function WizardPage() {
 
           {currentStep === "crossref" && subStep === 1 && (
             <div className="flex flex-col gap-4">
-               {crossrefFiles.map((f: any) => (
+              {crossrefFiles.length === 0 ? (
+                <ConfiguratorCard>
+                  <div className="flex flex-col items-center py-8 text-center">
+                    <Database size={40} className="text-[#7a7a7a] mb-4" />
+                    <p className="text-[17px] font-semibold text-ink mb-1">No hay archivos de referencia</p>
+                    <p className="text-[14px] text-[#7a7a7a] max-w-sm">
+                      Suba archivos desde la página de Referencia Cruzada antes de continuar.
+                    </p>
+                  </div>
+                </ConfiguratorCard>
+              ) : (
+                crossrefFiles.map((f: any) => (
                   <ConfiguratorCard key={f.id}>
                     <div className="flex items-center justify-between">
                         <div>
@@ -330,7 +330,8 @@ export default function WizardPage() {
                         </PillChip>
                     </div>
                   </ConfiguratorCard>
-                ))}
+                ))
+              )}
             </div>
           )}
 
@@ -339,13 +340,14 @@ export default function WizardPage() {
                 <div className="space-y-6">
                     <div className="space-y-2">
                         <label className="text-[14px] font-semibold text-[#7a7a7a] uppercase tracking-wide">Campo de unión</label>
-                        <select 
-                            value={crossrefMatchColumn} 
-                            onChange={(e) => setCrossrefMatchColumn(e.target.value)} 
-                            className="w-full bg-parchment rounded-lg px-4 py-3 text-ink focus:outline-none border border-[#e0e0e0] appearance-none"
-                        >
-                            {crossrefData?.columns?.map((c: string) => <option key={c} value={c}>{c}</option>)}
-                        </select>
+                        <Select value={crossrefMatchColumn} onValueChange={(v) => v && setCrossrefMatchColumn(v)}>
+                            <SelectTrigger className="w-full bg-parchment rounded-lg px-4 py-3 text-ink border border-[#e0e0e0]">
+                                <SelectValue placeholder="Seleccionar campo" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {crossrefData?.columns?.map((c: string) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                            </SelectContent>
+                        </Select>
                     </div>
                     <button onClick={goNext} className="w-full bg-action-blue text-white rounded-full py-3 text-[17px] font-medium active-scale">
                         Confirmar Enlace
