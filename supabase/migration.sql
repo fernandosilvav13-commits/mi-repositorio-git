@@ -128,3 +128,10 @@ create index if not exists idx_templates_created_by on templates(created_by);
 create index if not exists idx_rules_created_by on rules(created_by);
 create index if not exists idx_extraction_results_template on extraction_results(template_id);
 create index if not exists idx_crossref_files_created_by on crossref_files(created_by);
+
+-- Columna de estado para tracking de matching
+alter table crossref_files
+  add column if not exists status text not null default 'unmatched';
+
+-- Índice para filtrar por estado (Phase 03)
+create index if not exists idx_crossref_files_status on crossref_files(status);
