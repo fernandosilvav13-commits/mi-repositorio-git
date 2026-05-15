@@ -74,9 +74,10 @@ Plans:
   1. When exporting after cross-reference, the Excel file includes columns from the matched reference data
   2. Rows that did not match any cross-reference data are visually flagged in the exported output
   3. The export provides a clear indication of which columns originated from cross-reference data
-**Plans**: 3 plans
+**Plans**: 4 plans
 
 Plans:
+- [ ] 04-00-PLAN.md — Setup testing infrastructure and failing tests
 - [ ] 04-01-PLAN.md — Refactor cross-reference merge logic (compound keys, O(1) tuples)
 - [ ] 04-02-PLAN.md — Excel visual styling (row highlighting, header prefixes)
 - [ ] 04-03-PLAN.md — Export API orchestration and integration
@@ -89,7 +90,7 @@ Plans:
 | 1. Frontend Overhaul (Apple Design) | v1.0 | 4/4 | Complete | 2026-05-14 |
 | 2. Crossref Page Redesign | v1.1 | 3/3 | Complete | 2026-05-15 |
 | 3. Wizard Cross-Reference Integration | v1.1 | 3/3 | Complete | 2026-05-15 |
-| 4. Cross-Reference Export | v1.1 | 0/3 | In progress | - |
+| 4. Cross-Reference Export | v1.1 | 0/4 | In progress | - |
 
 ### Phase 5: 04
 
