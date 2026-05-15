@@ -59,6 +59,15 @@ export default function WizardPage() {
 
   const [rules, setRules] = useState<any[]>([]);
   const [selectedRuleIds, setSelectedRuleIds] = useState<Set<string>>(new Set());
+  const [newRule, setNewRule] = useState({
+    name: "",
+    description: "",
+    field: "",
+    operator: "==",
+    value: "",
+    action_type: "fill_row",
+    action_color: "GREEN",
+  });
 
   const [extracting, setExtracting] = useState(false);
   const [extractionResults, setExtractionResults] = useState<any[]>([]);
@@ -102,6 +111,13 @@ export default function WizardPage() {
             setSubStep(subStep + 1);
             return;
         }
+    }
+
+    if (currentStep === "rules") {
+      if (subStep < 1) {
+        setSubStep(subStep + 1);
+        return;
+      }
     }
 
     const idx = STEPS.findIndex((s) => s.key === currentStep);
@@ -206,6 +222,27 @@ export default function WizardPage() {
       toast.error("Error al exportar");
     } finally {
       setExporting(false);
+    }
+  };
+
+  const handleCreateRule = async () => {
+    try {
+      const payload = {
+        name: newRule.name,
+        description: newRule.description,
+        conditions: [{ field: newRule.field, operator: newRule.operator, value: newRule.value }],
+        action: { type: newRule.action_type, params: { color: newRule.action_color } },
+        enabled: true,
+      };
+      const res = await api.rules.create(payload);
+      toast.success("Regla creada");
+      const updated = await api.rules.list();
+      setRules(updated);
+      setSelectedRuleIds(new Set([...selectedRuleIds, res.id]));
+      setSubStep(0);
+      setNewRule({ name: "", description: "", field: "", operator: "==", value: "", action_type: "fill_row", action_color: "GREEN" });
+    } catch (e) {
+      toast.error("Error al crear regla");
     }
   };
 
@@ -469,7 +506,7 @@ export default function WizardPage() {
             </ConfiguratorCard>
           )}
 
-          {currentStep === "rules" && (
+          {currentStep === "rules" && subStep === 0 && (
             <div className="flex flex-col gap-4">
                 {rules.map((r: any) => (
                   <ConfiguratorCard key={r.id}>
@@ -497,12 +534,113 @@ export default function WizardPage() {
                     </div>
                   </ConfiguratorCard>
                 ))}
+                <button 
+                    onClick={() => setSubStep(1)} 
+                    className="w-full py-6 border-2 border-dashed border-[#e0e0e0] rounded-lg text-[#7a7a7a] hover:border-action-blue hover:text-action-blue transition-all flex items-center justify-center gap-2 font-medium"
+                >
+                    <Plus size={20} /> Crear nueva regla
+                </button>
                 <div className="mt-8 flex justify-center">
                     <button onClick={goNext} className="bg-action-blue text-white rounded-full px-12 py-3 text-[17px] font-medium active-scale">
                         Continuar
                     </button>
                 </div>
             </div>
+          )}
+
+          {currentStep === "rules" && subStep === 1 && (
+            <ConfiguratorCard title="Nueva Regla" subtitle="Defina una condición y acción para la regla de negocio.">
+                <div className="space-y-6">
+                    <div className="space-y-2">
+                        <label className="text-[14px] font-semibold text-[#7a7a7a] uppercase tracking-wide">Nombre</label>
+                        <input 
+                            value={newRule.name} 
+                            onChange={(e) => setNewRule({...newRule, name: e.target.value})} 
+                            placeholder="Ej: Más de 4 títulos" 
+                            className="w-full border-b border-[#e0e0e0] py-2 text-[17px] focus:outline-none focus:border-action-blue transition-colors" 
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-[14px] font-semibold text-[#7a7a7a] uppercase tracking-wide">Descripción</label>
+                        <input 
+                            value={newRule.description} 
+                            onChange={(e) => setNewRule({...newRule, description: e.target.value})} 
+                            placeholder="Describa el propósito de la regla" 
+                            className="w-full border-b border-[#e0e0e0] py-2 text-[17px] focus:outline-none focus:border-action-blue transition-colors" 
+                        />
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                            <label className="text-[14px] font-semibold text-[#7a7a7a] uppercase tracking-wide">Campo</label>
+                            <input 
+                                value={newRule.field} 
+                                onChange={(e) => setNewRule({...newRule, field: e.target.value})} 
+                                placeholder="ej: titulos" 
+                                className="w-full bg-parchment rounded-md px-4 py-2 text-ink focus:outline-none border border-[#e0e0e0]" 
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[14px] font-semibold text-[#7a7a7a] uppercase tracking-wide">Operador</label>
+                            <select 
+                                value={newRule.operator} 
+                                onChange={(e) => setNewRule({...newRule, operator: e.target.value})}
+                                className="w-full bg-parchment rounded-md px-4 py-2 text-ink focus:outline-none border border-[#e0e0e0]"
+                            >
+                                <option value="==">Igual a</option>
+                                <option value="!=">Distinto de</option>
+                                <option value=">">Mayor que</option>
+                                <option value="<">Menor que</option>
+                                <option value="contains">Contiene</option>
+                                <option value="not_contains">No contiene</option>
+                                <option value="is_empty">Está vacío</option>
+                                <option value="is_not_empty">No está vacío</option>
+                                <option value="count>">Conteo mayor a</option>
+                                <option value="count<">Conteo menor a</option>
+                            </select>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[14px] font-semibold text-[#7a7a7a] uppercase tracking-wide">Valor</label>
+                            <input 
+                                value={newRule.value} 
+                                onChange={(e) => setNewRule({...newRule, value: e.target.value})} 
+                                placeholder="valor" 
+                                className="w-full bg-parchment rounded-md px-4 py-2 text-ink focus:outline-none border border-[#e0e0e0]" 
+                            />
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <label className="text-[14px] font-semibold text-[#7a7a7a] uppercase tracking-wide">Acción</label>
+                            <select 
+                                value={newRule.action_type} 
+                                onChange={(e) => setNewRule({...newRule, action_type: e.target.value})}
+                                className="w-full bg-parchment rounded-md px-4 py-2 text-ink focus:outline-none border border-[#e0e0e0]"
+                            >
+                                <option value="fill_row">Pintar fila</option>
+                            </select>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[14px] font-semibold text-[#7a7a7a] uppercase tracking-wide">Color</label>
+                            <div className="flex gap-2">
+                                {["GREEN", "YELLOW", "RED"].map((c) => (
+                                    <button
+                                        key={c}
+                                        onClick={() => setNewRule({...newRule, action_color: c})}
+                                        className={cn(
+                                            "w-10 h-10 rounded-full border-2 transition-all",
+                                            newRule.action_color === c ? "border-ink scale-110" : "border-transparent"
+                                        )}
+                                        style={{ backgroundColor: c === "GREEN" ? "#44FF44" : c === "YELLOW" ? "#FFFF44" : "#FF4444" }}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                    <button onClick={handleCreateRule} className="w-full bg-action-blue text-white rounded-full py-3 text-[17px] font-medium active-scale">
+                        Guardar Regla
+                    </button>
+                </div>
+            </ConfiguratorCard>
           )}
 
           {currentStep === "extract" && (
