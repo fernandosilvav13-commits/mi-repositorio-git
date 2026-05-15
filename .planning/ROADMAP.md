@@ -27,8 +27,8 @@ Plans:
 **Milestone Goal:** Polish and integrate the cross-reference data matching feature into the Apple design system and Wizard flow.
 
 - [x] **Phase 02: Crossref Page Redesign** — Redesign the cross-reference page with Apple Design System components (Tile, FrostedContainer, PillChip) (completed 2026-05-15)
-- [ ] **Phase 03: Wizard Cross-Reference Integration** — Integrate cross-reference upload, column mapping, and preview into the Wizard flow
-- [ ] **Phase 04: Cross-Reference Export** — Exported Excel includes cross-referenced columns with unmatched rows flagged
+- [x] **Phase 03: Wizard Cross-Reference Integration** — Integrate cross-reference upload, column mapping, and preview into the Wizard flow (completed 2026-05-15)
+- [ ] **Phase 04: Cross-Reference Export** — Exported Excel includes cross-referenced columns with unmatched rows flagged (in progress)
 
 ## Phase Details
 
@@ -54,12 +54,17 @@ Plans:
 **Depends on**: Phase 02
 **Requirements**: WIZ-01, WIZ-02, WIZ-03
 **Success Criteria** (what must be TRUE):
-  1. User can upload a cross-reference file as a dedicated step within the Wizard flow
-  2. User can configure column mapping between extraction result fields and cross-reference fields within the Wizard
-  3. User can preview matched vs unmatched results within the Wizard before finalizing export
-  4. The Wizard cross-reference step connects to the existing backend CrossrefService for merging and semantic matching
-**Plans**: TBD
+   1. User can upload a cross-reference file as a dedicated step within the Wizard flow
+   2. User can configure column mapping between extraction result fields and cross-reference fields within the Wizard
+   3. User can preview matched vs unmatched results within the Wizard before finalizing export
+   4. The Wizard cross-reference step connects to the existing backend CrossrefService for merging and semantic matching
+**Plans**: 3 plans
 **UI hint**: yes
+
+Plans:
+- [x] 03-01-PLAN.md — Crossref upload step enhancement (upload/selection/error states in Wizard)
+- [x] 03-02-PLAN.md — Column mapping UI (compound match keys, auto-suggest, output picker)
+- [x] 03-03-PLAN.md — Match preview in review step (summary bar, expandable tables)
 
 ### Phase 04: Cross-Reference Export
 **Goal**: Exported Excel files include matched cross-reference data with clear unmatched row indicators
@@ -69,7 +74,13 @@ Plans:
   1. When exporting after cross-reference, the Excel file includes columns from the matched reference data
   2. Rows that did not match any cross-reference data are visually flagged in the exported output
   3. The export provides a clear indication of which columns originated from cross-reference data
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 04-01-PLAN.md — Refactor cross-reference merge logic (compound keys, O(1) tuples)
+- [ ] 04-02-PLAN.md — Excel visual styling (row highlighting, header prefixes)
+- [ ] 04-03-PLAN.md — Export API orchestration and integration
+**UI hint**: yes
 
 ## Progress
 
@@ -77,5 +88,15 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 1. Frontend Overhaul (Apple Design) | v1.0 | 4/4 | Complete | 2026-05-14 |
 | 2. Crossref Page Redesign | v1.1 | 3/3 | Complete | 2026-05-15 |
-| 3. Wizard Cross-Reference Integration | v1.1 | 0/0 | Not started | - |
-| 4. Cross-Reference Export | v1.1 | 0/0 | Not started | - |
+| 3. Wizard Cross-Reference Integration | v1.1 | 3/3 | Complete | 2026-05-15 |
+| 4. Cross-Reference Export | v1.1 | 0/3 | In progress | - |
+
+### Phase 5: 04
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 4
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 5 to break down)
