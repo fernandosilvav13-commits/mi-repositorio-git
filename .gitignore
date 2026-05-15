@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.env
+backend/uploads/
+backend/outputs/
+node_modules/
+.next/
+venv/
+backend/venv/
+*.pkl
+*.log
