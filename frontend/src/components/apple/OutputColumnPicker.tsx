@@ -16,12 +16,12 @@ const OutputColumnPicker = ({
   suggested,
   onChange,
 }: OutputColumnPickerProps) => {
-  // Auto-select suggested columns on mount if nothing selected yet
+  // Auto-select suggested on mount if empty
   useEffect(() => {
     if (selected.length === 0 && suggested.length > 0) {
       onChange(suggested);
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   const toggleColumn = (column: string) => {
     if (selected.includes(column)) {
@@ -34,10 +34,12 @@ const OutputColumnPicker = ({
   if (columns.length === 0) {
     return (
       <div className="space-y-3">
-        <p className="text-[14px] font-semibold uppercase tracking-wide text-ink">
+        <h4 className="text-[14px] font-semibold uppercase tracking-wide text-ink">
           Columnas a incluir
+        </h4>
+        <p className="text-[14px] text-[#7a7a7a]">
+          No hay columnas disponibles
         </p>
-        <p className="text-[14px] text-[#7a7a7a]">No hay columnas disponibles</p>
       </div>
     );
   }
@@ -45,9 +47,9 @@ const OutputColumnPicker = ({
   return (
     <div className="space-y-3">
       <div>
-        <p className="text-[14px] font-semibold uppercase tracking-wide text-ink">
+        <h4 className="text-[14px] font-semibold uppercase tracking-wide text-ink">
           Columnas a incluir
-        </p>
+        </h4>
         <p className="text-[14px] text-[#7a7a7a] mt-1">
           Seleccione los campos adicionales que desea incorporar desde la referencia
         </p>
@@ -63,16 +65,17 @@ const OutputColumnPicker = ({
               key={column}
               onClick={() => toggleColumn(column)}
               className={cn(
-                "rounded-full px-4 py-2 text-[14px] font-medium transition-all cursor-pointer",
+                "rounded-full px-4 py-2 text-[14px] font-medium transition-all duration-300 relative",
                 isSelected
-                  ? "bg-action-blue text-white"
-                  : "border border-[#e0e0e0] text-ink bg-white hover:border-[#7a7a7a]",
+                  ? "bg-action-blue text-white shadow-sm"
+                  : "border border-[#e0e0e0] text-ink bg-white hover:border-[#7a7a7a]"
               )}
             >
               {column}
               {isSuggested && !isSelected && (
-                <span className="ml-1.5 text-[11px] text-[#7a7a7a] font-normal">
-                  Sugerido
+                <span className="absolute -top-1 -right-1 flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-action-blue opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-action-blue"></span>
                 </span>
               )}
             </button>
