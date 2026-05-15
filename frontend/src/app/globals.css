@@ -58,6 +58,19 @@
   }
 }
 
+@layer utilities {
+  .apple-tight {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: var(--tracking-apple-tight);
+  }
+
+  .active-scale:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease-out;
+  }
+}
+
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
