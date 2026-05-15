@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Cross-Reference Integration
 status: executing
-stopped_at: Phase 02 complete — crossref page redesigned with Apple Design System
-last_updated: "2026-05-15T14:28:00.000Z"
-last_activity: 2026-05-15 -- Phase 02 complete
+stopped_at: Phase 03 discuss-phase complete — Wizard Crossref Integration context gathered
+last_updated: "2026-05-15T14:42:00.000Z"
+last_activity: 2026-05-15 -- Phase 03 discuss-phase complete
 progress:
   total_phases: 3
   completed_phases: 1
@@ -25,14 +25,14 @@ See: .planning/PROJECT.md (updated 2026-05-15)
 
 ## Current Position
 
-Phase: 02 (crossref-page-redesign) — COMPLETE
-Plan: 3 of 3
-Status: Phase 02 complete
-Last activity: 2026-05-15 -- Phase 02 complete
+Phase: 03 (wizard-crossref-integration) — DISCUSS COMPLETE
+Plan: 0 of 0 (not yet planned)
+Status: Phase 03 discuss-phase complete — context gathered
+Last activity: 2026-05-15 -- Phase 03 discuss-phase complete
 
-Progress: [██████████] 100% (Phase 02)
+Progress: Next: plan Phase 03
 
-*Calculation: Phase 02 = 3/3 plans complete. Milestone v1.1: 1 of 3 phases complete (Phase 02 shipped).*
+*Calculation: Phase 02 = 3/3 plans complete (shipped). Phase 03 = discuss complete, ready for planning.*
 
 ## Performance Metrics
 
@@ -48,7 +48,7 @@ Progress: [██████████] 100% (Phase 02)
 |-------|-------|-------|----------|
 | 1. Frontend Overhaul (Apple Design) | 4 | complete | N/A |
 | 2. Crossref Page Redesign | 3 | complete | ~2min |
-| 3. Wizard Cross-Reference Integration | 0 | pending | - |
+| 3. Wizard Cross-Reference Integration | 0 | discuss complete | - |
 | 4. Cross-Reference Export | 0 | pending | - |
 
 ## Accumulated Context
@@ -67,6 +67,11 @@ Progress: [██████████] 100% (Phase 02)
 - [Phase 02-crossref-page-redesign 03]: Two-section layout (no export CTA) — Deferred to Phase 04 per roadmap
 - [Phase 02-crossref-page-redesign 03]: Local manifest.json replaced Supabase for crossref storage — Supabase crossref_files table was unavailable; manifest more robust for single-user desktop-style usage
 - [Phase 02-crossref-page-redesign 03]: CSV storage split — 100-row preview in DB, full data read from disk via load_file_data() — Avoids Supabase timeout on large files
+- [Phase 03-wizard-crossref]: Preview as summary with drill-down (two sections: Matched/Unmatched, any column as match key)
+- [Phase 03-wizard-crossref]: Column mapping: smart suggestion with override, single shared auto-map field, multiple match keys
+- [Phase 03-wizard-crossref]: CrossRef step keeps position at Wizard step 2; all mapping configured at file upload time
+- [Phase 03-wizard-crossref]: Always semantic matching (Gemini), runs during extraction
+- [Phase 03-wizard-crossref]: Match preview shown in review step; auto re-match on mapping change
 
 ### Pending Todos
 
