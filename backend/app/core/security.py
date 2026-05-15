@@ -31,6 +31,8 @@ def validate_magic_bytes(content: bytes, ext: str) -> bool:
     expected = MAGIC_BYTES.get(ext.lower())
     if expected is None:
         return False
+    if ext.lower() == ".csv":
+        return True
     return any(content.startswith(m) for m in expected if m)
 
 
