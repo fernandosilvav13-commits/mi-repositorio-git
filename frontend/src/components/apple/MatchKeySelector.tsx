@@ -1,15 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Plus, X, Lightbulb } from "lucide-react";
+import { Plus, X } from "lucide-react";
+import SmartSuggestionChip from "./SmartSuggestionChip";
 
 interface MatchKeyPair {
   extraction: string;
@@ -31,134 +26,118 @@ const MatchKeySelector = ({
   value,
   onChange,
 }: MatchKeySelectorProps) => {
-  const [acceptedSuggestions, setAcceptedSuggestions] = useState<Set<number>>(new Set());
-
-  const updateKey = (index: number, field: "extraction" | "crossref", newValue: string) => {
-    const next = value.map((pair, i) =>
-      i === index ? { ...pair, [field]: newValue } : pair
-    );
-    onChange(next);
-  };
-
-  const removeKey = (index: number) => {
-    onChange(value.filter((_, i) => i !== index));
-  };
-
-  const addKey = () => {
+  const addKeyRow = () => {
     onChange([...value, { extraction: "", crossref: "" }]);
   };
 
-  const acceptSuggestion = (idx: number, suggestion: MatchKeyPair) => {
-    onChange([...value, suggestion]);
-    setAcceptedSuggestions((prev) => new Set(prev).add(idx));
+  const removeKeyRow = (index: number) => {
+    const newValue = [...value];
+    newValue.splice(index, 1);
+    onChange(newValue);
   };
 
-  const hasUnusedExtractionColumns =
-    extractionColumns.filter((c) => !value.find((v) => v.extraction === c)).length > 0;
-  const hasUnusedCrossrefColumns =
-    columns.filter((c) => !value.find((v) => v.crossref === c)).length > 0;
-  const canAddMore = hasUnusedExtractionColumns && hasUnusedCrossrefColumns;
+  const updateKeyRow = (index: number, field: keyof MatchKeyPair, val: string) => {
+    const newValue = [...value];
+    newValue[index] = { ...newValue[index], [field]: val };
+    onChange(newValue);
+  };
 
-  const visibleSuggestions = suggestedKeys.filter((_, idx) => !acceptedSuggestions.has(idx));
+  const handleAcceptSuggestion = (suggestion: MatchKeyPair) => {
+    // Check if it's already added to avoid duplicates
+    if (!value.some(v => v.extraction === suggestion.extraction && v.crossref === suggestion.crossref)) {
+      onChange([...value, suggestion]);
+    }
+  };
 
   return (
     <div className="space-y-4">
       <div>
-        <p className="text-[14px] font-semibold uppercase text-ink">
+        <h4 className="text-[14px] font-semibold uppercase tracking-wide text-ink">
           Clave(s) de coincidencia
-        </p>
+        </h4>
         <p className="text-[14px] text-[#7a7a7a] mt-1">
           Seleccione las columnas que la IA usará para encontrar coincidencias
         </p>
       </div>
 
-      {/* Auto-suggested Keys */}
-      {visibleSuggestions.length > 0 && (
-        <div className="space-y-2">
-          {visibleSuggestions.map((suggestion, idx) => (
-            <div
-              key={`suggest-${idx}`}
-              className="flex items-center gap-3 px-4 py-2 rounded-lg bg-[#0066cc]/3 border border-[#0066cc]/10"
-            >
-              <Lightbulb size={16} className="text-action-blue shrink-0" />
-              <span className="text-[14px] text-ink flex-1">
-                Sugerencia: {suggestion.extraction} ↔ {suggestion.crossref}
-              </span>
-              <button
-                onClick={() => acceptSuggestion(idx, suggestion)}
-                className="text-[14px] font-medium text-action-blue hover:underline shrink-0"
-              >
-                Usar sugerencia
-              </button>
-            </div>
-          ))}
+      {suggestedKeys.length > 0 && (
+        <div className="flex flex-wrap gap-2 py-2">
+          {suggestedKeys
+            .filter(suggested => !value.some(v => v.extraction === suggested.extraction && v.crossref === suggested.crossref))
+            .map((suggestion, idx) => (
+              <SmartSuggestionChip
+                key={`suggested-${idx}`}
+                extractionColumn={suggestion.extraction}
+                crossrefColumn={suggestion.crossref}
+                onAccept={() => handleAcceptSuggestion(suggestion)}
+              />
+            ))}
         </div>
       )}
 
-      {/* Match Key Rows */}
-      {value.length > 0 && (
-        <div className="space-y-3">
-          {value.map((pair, idx) => (
-            <div
-              key={idx}
-              className="flex gap-4 items-center animate-in fade-in slide-in-from-left-2"
-            >
-              <div className="flex-1">
-                <Select
-                  value={pair.extraction}
-                  onValueChange={(v) => v && updateKey(idx, "extraction", v)}
-                >
-                  <SelectTrigger className="w-full bg-parchment rounded-lg px-4 py-3 text-ink border border-[#e0e0e0]">
-                    <SelectValue placeholder="Campo extraído" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {extractionColumns.map((col) => (
-                      <SelectItem key={col} value={col}>
-                        {col}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="text-[#7a7a7a] text-center w-8 shrink-0">↔</div>
-              <div className="flex-1">
-                <Select
-                  value={pair.crossref}
-                  onValueChange={(v) => v && updateKey(idx, "crossref", v)}
-                >
-                  <SelectTrigger className="w-full bg-parchment rounded-lg px-4 py-3 text-ink border border-[#e0e0e0]">
-                    <SelectValue placeholder="Campo referencia" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {columns.map((col) => (
-                      <SelectItem key={col} value={col}>
-                        {col}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <button
-                onClick={() => removeKey(idx)}
-                className="text-[#7a7a7a] hover:text-red-500 transition-colors shrink-0"
+      <div className="space-y-3">
+        {value.map((pair, index) => (
+          <div key={index} className="flex gap-4 items-center animate-in fade-in slide-in-from-left-2">
+            <div className="flex-1">
+              <Select
+                value={pair.extraction}
+                onValueChange={(val) => updateKeyRow(index, "extraction", val)}
               >
-                <X size={20} />
-              </button>
+                <SelectTrigger className="w-full rounded-full border-[#e0e0e0]">
+                  <SelectValue placeholder="Campo extraído" />
+                </SelectTrigger>
+                <SelectContent>
+                  {extractionColumns.map((col) => (
+                    <SelectItem key={col} value={col}>
+                      {col}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-          ))}
-        </div>
-      )}
 
-      {/* Add Another Key Button */}
-      {canAddMore && (
-        <button
-          onClick={addKey}
-          className="text-[14px] font-medium text-action-blue hover:underline flex items-center gap-1"
-        >
-          <Plus size={16} />
-          Agregar otra clave
-        </button>
-      )}
+            <div className="text-[#7a7a7a] text-center w-8 shrink-0">
+              →
+            </div>
+
+            <div className="flex-1">
+              <Select
+                value={pair.crossref}
+                onValueChange={(val) => updateKeyRow(index, "crossref", val)}
+              >
+                <SelectTrigger className="w-full rounded-full border-[#e0e0e0]">
+                  <SelectValue placeholder="Campo referencia" />
+                </SelectTrigger>
+                <SelectContent>
+                  {columns.map((col) => (
+                    <SelectItem key={col} value={col}>
+                      {col}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-[#7a7a7a] hover:text-red-500 rounded-full shrink-0"
+              onClick={() => removeKeyRow(index)}
+              title="Quitar clave"
+            >
+              <X size={18} />
+            </Button>
+          </div>
+        ))}
+      </div>
+
+      <button
+        onClick={addKeyRow}
+        className="text-[14px] font-medium text-action-blue hover:underline flex items-center gap-1"
+      >
+        <Plus size={14} />
+        Agregar otra clave
+      </button>
     </div>
   );
 };
