@@ -31,6 +31,7 @@ async def upload_crossref(file: UploadFile = File(...)):
         "columns": columns,
         "data": data,
         "row_count": len(data),
+        "status": "unmatched",
     }).execute()
 
     return {
@@ -38,6 +39,7 @@ async def upload_crossref(file: UploadFile = File(...)):
         "name": safe_name,
         "columns": columns,
         "row_count": len(data),
+        "status": "unmatched",
     }
 
 
@@ -45,7 +47,7 @@ async def upload_crossref(file: UploadFile = File(...)):
 async def list_files():
     supabase = require_supabase()
     result = supabase.table("crossref_files")\
-        .select("id,name,file_type,columns,row_count,created_at")\
+        .select("id,name,file_type,columns,row_count,created_at,status")\
         .order("created_at", desc=True).execute()
     return result.data
 
