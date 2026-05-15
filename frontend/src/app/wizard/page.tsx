@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { api } from "@/lib/api";
-import { LucideIcon, Upload, Database, Layout, ShieldCheck, Cpu, FileSpreadsheet, Star, ChevronRight, ChevronLeft, Plus, Check, X } from "lucide-react";
+import { LucideIcon, Upload, Database, Layout, ShieldCheck, Cpu, FileSpreadsheet, Star, ChevronRight, ChevronLeft, Plus, Check, X, AlertCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import ConfiguratorCard from "@/components/apple/ConfiguratorCard";
 import PillChip from "@/components/apple/PillChip";
@@ -50,12 +50,18 @@ export default function WizardPage() {
   const [matchColumn, setMatchColumn] = useState("");
   const [crossrefMatchColumn, setCrossrefMatchColumn] = useState("");
   const [outputColumns, setOutputColumns] = useState<string[]>([]);
+  const [crossrefStatus, setCrossrefStatus] = useState<"idle" | "loading" | "ready" | "mapped">("idle");
+  const [crossrefError, setCrossrefError] = useState<string | null>(null);
+  const [crossrefStepError, setCrossrefStepError] = useState<string | null>(null);
   
   const [templates, setTemplates] = useState<any[]>([]);
   const [selectedTemplateId, setSelectedTemplateId] = useState("");
   const [templateColumns, setTemplateColumns] = useState<string[]>([]);
   const [newTemplateName, setNewTemplateName] = useState("");
   const [newTemplateColumns, setNewTemplateColumns] = useState<any[]>([]);
+  const [editingTemplateId, setEditingTemplateId] = useState<string | null>(null);
+  const [editTemplateName, setEditTemplateName] = useState("");
+  const [editTemplateColumns, setEditTemplateColumns] = useState<any[]>([]);
 
   const [rules, setRules] = useState<any[]>([]);
   const [selectedRuleIds, setSelectedRuleIds] = useState<Set<string>>(new Set());
@@ -107,6 +113,14 @@ export default function WizardPage() {
             setSubStep(0);
             return;
         }
+        if (subStep === 1) {
+            setSubStep(0);
+            return;
+        }
+        if (subStep === 2) {
+            setSubStep(0);
+            return;
+        }
         if (subStep < 1) {
             setSubStep(subStep + 1);
             return;
@@ -114,10 +128,7 @@ export default function WizardPage() {
     }
 
     if (currentStep === "rules") {
-      if (subStep < 1) {
-        setSubStep(subStep + 1);
-        return;
-      }
+      // Avanza directamente al siguiente paso, sin obligar a crear reglas
     }
 
     const idx = STEPS.findIndex((s) => s.key === currentStep);
@@ -153,16 +164,20 @@ export default function WizardPage() {
   const handleUploadCrossref = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
     setUploadingCrossref(true);
+    setCrossrefStepError(null);
+    setCrossrefStatus("loading");
     try {
       const result = await api.crossref.upload(files[0]);
-      toast.success("Archivo de referencia subido");
       const updated = await api.crossref.list();
       setCrossrefFiles(updated);
       setSelectedCrossrefId(result.id);
+      setCrossrefData(result);
+      setCrossrefStatus("ready");
+      setSubStep(2);
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : "Error al subir archivo de referencia";
       console.error("CrossRef upload error:", e);
-      toast.error(msg);
+      setCrossrefStepError("Error al subir archivo. Verifique el formato e intente nuevamente");
+      setCrossrefStatus("idle");
     } finally {
       setUploadingCrossref(false);
     }
@@ -170,11 +185,20 @@ export default function WizardPage() {
 
   const handleSelectCrossref = async (id: string) => {
     setSelectedCrossrefId(id);
-    const data = await api.crossref.get(id);
-    setCrossrefData(data);
-    setCrossrefMatchColumn(data.columns?.[0] || "");
-    setOutputColumns(data.columns?.slice(1, 3) || []);
-    goNext();
+    setCrossrefStatus("loading");
+    setCrossrefStepError(null);
+    try {
+      const data = await api.crossref.get(id);
+      setCrossrefData(data);
+      setCrossrefMatchColumn(data.columns?.[0] || "");
+      setOutputColumns(data.columns?.slice(1, 3) || []);
+      setCrossrefStatus("ready");
+      setSubStep(2);
+    } catch (e: unknown) {
+      console.error("CrossRef column load error:", e);
+      setCrossrefStepError("Error al cargar columnas del archivo. Intente nuevamente o seleccione otro archivo.");
+      setCrossrefStatus("idle");
+    }
   };
 
   const handleCreateTemplate = async () => {
@@ -224,6 +248,24 @@ export default function WizardPage() {
       toast.error("Error al exportar");
     } finally {
       setExporting(false);
+    }
+  };
+
+  const handleUpdateTemplate = async () => {
+    if (!editingTemplateId) return;
+    try {
+      await api.templates.update(editingTemplateId, {
+        name: editTemplateName,
+        columns: editTemplateColumns,
+      });
+      toast.success("Plantilla actualizada");
+      const updated = await api.templates.list();
+      setTemplates(updated);
+      setEditingTemplateId(null);
+      setSubStep(0);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Error al actualizar plantilla";
+      toast.error(msg);
     }
   };
 
@@ -339,7 +381,7 @@ export default function WizardPage() {
                 subtitle="Vincular con bases de datos externas para validación de RUT, títulos o experiencia."
               >
                 <div className="flex justify-end">
-                    <PillChip selected={enableCrossref === true} onClick={() => { setEnableCrossref(true); setSubStep(1); }}>
+                    <PillChip selected={enableCrossref === true} onClick={() => { setEnableCrossref(true); setCrossrefStepError(null); setSubStep(1); }}>
                         Seleccionar
                     </PillChip>
                 </div>
@@ -364,6 +406,25 @@ export default function WizardPage() {
 
           {currentStep === "crossref" && subStep === 1 && (
             <div className="flex flex-col gap-4">
+              {/* Error banner */}
+              {crossrefStepError && (
+                <ConfiguratorCard className="!border-red-400/50 !bg-red-50/50">
+                  <div className="flex items-start gap-3">
+                    <AlertCircle size={20} className="text-red-500 mt-0.5 shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-[15px] font-medium text-red-800">{crossrefStepError}</p>
+                    </div>
+                    <button
+                      onClick={() => setCrossrefStepError(null)}
+                      className="text-red-400 hover:text-red-600 transition-colors"
+                    >
+                      <X size={18} />
+                    </button>
+                  </div>
+                </ConfiguratorCard>
+              )}
+
+              {/* Upload Section */}
               <ConfiguratorCard title="Subir archivo de referencia" subtitle="CSV, PDF, DOCX o PPT con datos maestros para validación.">
                 <div className="flex flex-col items-center py-4 gap-4">
                   <input
@@ -374,17 +435,25 @@ export default function WizardPage() {
                     onChange={(e) => handleUploadCrossref(e.target.files)}
                   />
                   <div
-                    onClick={() => crossrefFileRef.current?.click()}
+                    onClick={() => !uploadingCrossref && crossrefFileRef.current?.click()}
                     className="w-full aspect-[3/1] rounded-lg border-2 border-dashed border-[#e0e0e0] flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-action-blue transition-colors bg-white/50"
                   >
-                    <Upload size={24} className="text-[#7a7a7a]" />
-                    <p className="text-[14px] font-medium text-[#7a7a7a]">
-                      {uploadingCrossref ? "Subiendo..." : "Haga clic para seleccionar archivo"}
-                    </p>
+                    {uploadingCrossref ? (
+                      <>
+                        <Loader2 size={24} className="text-action-blue animate-spin" />
+                        <p className="text-[14px] font-medium text-action-blue">Subiendo...</p>
+                      </>
+                    ) : (
+                      <>
+                        <Upload size={24} className="text-[#7a7a7a]" />
+                        <p className="text-[14px] font-medium text-[#7a7a7a]">Haga clic para seleccionar archivo</p>
+                      </>
+                    )}
                   </div>
                 </div>
               </ConfiguratorCard>
 
+              {/* Available Files Section */}
               {crossrefFiles.length > 0 && (
                 <>
                   <p className="text-[14px] font-semibold text-[#7a7a7a] uppercase tracking-wide px-1">
@@ -393,17 +462,28 @@ export default function WizardPage() {
                   {crossrefFiles.map((f: any) => (
                     <ConfiguratorCard key={f.id}>
                       <div className="flex items-center justify-between">
-                          <div>
-                              <p className="text-[17px] font-semibold text-ink">{f.name}</p>
-                              <p className="text-[14px] text-[#7a7a7a]">{f.row_count} registros</p>
-                          </div>
-                          <PillChip selected={selectedCrossrefId === f.id} onClick={() => handleSelectCrossref(f.id)}>
-                              {selectedCrossrefId === f.id ? "Seleccionado" : "Usar este"}
-                          </PillChip>
+                        <div>
+                          <p className="text-[17px] font-semibold text-ink">{f.name}</p>
+                          <p className="text-[14px] text-[#7a7a7a]">{f.row_count} registros</p>
+                        </div>
+                        <PillChip selected={selectedCrossrefId === f.id} onClick={() => handleSelectCrossref(f.id)}>
+                          {selectedCrossrefId === f.id ? "Seleccionado" : "Usar este"}
+                        </PillChip>
                       </div>
                     </ConfiguratorCard>
                   ))}
                 </>
+              )}
+
+              {/* Empty State */}
+              {crossrefFiles.length === 0 && !uploadingCrossref && (
+                <ConfiguratorCard>
+                  <div className="flex flex-col items-center py-8 gap-3">
+                    <Database size={32} className="text-[#7a7a7a] opacity-40" />
+                    <p className="text-[17px] font-medium text-ink">Suba un archivo de referencia para comenzar</p>
+                    <p className="text-[14px] text-[#7a7a7a]">Los formatos compatibles son CSV, PDF, DOCX y PPT</p>
+                  </div>
+                </ConfiguratorCard>
               )}
             </div>
           )}
@@ -438,15 +518,28 @@ export default function WizardPage() {
                             <p className="text-[17px] font-semibold text-ink">{t.name}</p>
                             <p className="text-[14px] text-[#7a7a7a]">{t.columns?.length} campos configurados</p>
                         </div>
-                        <PillChip selected={selectedTemplateId === t.id} onClick={() => {
-                            setSelectedTemplateId(t.id);
-                            setTemplateColumns(t.columns.map((c:any) => c.name));
-                            setStepHistory((prev) => [...prev, { step: currentStep, subStep }]);
-                            setCurrentStep("rules");
-                            setSubStep(0);
-                        }}>
-                            Seleccionar
-                        </PillChip>
+                        <div className="flex gap-2">
+                            <PillChip selected={selectedTemplateId === t.id} onClick={() => {
+                                setSelectedTemplateId(t.id);
+                                setTemplateColumns(t.columns.map((c:any) => c.name));
+                                setStepHistory((prev) => [...prev, { step: currentStep, subStep }]);
+                                setCurrentStep("rules");
+                                setSubStep(0);
+                            }}>
+                                Seleccionar
+                            </PillChip>
+                            <button
+                                onClick={() => {
+                                    setEditingTemplateId(t.id);
+                                    setEditTemplateName(t.name);
+                                    setEditTemplateColumns(t.columns?.map((c:any) => ({...c})) || []);
+                                    setSubStep(2);
+                                }}
+                                className="text-[14px] font-medium text-action-blue hover:underline ml-2"
+                            >
+                                Editar
+                            </button>
+                        </div>
                     </div>
                   </ConfiguratorCard>
                 ))}
@@ -508,6 +601,60 @@ export default function WizardPage() {
             </ConfiguratorCard>
           )}
 
+          {currentStep === "template" && subStep === 2 && editingTemplateId && (
+            <ConfiguratorCard title="Editar Plantilla" subtitle="Modifique los campos de la plantilla existente.">
+                <div className="space-y-8">
+                    <div className="space-y-2">
+                        <label className="text-[14px] font-semibold text-[#7a7a7a] uppercase tracking-wide">Nombre de Plantilla</label>
+                        <input 
+                            value={editTemplateName} 
+                            onChange={(e) => setEditTemplateName(e.target.value)} 
+                            placeholder="Ej: Reclutamiento IT 2024" 
+                            className="w-full border-b border-[#e0e0e0] py-2 text-[21px] font-semibold focus:outline-none focus:border-action-blue transition-colors" 
+                        />
+                    </div>
+                    <div className="space-y-4">
+                        <div className="flex justify-between items-center">
+                            <label className="text-[14px] font-semibold text-[#7a7a7a] uppercase tracking-wide">Columnas de salida</label>
+                            <button onClick={() => setEditTemplateColumns([...editTemplateColumns, {name: "", data_type: "string"}])} className="text-action-blue hover:underline text-[14px] font-medium">
+                                + Agregar
+                            </button>
+                        </div>
+                        <div className="space-y-3">
+                            {editTemplateColumns.map((col, i) => (
+                                <div key={i} className="flex gap-4 items-center animate-in fade-in slide-in-from-left-2">
+                                    <input 
+                                        value={col.name} 
+                                        onChange={(e) => {
+                                            const c = [...editTemplateColumns];
+                                            c[i].name = e.target.value;
+                                            setEditTemplateColumns(c);
+                                        }} 
+                                        placeholder="Nombre del campo" 
+                                        className="flex-1 bg-parchment rounded-md px-4 py-2 text-ink focus:outline-none border border-[#e0e0e0]" 
+                                    />
+                                    <button 
+                                        onClick={() => setEditTemplateColumns(editTemplateColumns.filter((_, idx) => idx !== i))}
+                                        className="text-[#7a7a7a] hover:text-red-500"
+                                    >
+                                        <X size={20} />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="flex gap-3">
+                        <button onClick={handleUpdateTemplate} className="flex-1 bg-action-blue text-white rounded-full py-3 text-[17px] font-medium active-scale">
+                            Guardar Cambios
+                        </button>
+                        <button onClick={() => { setEditingTemplateId(null); setSubStep(0); }} className="flex-1 border border-[#e0e0e0] text-[#7a7a7a] rounded-full py-3 text-[17px] font-medium active-scale">
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+            </ConfiguratorCard>
+          )}
+
           {currentStep === "rules" && subStep === 0 && (
             <div className="flex flex-col gap-4">
                 {rules.map((r: any) => (
@@ -542,7 +689,13 @@ export default function WizardPage() {
                 >
                     <Plus size={20} /> Crear nueva regla
                 </button>
-                <div className="mt-8 flex justify-center">
+                <button
+                    onClick={goNext}
+                    className="w-full py-3 text-[#7a7a7a] hover:text-action-blue transition-all text-[15px] font-medium text-center"
+                >
+                    No necesito crear reglas, continuar de todas formas →
+                </button>
+                <div className="flex justify-center">
                     <button onClick={goNext} className="bg-action-blue text-white rounded-full px-12 py-3 text-[17px] font-medium active-scale">
                         Continuar
                     </button>
