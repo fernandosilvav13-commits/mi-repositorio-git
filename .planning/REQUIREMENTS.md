@@ -9,8 +9,8 @@ Requirements for v1.1 Cross-Reference Integration. Each maps to roadmap phases.
 
 ### Crossref Page Redesign
 
-- [ ] **CRSS-01**: User can upload and manage cross-reference files in an Apple-designed page with Tile, FrostedContainer, and PillChip components
-- [ ] **CRSS-02**: User can view uploaded cross-reference files in a clean artifact-based list with match status indicators
+- [x] **CRSS-01**: User can upload and manage cross-reference files in an Apple-designed page with Tile, FrostedContainer, and PillChip components
+- [x] **CRSS-02**: User can view uploaded cross-reference files in a clean artifact-based list with match status indicators
 
 ### Wizard Integration
 
@@ -45,8 +45,8 @@ Deferred to future release.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CRSS-01 | Phase 02 | Pending |
-| CRSS-02 | Phase 02 | Pending |
+| CRSS-01 | Phase 02 | Complete |
+| CRSS-02 | Phase 02 | Complete |
 | WIZ-01 | Phase 03 | Pending |
 | WIZ-02 | Phase 03 | Pending |
 | WIZ-03 | Phase 03 | Pending |
