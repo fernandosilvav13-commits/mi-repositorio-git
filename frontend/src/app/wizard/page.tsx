@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -18,6 +18,8 @@ import PillChip from "@/components/apple/PillChip";
 import FrostedContainer from "@/components/apple/FrostedContainer";
 import MatchKeySelector from "@/components/apple/MatchKeySelector";
 import OutputColumnPicker from "@/components/apple/OutputColumnPicker";
+import MatchSummaryBar from "@/components/apple/MatchSummaryBar";
+import MatchTable from "@/components/apple/MatchTable";
 import { cn } from "@/lib/utils";
 
 type Step = "upload" | "crossref" | "template" | "rules" | "extract" | "export" | "review";
@@ -86,6 +88,18 @@ export default function WizardPage() {
 
   const [conforme, setConforme] = useState<boolean | null>(null);
   const [feedbackSent, setFeedbackSent] = useState(false);
+
+  // Match Preview State
+  const [matchPreview, setMatchPreview] = useState<{
+    matched: Record<string, string>[];
+    unmatched: Record<string, string>[];
+    matchedCount: number;
+    unmatchedCount: number;
+  } | null>(null);
+  const [matchPreviewLoading, setMatchPreviewLoading] = useState(false);
+  const [previewExpanded, setPreviewExpanded] = useState<"matched" | "unmatched" | null>(null);
+  const [previewError, setPreviewError] = useState<string | null>(null);
+  const [mappingVersion, setMappingVersion] = useState(0);
 
   useEffect(() => {
     api.templates.list().then(setTemplates).catch(() => {});
@@ -327,6 +341,81 @@ export default function WizardPage() {
       toast.error("Error al crear regla");
     }
   };
+
+  const fetchMatchPreview = useCallback(async () => {
+    if (!enableCrossref || !selectedCrossrefId || !crossrefData || matchKeys.length === 0 || extractionResults.length === 0) return;
+    
+    setMatchPreviewLoading(true);
+    setPreviewError(null);
+    try {
+      // Fetch full crossref data
+      const fullData = await api.crossref.get(selectedCrossrefId);
+      
+      const extractionRows = extractionResults.map(r => r.data);
+      const crossrefRows = fullData.data || [];
+      
+      const primaryKey = matchKeys[0];
+      if (primaryKey) {
+        const extKey = primaryKey.extraction;
+        const crefKey = primaryKey.crossref;
+        
+        // Build lookup from crossref data
+        const lookup = new Map<string, Record<string, string>>();
+        for (const row of crossrefRows) {
+          const val = String(row[crefKey] || "").trim().toLowerCase();
+          if (val) lookup.set(val, row);
+        }
+        
+        const matched: Record<string, string>[] = [];
+        const unmatched: Record<string, string>[] = [];
+        
+        for (const row of extractionRows) {
+          const matchVal = String(row[extKey] || "").trim().toLowerCase();
+          const matchedRow = lookup.get(matchVal);
+          
+          if (matchedRow) {
+            // Merge extraction + crossref data
+            const merged = { ...row };
+            for (const col of outputColumns) {
+              merged[`xref_${col}`] = matchedRow[col] || "";
+            }
+            matched.push(merged);
+          } else {
+            // Show extraction data with blank crossref columns
+            const unmerged = { ...row };
+            for (const col of outputColumns) {
+              unmerged[`xref_${col}`] = "NO ENCONTRADO";
+            }
+            unmatched.push(unmerged);
+          }
+        }
+        
+        setMatchPreview({
+          matched,
+          unmatched,
+          matchedCount: matched.length,
+          unmatchedCount: unmatched.length,
+        });
+      }
+    } catch (e) {
+      console.error("Fetch match preview error:", e);
+      setPreviewError("Error al generar vista previa de validación. Revise la configuración de cruce e intente nuevamente.");
+    } finally {
+      setMatchPreviewLoading(false);
+    }
+  }, [enableCrossref, selectedCrossrefId, crossrefData, matchKeys, outputColumns, extractionResults]);
+
+  // Re-fetch match preview when user enters review step or mapping changes
+  useEffect(() => {
+    if (currentStep === "review" && enableCrossref && selectedCrossrefId) {
+      fetchMatchPreview();
+    }
+  }, [currentStep, mappingVersion, enableCrossref, selectedCrossrefId, fetchMatchPreview]);
+
+  // Track mapping changes
+  useEffect(() => {
+    setMappingVersion(v => v + 1);
+  }, [matchKeys, outputColumns]);
 
   return (
     <div className="min-h-screen bg-parchment flex flex-col items-center pt-[104px] pb-24 overflow-x-hidden">
@@ -914,6 +1003,69 @@ export default function WizardPage() {
                     <button onClick={() => setFeedbackSent(true)} className="mt-6 text-action-blue font-medium hover:underline">Enviar feedback</button>
                 </ConfiguratorCard>
               </div>
+
+              {/* Match Preview Section */}
+              {(enableCrossref && selectedCrossrefId && matchKeys.length > 0) && (
+                <ConfiguratorCard title="Validación de datos" subtitle="Resultados del cruce con la base de referencia">
+                  {previewError ? (
+                    <div className="p-4 rounded-lg bg-red-50/50 border border-red-400/50 text-[14px] text-red-700">
+                      {previewError}
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <MatchSummaryBar
+                        matchedCount={matchPreview?.matchedCount ?? 0}
+                        unmatchedCount={matchPreview?.unmatchedCount ?? 0}
+                        expandedSection={previewExpanded}
+                        onToggleMatch={() => setPreviewExpanded(previewExpanded === "matched" ? null : "matched")}
+                        onToggleUnmatched={() => setPreviewExpanded(previewExpanded === "unmatched" ? null : "unmatched")}
+                        loading={matchPreviewLoading}
+                      />
+
+                      {matchPreviewLoading && (
+                        <div className="animate-pulse space-y-3">
+                          <div className="h-8 bg-gray-100 rounded" />
+                          <div className="h-8 bg-gray-100 rounded w-3/4" />
+                        </div>
+                      )}
+
+                      {!matchPreviewLoading && previewExpanded === "matched" && matchPreview && (
+                        <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                          <div className="flex items-center gap-2 mb-3">
+                            <span className="text-[14px] font-semibold text-[#34c759]">Concordancia</span>
+                            <PillChip variant="status" statusType="matched">
+                              {matchPreview.matchedCount} registros validados correctamente
+                            </PillChip>
+                          </div>
+                          <MatchTable
+                            columns={[...templateColumns, ...outputColumns.map(c => `xref_${c}`)]}
+                            rows={matchPreview.matched}
+                            variant="matched"
+                            extractionColumnCount={templateColumns.length}
+                          />
+                        </div>
+                      )}
+
+                      {!matchPreviewLoading && previewExpanded === "unmatched" && matchPreview && (
+                        <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                          <div className="flex items-center gap-2 mb-3">
+                            <span className="text-[14px] font-semibold text-[#ff9500]">Sin concordancia</span>
+                            <PillChip variant="status" statusType="unmatched">
+                              {matchPreview.unmatchedCount} registros sin validar
+                            </PillChip>
+                          </div>
+                          <MatchTable
+                            columns={[...templateColumns, ...outputColumns.map(c => `xref_${c}`)]}
+                            rows={matchPreview.unmatched}
+                            variant="unmatched"
+                            extractionColumnCount={templateColumns.length}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </ConfiguratorCard>
+              )}
 
               {feedbackSent && (
                 <div className="fixed inset-0 bg-parchment/95 backdrop-blur-md z-[100] flex flex-col items-center justify-center gap-8 animate-in fade-in duration-500">
