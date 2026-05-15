@@ -19,3 +19,5 @@ python-pptx
 XlsxWriter
 olefile
 PyJWT
+pytest
+pytest-asyncio
