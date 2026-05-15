@@ -4,14 +4,14 @@ milestone: v1.1
 milestone_name: Cross-Reference Integration
 status: executing
 stopped_at: Completed 02-crossref-page-redesign-01-PLAN.md
-last_updated: "2026-05-15T03:52:25.529Z"
+last_updated: "2026-05-15T03:56:34.112Z"
 last_activity: 2026-05-15
 progress:
   total_phases: 3
   completed_phases: 0
   total_plans: 3
-  completed_plans: 1
-  percent: 33
+  completed_plans: 2
+  percent: 67
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-05-15)
 ## Current Position
 
 Phase: 02 (Crossref Page Redesign) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-05-15
 
-Progress: [███░░░░░░░] 33%
+Progress: [███████░░░] 67%
 
 *Calculation: v1.0 = 1 of 4 phases complete (Phase 01 shipped). Remaining 3 phases at 0%.*
 
@@ -51,6 +51,7 @@ Progress: [███░░░░░░░] 33%
 | 3. Wizard Cross-Reference Integration | 0 | pending | - |
 | 4. Cross-Reference Export | 0 | pending | - |
 | Phase 02-crossref-page-redesign P01 | 2min | 2 tasks | 2 files |
+| Phase 02-crossref-page-redesign P02 | 2min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -62,6 +63,9 @@ Progress: [███░░░░░░░] 33%
 - Backend CrossrefService already exists with parsing, semantic_match, merge_data — Wizard phase (Phase 03) connects to existing APIs
 - [Phase 02-crossref-page-redesign]: Status defaults to 'unmatched' on upload, hardcoded not user-controllable — Mitigates tampering threat T-02-01
 - [Phase 02-crossref-page-redesign]: Migration uses IF NOT EXISTS guards for safe re-execution across environments — Additive-only changes prevent conflicts
+- [Phase 02-crossref-page-redesign]: PillChip variant prop uses 'selectable' as default for backward compatibility — Default selectable ensures existing code continues to work without changes
+- [Phase 02-crossref-page-redesign]: uploadWithProgress is a standalone function export (not part of api object) — Standalone export used because page redesign uses it directly with a different signature
+- [Phase 02-crossref-page-redesign]: XMLHttpRequest chosen over fetch for native upload progress events — XHR native upload.onprogress provides byte-level progress that fetch does not natively support
 
 ### Pending Todos
 
@@ -73,6 +77,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-15T03:52:25.501Z
+Last session: 2026-05-15T03:56:33.651Z
 Stopped at: Completed 02-crossref-page-redesign-01-PLAN.md
 Resume file: None

@@ -45,7 +45,7 @@ Plans:
 
 Plans:
 - [x] 02-01-PLAN.md — Add status column to crossref_files + return status in API responses
-- [ ] 02-02-PLAN.md — Extend PillChip with status variant + add uploadWithProgress helper
+- [x] 02-02-PLAN.md — Extend PillChip with status variant + add uploadWithProgress helper
 - [ ] 02-03-PLAN.md — Redesign crossref page with Apple Design System components
 **UI hint**: yes
 
