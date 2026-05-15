@@ -107,14 +107,14 @@ Using Apple spacing system from DESIGN.md — Tailwind v4 tokens map as follows:
 |-------|-------|-------|
 | xxs | 4px | File type badge gaps, icon-to-text gaps |
 | xs | 8px | Badge gap spacing, row internal padding |
-| sm | 12px | Compact element spacing, PillChip internal padding |
-| md | 17px | Table cell vertical padding, Drop zone text-to-border gap |
 | lg | 24px | Card internal padding, between drop zone and format badges |
 | xl | 32px | Section heading vertical gaps, table margin from container edge |
 | xxl | 48px | Between upload progress bars, between end of upload and list |
 | section | 80px | Tile vertical padding (py-20 → 80px) — matches Tile.tsx |
 
 **Exceptions:**
+- `sm`: 12px — Apple canonical spacing token per DESIGN.md (`spacing.sm`). Not a multiple of 4 but Apple's standard compact spacing value.
+- `md`: 17px — Apple canonical spacing token per DESIGN.md (`spacing.md`). Not a multiple of 4 but Apple's standard medium spacing value (body font size).
 - Drop zone internal vertical padding: 64px (py-16) — not a standard token but matches Apple's generous whitespace aesthetic
 - Table row minimum height: 52px — matches Apple sub-nav height, gives enough touch target for mobile
 - Floating back button: position at top-left with 32px offset from edges
@@ -137,13 +137,13 @@ Using SF Pro Display / SF Pro Text font family from DESIGN.md and globals.css `-
 | File name (table) | 17px | 600 | 1.24 | -0.374px | `body-strong` |
 | Table header | 14px | 600 | 1.29 | -0.224px | `caption-strong` |
 | Status badge | 14px | 600 | 1.29 | -0.224px | `caption-strong` |
-| PillChip value | 14px | 500 | 1.29 | -0.224px | `caption-strong` variant |
+| PillChip value | 14px | 600 | 1.29 | -0.224px | `caption-strong` |
 | Table action (icon) | — | — | — | — | lucide icon at 16px |
-| Empty state heading | 24px | 300 | 1.5 | 0 | `lead-airy` |
+| Empty state heading | 21px | 400 | 1.47 | -0.374px | `body` (size from `tagline`) |
 | Empty state body | 17px | 400 | 1.47 | -0.374px | `body` |
 | Upload progress label | 14px | 400 | 1.43 | -0.224px | `caption` |
 
-### Declared Set (3 sizes + 2 weights)
+### Declared Set (4 sizes + 2 weights)
 
 | Property | Value |
 |----------|-------|
@@ -152,7 +152,7 @@ Using SF Pro Display / SF Pro Text font family from DESIGN.md and globals.css `-
 | Body line-height | 1.47 |
 | Heading line-height | 1.10 (display), 1.19 (tagline), 1.24 (body-strong) |
 
-**Note:** Weight 300 is used for empty state heading (24px/300 `lead-airy`) — a deliberate Apple pattern for airy, low-density states. All other text uses 400 or 600 per Apple ladder.
+**Note:** Empty state heading uses 21px/400 — reusing the `tagline` size with body weight to maintain visual hierarchy while staying within the 4-size, 2-weight limit. All text uses 400 or 600 per Apple ladder (weight 500 deliberately absent in Apple's system — mid-weight readings always use 600).
 
 ---
 
@@ -218,7 +218,7 @@ All copy in English, matching Phase 01 extraction page tone. Uses museum-gallery
 | Table header: Name | File | Minimal column label |
 | Table header: Status | Status | Minimal column label |
 | Table header: Action | (no label, icon-only) | Lucide trash-2 icon |
-| Empty state heading | No reference files yet | Apple airy tone (300 weight) |
+| Empty state heading | No reference files yet | 21px/400 — tagline size with body weight |
 | Empty state body | Upload a CSV, PDF, PPT, or DOCX file to begin cross-referencing your data. | Actionable next step included |
 | Upload progress text | {name} — {percent}% | Per-file: "{filename} — 60%" |
 | Upload complete | {name} — Complete | Checkmark animation on complete |
