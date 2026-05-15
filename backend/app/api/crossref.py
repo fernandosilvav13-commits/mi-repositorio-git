@@ -22,17 +22,23 @@ async def upload_crossref(file: UploadFile = File(...)):
     async with aiofiles.open(str(file_path), "wb") as buffer:
         await buffer.write(content)
 
-    columns, data = crossref_service.parse_file(str(file_path))
+    try:
+        columns, data = crossref_service.parse_file(str(file_path))
+    except Exception as e:
+        raise HTTPException(400, f"Error al parsear archivo: {e}")
 
     supabase = require_supabase()
-    result = supabase.table("crossref_files").insert({
-        "name": safe_name,
-        "file_type": ext,
-        "columns": columns,
-        "data": data,
-        "row_count": len(data),
-        "status": "unmatched",
-    }).execute()
+    try:
+        result = supabase.table("crossref_files").insert({
+            "name": safe_name,
+            "file_type": ext,
+            "columns": columns,
+            "data": data,
+            "row_count": len(data),
+            "status": "unmatched",
+        }).execute()
+    except Exception as e:
+        raise HTTPException(502, f"Error al guardar en base de datos: {e}")
 
     return {
         "id": result.data[0]["id"],

@@ -159,8 +159,10 @@ export default function WizardPage() {
       const updated = await api.crossref.list();
       setCrossrefFiles(updated);
       setSelectedCrossrefId(result.id);
-    } catch (e) {
-      toast.error("Error al subir archivo de referencia");
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Error al subir archivo de referencia";
+      console.error("CrossRef upload error:", e);
+      toast.error(msg);
     } finally {
       setUploadingCrossref(false);
     }

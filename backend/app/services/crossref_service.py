@@ -63,7 +63,16 @@ class CrossrefService:
 
     def _parse_csv(self, file_path: str) -> tuple[list[str], list[dict]]:
         import pandas as pd
-        df = pd.read_csv(file_path, dtype=str)
+        encodings = ["utf-8", "utf-8-sig", "latin-1", "cp1252"]
+        df = None
+        for enc in encodings:
+            try:
+                df = pd.read_csv(file_path, dtype=str, encoding=enc, sep=None, engine="python")
+                break
+            except (UnicodeDecodeError, pd.errors.ParserError):
+                continue
+        if df is None:
+            df = pd.read_csv(file_path, dtype=str, encoding="latin-1", on_bad_lines="skip")
         df = df.fillna("")
         columns = list(df.columns)
         rows = df.to_dict(orient="records")
