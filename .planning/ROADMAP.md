@@ -26,7 +26,7 @@ Plans:
 
 **Milestone Goal:** Polish and integrate the cross-reference data matching feature into the Apple design system and Wizard flow.
 
-- [ ] **Phase 02: Crossref Page Redesign** — Redesign the cross-reference page with Apple Design System components (Tile, FrostedContainer, PillChip)
+- [x] **Phase 02: Crossref Page Redesign** — Redesign the cross-reference page with Apple Design System components (Tile, FrostedContainer, PillChip) (completed 2026-05-15)
 - [ ] **Phase 03: Wizard Cross-Reference Integration** — Integrate cross-reference upload, column mapping, and preview into the Wizard flow
 - [ ] **Phase 04: Cross-Reference Export** — Exported Excel includes cross-referenced columns with unmatched rows flagged
 
@@ -46,7 +46,7 @@ Plans:
 Plans:
 - [x] 02-01-PLAN.md — Add status column to crossref_files + return status in API responses
 - [x] 02-02-PLAN.md — Extend PillChip with status variant + add uploadWithProgress helper
-- [ ] 02-03-PLAN.md — Redesign crossref page with Apple Design System components
+- [x] 02-03-PLAN.md — Redesign crossref page with Apple Design System components
 **UI hint**: yes
 
 ### Phase 03: Wizard Cross-Reference Integration
@@ -76,6 +76,6 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 1. Frontend Overhaul (Apple Design) | v1.0 | 4/4 | Complete | 2026-05-14 |
-| 2. Crossref Page Redesign | v1.1 | 1/3 | In Progress | - |
+| 2. Crossref Page Redesign | v1.1 | 3/3 | Complete | 2026-05-15 |
 | 3. Wizard Cross-Reference Integration | v1.1 | 0/0 | Not started | - |
 | 4. Cross-Reference Export | v1.1 | 0/0 | Not started | - |
