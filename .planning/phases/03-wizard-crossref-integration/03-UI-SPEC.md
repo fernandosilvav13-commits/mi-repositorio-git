@@ -1,7 +1,8 @@
 ---
 phase: 03
 slug: wizard-crossref-integration
-status: draft
+status: approved
+reviewed_at: 2026-05-15T10:50:00Z
 shadcn_initialized: true
 preset: base-nova (neutral base, lucide icons, CSS variables enabled)
 created: 2026-05-15
@@ -35,7 +36,7 @@ Declared values (multiples of 4 — Apple 8px base unit with sub-base adjustment
 | xxs | 4px | Icon gaps, inline padding, status dot spacing |
 | xs | 8px | Table cell vertical padding, compact element gaps |
 | sm | 12px | Button padding vertical (8–12px), chip internal spacing |
-| md | 17px | Default horizontal padding (Apple body line-height constant) |
+| md | 16px | Default horizontal padding, card inner spacing |
 | lg | 24px | ConfiguratorCard internal padding, section inner spacing |
 | xl | 32px | Layout gaps between cards, wizard step content margins |
 | xxl | 48px | Major section breaks, wizard section separation |
@@ -69,7 +70,7 @@ Relevant to this phase only (Wizard crossref integration subset of Apple system)
 | Caption | 14px | 400 | 1.43 | Secondary text, file metadata, row counts |
 | Button utility | 14px | 400 | 1.29 | Secondary CTAs, "Agregar clave" links |
 | Pill chip | 14px | 600 | — | Status indicators (matched/unmatched) via PillChip component |
-| Fine print | 12px | 400 | 1.0 | Match status subtle labels |
+| — | — | — | — | *Match status subtle labels use Caption (14px / 400) — no separate fine-print token* |
 
 > Source: `apple/DESIGN.md` typography table (lines 337-355), Wizard implementation at `frontend/src/app/wizard/page.tsx` lines 309-321.
 
@@ -100,6 +101,24 @@ Relevant to this phase only (Wizard crossref integration subset of Apple system)
 
 ---
 
+## Visual Hierarchy & Focal Point
+
+**Primary focal point (crossref step):** The step heading question — *"¿Desea validar o completar los datos con una base de referencia?"* — is the visual anchor users see first when entering the crossref step. It uses `Heading` (34px / 600) with maximum contrast (ink #1d1d1f on parchment #f5f5f7). All other elements in the step (option cards, upload area, mapping UI) are secondary to this question.
+
+**Secondary focal points** (drill-down in order of user attention):
+
+| Rank | Element | Typography | Container |
+|------|---------|------------|-----------|
+| 1 | Step heading question | Heading 34px/600 | Top of ConfiguratorCard, no border |
+| 2 | Option cards ("Sí, cruzar datos" / "No, omitir") | Display 21px/600 | side‑by‑side ConfiguratorCards |
+| 3 | "Subir archivo de referencia" (upload card) | Display 21px/600 | ConfiguratorCard with dropzone |
+| 4 | "Columnas de cruce" (mapping card title) | Display 21px/600 | ConfiguratorCard |
+| 5 | Match preview summary bar | Body 17px/400 + PillChip 14px/600 | FrostedContainer |
+
+The heading question must always be visible at the top of the step — it should not scroll out of view when the user expands the upload or mapping areas.
+
+---
+
 ## Copywriting Contract
 
 All copy in Spanish (matching existing Wizard locale).
@@ -122,7 +141,7 @@ All copy in Spanish (matching existing Wizard locale).
 | Output columns label | **NEW — "Columnas a incluir"** | Label for output column selector |
 | Output columns hint | **NEW — "Seleccione los campos adicionales que desea incorporar desde la referencia"** | Helper text for output selection |
 | Add match key action | **NEW — "Agregar otra clave"** | Link/button to add another compound match key |
-| Remove match key action | **NEW — "Quitar"** | Action to remove a match key row |
+| Remove match key action | **NEW — "Quitar clave"** | Action to remove a match key row — uses verb + noun pattern for specificity |
 | Column mapping CTA | **NEW — "Confirmar correspondencia"** | Primary button to confirm mapping and proceed |
 | Preview heading (review step) | **NEW — "Validación de datos"** | Match preview section heading within review step |
 | Summary format | **NEW — "{N} registros coinciden • {M} registros sin coincidencia"** | Summary line above expandable sections |
@@ -134,6 +153,11 @@ All copy in Spanish (matching existing Wizard locale).
 | Preview table header — crossref | **NEW — "Datos de referencia"** | Column group header for crossref fields in matched table |
 | Empty state (crossref enabled, no file) | **NEW — "Suba un archivo de referencia para comenzar"** | Shown when crossref is enabled but user hasn't uploaded a file yet |
 | Empty state subtitle | **NEW — "Los formatos compatibles son CSV, PDF, DOCX y PPT"** | Helper below empty state message |
+| Upload error | **NEW — "Error al subir archivo. Verifique el formato e intente nuevamente"** | Shown when file upload fails (network, format, or size) |
+| Upload error subtitle | **NEW — "Formatos aceptados: CSV, PDF, DOCX, PPT. Tamaño máximo: 10 MB."** | Below upload error message — solution path clarifying allowed formats |
+| Column load error | **NEW — "Error al cargar columnas del archivo. Intente nuevamente o seleccione otro archivo."** | Shown when crossref file is selected but column parsing fails |
+| Match preview error | **NEW — "Error al generar vista previa de validación. Revise la configuración de cruce e intente nuevamente."** | Shown when semantic matching fails during review step preview |
+| Mapping config error | **NEW — "Error al configurar la correspondencia. Asegúrese de seleccionar al menos una clave de coincidencia."** | Shown when "Confirmar correspondencia" fails due to incomplete config |
 | Destructive actions | None in this phase | No delete/remove destructive actions are new in this phase |
 
 **Existing Wizard labels (unchanged):**
@@ -213,6 +237,9 @@ If user returns to crossref step, changes column mapping, then returns to review
 | Extraction complete with crossref | Review step shows match preview | Summary + expandable sections |
 | Mapping changed, re-entering review | Review step match preview | Auto re-fetch, show loading overlay on preview |
 | No crossref configured on extraction | Review step (no change) | Existing review step behavior |
+| Upload error | subStep=1 with error banner above upload dropzone | Show "Error al subir archivo" message + retry option. User can dismiss error and try again. |
+| Column load error | subStep=1 with error banner below file selected | Show "Error al cargar columnas" message + file picker reset. User can select a different file. |
+| Match preview error | Review step with error state replacing preview content | Show "Error al generar vista previa" inline within the preview area. User can return to crossref step to adjust mapping. |
 
 ---
 
@@ -298,10 +325,10 @@ All UI in this phase uses existing shadcn components (Button, Select, Badge, Tab
 - [ ] Dimension 2 Visuals: PASS
 - [ ] Dimension 3 Color: PASS
 - [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
+- [ ] Dimension 5 Spacing: FLAG (12px/80px maintain 4px grid with documented justification)
 - [ ] Dimension 6 Registry Safety: PASS
 
-**Approval:** pending
+**Approval:** approved 2026-05-15
 
 ---
 
