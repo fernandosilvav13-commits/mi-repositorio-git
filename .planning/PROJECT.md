@@ -1,5 +1,15 @@
 # CicloAI
 
+## Current Milestone: v1.1 Cross-Reference Integration
+
+**Goal:** Polish and integrate the cross-reference data matching feature into the Apple design system and Wizard flow.
+
+**Target features:**
+- Redesign crossref page with Apple Design System (Tile, ProductCard, PillChip)
+- Integrate cross-reference file upload + column mapping step into the Wizard flow
+- Connect Wizard crossref step to existing backend merge/semantic match APIs
+- Preview matched results before export
+
 ## What This Is
 
 A CV data extraction system with Apple-inspired frontend design, multi-step ingestion wizard, and Excel export. Extracts structured data from CVs using AI (Gemini), applies conditional rules, and exports to formatted Excel files.
@@ -50,6 +60,23 @@ Frontend redesigned with Apple "museum gallery" design language.
 - RUT consolidation occurs server-side during export, not in Supabase
 - Single-command launch via `./start.sh`
 
+## Evolution
+
+This document evolves at phase transitions and milestone boundaries.
+
+**After each phase transition** (via `/gsd-transition`):
+1. Requirements invalidated? → Move to Out of Scope with reason
+2. Requirements validated? → Move to Validated with phase reference
+3. New requirements emerged? → Add to Active
+4. Decisions to log? → Add to Key Decisions
+5. "What This Is" still accurate? → Update if drifted
+
+**After each milestone** (via `/gsd-complete-milestone`):
+1. Full review of all sections
+2. Core Value check — still the right priority?
+3. Audit Out of Scope — reasons still valid?
+4. Update Context with current state
+
 ---
 
-*Last updated: 2026-05-15 after v1.0 milestone*
+*Last updated: 2026-05-15 after v1.1 milestone started*
