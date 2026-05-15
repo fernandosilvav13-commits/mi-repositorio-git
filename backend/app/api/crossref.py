@@ -1,8 +1,10 @@
+import json
+import uuid
+from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException, UploadFile, File, Depends
 from app.core.auth import require_auth
 from app.core.security import validate_upload, sanitize_filename
 from app.services.crossref_service import CrossrefService
-from app.core.database import require_supabase
 from pathlib import Path
 import aiofiles
 
@@ -10,8 +12,19 @@ router = APIRouter(dependencies=[Depends(require_auth)])
 crossref_service = CrossrefService()
 upload_dir = Path("uploads/crossref")
 upload_dir.mkdir(parents=True, exist_ok=True)
+manifest_path = upload_dir / "manifest.json"
 
 PREVIEW_MAX_ROWS = 100
+
+
+def _load_manifest() -> list[dict]:
+    if manifest_path.exists():
+        return json.loads(manifest_path.read_text())
+    return []
+
+
+def _save_manifest(entries: list[dict]):
+    manifest_path.write_text(json.dumps(entries, indent=2, default=str))
 
 
 @router.post("/upload")
@@ -29,48 +42,51 @@ async def upload_crossref(file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(400, f"Error al parsear archivo: {e}")
 
-    supabase = require_supabase()
-    try:
-        result = supabase.table("crossref_files").insert({
-            "name": safe_name,
-            "file_type": ext,
-            "columns": columns,
-            "data": data[:PREVIEW_MAX_ROWS],
-            "row_count": len(data),
-            "status": "unmatched",
-        }).execute()
-    except Exception as e:
-        raise HTTPException(502, f"Error al guardar en base de datos: {e}")
-
-    return {
-        "id": result.data[0]["id"],
+    entry = {
+        "id": str(uuid.uuid4()),
         "name": safe_name,
+        "file_type": ext,
         "columns": columns,
+        "data": data[:PREVIEW_MAX_ROWS],
         "row_count": len(data),
         "status": "unmatched",
+        "created_at": datetime.now(timezone.utc).isoformat(),
     }
+
+    manifest = _load_manifest()
+    manifest.insert(0, entry)
+    _save_manifest(manifest)
+
+    return {k: entry[k] for k in ("id", "name", "columns", "row_count", "status")}
 
 
 @router.get("/files")
 async def list_files():
-    supabase = require_supabase()
-    result = supabase.table("crossref_files")\
-        .select("id,name,file_type,columns,row_count,created_at,status")\
-        .order("created_at", desc=True).execute()
-    return result.data
+    manifest = _load_manifest()
+    return [
+        {k: e[k] for k in ("id", "name", "file_type", "columns", "row_count", "created_at", "status")}
+        for e in manifest
+    ]
 
 
 @router.get("/files/{file_id}")
 async def get_file(file_id: str):
-    supabase = require_supabase()
-    result = supabase.table("crossref_files").select("*").eq("id", file_id).execute()
-    if not result.data:
-        raise HTTPException(404, "Archivo no encontrado")
-    return result.data[0]
+    manifest = _load_manifest()
+    for entry in manifest:
+        if entry["id"] == file_id:
+            return entry
+    raise HTTPException(404, "Archivo no encontrado")
 
 
 @router.delete("/files/{file_id}")
 async def delete_file(file_id: str):
-    supabase = require_supabase()
-    supabase.table("crossref_files").delete().eq("id", file_id).execute()
-    return {"ok": True}
+    manifest = _load_manifest()
+    for i, entry in enumerate(manifest):
+        if entry["id"] == file_id:
+            file_path = upload_dir / entry["name"]
+            if file_path.exists():
+                file_path.unlink()
+            manifest.pop(i)
+            _save_manifest(manifest)
+            return {"ok": True}
+    raise HTTPException(404, "Archivo no encontrado")

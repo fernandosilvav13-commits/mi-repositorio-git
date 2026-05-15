@@ -5,6 +5,8 @@ from app.services.rules_engine import RulesEngine
 from app.services.consolidator import Consolidator
 from app.services.crossref_service import CrossrefService
 from app.core.database import require_supabase
+from pathlib import Path
+import json
 
 router = APIRouter()
 excel_service = ExcelService()
@@ -39,16 +41,18 @@ async def export_to_excel(data: dict):
     consolidated_rows, _ = consolidator.consolidate(columns, rows)
 
     if crossref_file_id and column_mapping:
-        crossref_result = (
-            supabase.table("crossref_files")
-            .select("name")
-            .eq("id", crossref_file_id)
-            .execute()
-        )
-        if not crossref_result.data:
+        manifest_path = Path("uploads/crossref/manifest.json")
+        entry = None
+        if manifest_path.exists():
+            manifest = json.loads(manifest_path.read_text())
+            for e in manifest:
+                if e["id"] == crossref_file_id:
+                    entry = e
+                    break
+        if not entry:
             raise HTTPException(404, "Archivo de cruce no encontrado")
 
-        full_data = crossref_service.load_file_data(crossref_result.data[0]["name"])
+        full_data = crossref_service.load_file_data(entry["name"])
         merged_rows = crossref_service.merge_data(
             rows=consolidated_rows,
             crossref_rows=full_data,
