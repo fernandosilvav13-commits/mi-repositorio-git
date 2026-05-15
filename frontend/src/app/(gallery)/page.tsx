@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
+import { FileText } from "lucide-react";
 
 interface Result {
   id?: string;
@@ -84,7 +84,6 @@ export default function GalleryPage() {
           Extracted Insights
         </h1>
         
-        {/* Controls Overlay (Apple-style sub-nav) */}
         <div className="flex flex-wrap items-center justify-center gap-4 mt-4 p-4 rounded-2xl bg-near-black/5 backdrop-blur-md">
           <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
             <SelectTrigger className="w-[200px] bg-white rounded-full border-none shadow-sm h-10 px-4">
@@ -134,15 +133,41 @@ export default function GalleryPage() {
       <Tile variant="dark" className="min-h-[600px] !items-start">
         {results.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-7xl mx-auto">
-            {results.map((result, idx) => (
-              <ProductCard
-                key={result.id || idx}
-                title={result.filename}
-                description="Status: Pristine"
-              >
-                {/* Data mapping will be done in Task 2 */}
-              </ProductCard>
-            ))}
+            {results.map((result, idx) => {
+              // Task 2: Data Mapping
+              const score = result.data.score || result.data.Score || "Pristine";
+              const rut = result.data.RUT || result.data.rut || "Unknown";
+              
+              return (
+                <ProductCard
+                  key={result.id || idx}
+                  title={result.filename}
+                  description={`Condition: ${score}`}
+                  className="h-full"
+                >
+                  <div className="flex flex-col gap-4">
+                    <div className="relative w-full aspect-[4/3] bg-near-black-2 rounded-md flex items-center justify-center overflow-hidden">
+                       <FileText size={64} className="text-white/10" />
+                       <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent pointer-events-none" />
+                    </div>
+                    
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[10px] uppercase tracking-widest text-ink/40 font-bold">
+                        Artifact Metadata
+                      </span>
+                      <div className="flex justify-between items-center py-2 border-b border-ink/5">
+                        <span className="text-[13px] text-ink/60">Serial No.</span>
+                        <span className="text-[13px] font-mono font-medium">{rut}</span>
+                      </div>
+                      <div className="flex justify-between items-center py-2">
+                        <span className="text-[13px] text-ink/60">Provenance</span>
+                        <span className="text-[13px]">{result.folder || "Raíz"}</span>
+                      </div>
+                    </div>
+                  </div>
+                </ProductCard>
+              );
+            })}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-40 w-full text-white/40">
