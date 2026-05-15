@@ -77,8 +77,8 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 04-00-PLAN.md — Setup testing infrastructure and failing tests
-- [ ] 04-01-PLAN.md — Refactor cross-reference merge logic (compound keys, O(1) tuples)
+- [x] 04-00-PLAN.md — Setup testing infrastructure and failing tests
+- [x] 04-01-PLAN.md — Refactor cross-reference merge logic (compound keys, O(1) tuples)
 - [ ] 04-02-PLAN.md — Excel visual styling (row highlighting, header prefixes)
 - [ ] 04-03-PLAN.md — Export API orchestration and integration
 **UI hint**: yes

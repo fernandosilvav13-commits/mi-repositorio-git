@@ -20,7 +20,7 @@ Requirements for v1.1 Cross-Reference Integration. Each maps to roadmap phases.
 
 ### Export with Cross-Reference
 
-- [ ] **EXP-01**: Exported Excel includes cross-referenced data columns from matched rows
+- [x] **EXP-01**: Exported Excel includes cross-referenced data columns from matched rows
 - [ ] **EXP-02**: Unmatched rows are visually flagged in the exported output
 
 ## v2 Requirements
@@ -50,7 +50,7 @@ Deferred to future release.
 | WIZ-01 | Phase 03 | Pending |
 | WIZ-02 | Phase 03 | Pending |
 | WIZ-03 | Phase 03 | Complete |
-| EXP-01 | Phase 04 | Pending |
+| EXP-01 | Phase 04 | Complete |
 | EXP-02 | Phase 04 | Pending |
 
 **Coverage:**
