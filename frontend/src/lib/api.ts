@@ -29,6 +29,33 @@ async function downloadBlob(path: string, data: any, filename: string = "resulta
   URL.revokeObjectURL(url);
 }
 
+const uploadWithProgress = (
+  file: File,
+  onProgress: (percent: number) => void
+): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    const form = new FormData();
+    form.append("file", file);
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", `${API_BASE}/api/crossref/upload`);
+    xhr.upload.onprogress = (e: ProgressEvent) => {
+      if (e.lengthComputable) {
+        onProgress(Math.round((e.loaded / e.total) * 100));
+      }
+    };
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve(JSON.parse(xhr.responseText));
+      } else {
+        reject(new Error(xhr.responseText));
+      }
+    };
+    xhr.onerror = () => reject(new Error("Upload failed"));
+    xhr.onabort = () => reject(new Error("Upload cancelled"));
+    xhr.send(form);
+  });
+};
+
 export const api = {
   ingest: {
     upload: (files: File[]) => {
@@ -99,3 +126,5 @@ export const api = {
       request<any>(`/api/crossref/files/${id}`, { method: "DELETE" }),
   },
 };
+
+export { uploadWithProgress };
