@@ -1,9 +1,23 @@
 import pytest
 from app.services.crossref_service import CrossrefService
 
+from app.schemas.crossref import ColumnMapping, MatchKey
+
 @pytest.fixture
 def service():
     return CrossrefService()
+
+def test_schema():
+    """Verify that ColumnMapping validates the Wizard payload format."""
+    payload = {
+        "matchKeys": [{"extractionKey": "k1", "crossrefKey": "c1"}],
+        "output_columns": ["col1"]
+    }
+    mapping = ColumnMapping(**payload)
+    assert len(mapping.matchKeys) == 1
+    assert mapping.matchKeys[0].extractionKey == "k1"
+    assert mapping.matchKeys[0].crossrefKey == "c1"
+    assert mapping.output_columns == ["col1"]
 
 def test_merge_data_compound_keys(service):
     """
