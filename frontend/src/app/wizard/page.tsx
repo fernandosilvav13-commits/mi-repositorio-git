@@ -16,6 +16,8 @@ import { toast } from "sonner";
 import ConfiguratorCard from "@/components/apple/ConfiguratorCard";
 import PillChip from "@/components/apple/PillChip";
 import FrostedContainer from "@/components/apple/FrostedContainer";
+import MatchKeySelector from "@/components/apple/MatchKeySelector";
+import OutputColumnPicker from "@/components/apple/OutputColumnPicker";
 import { cn } from "@/lib/utils";
 
 type Step = "upload" | "crossref" | "template" | "rules" | "extract" | "export" | "review";
@@ -47,8 +49,8 @@ export default function WizardPage() {
   const [uploadingCrossref, setUploadingCrossref] = useState(false);
   const [selectedCrossrefId, setSelectedCrossrefId] = useState("");
   const [crossrefData, setCrossrefData] = useState<any>(null);
-  const [matchColumn, setMatchColumn] = useState("");
-  const [crossrefMatchColumn, setCrossrefMatchColumn] = useState("");
+  const [matchKeys, setMatchKeys] = useState<{ extraction: string; crossref: string }[]>([]);
+  const [suggestedMatchKeys, setSuggestedMatchKeys] = useState<{ extraction: string; crossref: string }[]>([]);
   const [outputColumns, setOutputColumns] = useState<string[]>([]);
   const [crossrefStatus, setCrossrefStatus] = useState<"idle" | "loading" | "ready" | "mapped">("idle");
   const [crossrefError, setCrossrefError] = useState<string | null>(null);
@@ -161,6 +163,26 @@ export default function WizardPage() {
     }
   };
 
+  const computeSuggestedMatchKeys = (crossrefColumns: string[], extractionCols: string[]) => {
+    const suggestions: { extraction: string; crossref: string }[] = [];
+    for (const extCol of extractionCols) {
+      const match = crossrefColumns.find(
+        (c: string) => c.trim().toLowerCase() === extCol.trim().toLowerCase()
+      );
+      if (match) {
+        suggestions.push({ extraction: extCol, crossref: match });
+      }
+    }
+    return suggestions;
+  };
+
+  const computeSuggestedOutputColumns = (crossrefColumns: string[], extractionCols: string[]) => {
+    const templateColLower = extractionCols.map((c: string) => c.trim().toLowerCase());
+    return crossrefColumns.filter(
+      (c: string) => !templateColLower.includes(c.trim().toLowerCase())
+    );
+  };
+
   const handleUploadCrossref = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
     setUploadingCrossref(true);
@@ -172,6 +194,16 @@ export default function WizardPage() {
       setCrossrefFiles(updated);
       setSelectedCrossrefId(result.id);
       setCrossrefData(result);
+
+      // Compute auto-suggestions
+      const columns = result.columns || [];
+      const suggestions = computeSuggestedMatchKeys(columns, templateColumns);
+      setSuggestedMatchKeys(suggestions);
+      if (matchKeys.length === 0) {
+        setMatchKeys(suggestions.length > 0 ? suggestions : []);
+      }
+      setOutputColumns(computeSuggestedOutputColumns(columns, templateColumns));
+
       setCrossrefStatus("ready");
       setSubStep(2);
     } catch (e: unknown) {
@@ -190,8 +222,14 @@ export default function WizardPage() {
     try {
       const data = await api.crossref.get(id);
       setCrossrefData(data);
-      setCrossrefMatchColumn(data.columns?.[0] || "");
-      setOutputColumns(data.columns?.slice(1, 3) || []);
+
+      // Compute auto-suggestions
+      const columns = data.columns || [];
+      const suggestions = computeSuggestedMatchKeys(columns, templateColumns);
+      setSuggestedMatchKeys(suggestions);
+      setMatchKeys(suggestions.length > 0 ? suggestions : []);
+      setOutputColumns(computeSuggestedOutputColumns(columns, templateColumns));
+
       setCrossrefStatus("ready");
       setSubStep(2);
     } catch (e: unknown) {
@@ -236,8 +274,8 @@ export default function WizardPage() {
       if (enableCrossref && selectedCrossrefId) {
         payload.crossref_file_id = selectedCrossrefId;
         payload.column_mapping = {
-          match_column: matchColumn,
-          crossref_match_column: crossrefMatchColumn,
+          match_column: matchKeys[0]?.extraction || "",
+          crossref_match_column: matchKeys[0]?.crossref || "",
           output_columns: outputColumns,
         };
       }
@@ -489,23 +527,53 @@ export default function WizardPage() {
           )}
 
           {currentStep === "crossref" && subStep === 2 && (
-            <ConfiguratorCard title="Conexión de campos" subtitle="Seleccione la columna de la base maestra que se utilizará como llave de unión.">
-                <div className="space-y-6">
-                    <div className="space-y-2">
-                        <label className="text-[14px] font-semibold text-[#7a7a7a] uppercase tracking-wide">Campo de unión</label>
-                        <Select value={crossrefMatchColumn} onValueChange={(v) => v && setCrossrefMatchColumn(v)}>
-                            <SelectTrigger className="w-full bg-parchment rounded-lg px-4 py-3 text-ink border border-[#e0e0e0]">
-                                <SelectValue placeholder="Seleccionar campo" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {crossrefData?.columns?.map((c: string) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <button onClick={goNext} className="w-full bg-action-blue text-white rounded-full py-3 text-[17px] font-medium active-scale">
-                        Confirmar Enlace
-                    </button>
+            <ConfiguratorCard title="Columnas de cruce" subtitle="Configure cómo se relacionan los datos extraídos con los de referencia.">
+              {!crossrefData ? (
+                <div className="flex items-center justify-center py-8">
+                  <p className="text-[14px] text-[#7a7a7a]">Cargando columnas...</p>
                 </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Match Key Selector */}
+                  <MatchKeySelector
+                    columns={crossrefData?.columns || []}
+                    extractionColumns={templateColumns}
+                    suggestedKeys={suggestedMatchKeys}
+                    value={matchKeys}
+                    onChange={setMatchKeys}
+                  />
+
+                  {/* Divider */}
+                  <hr className="my-6 border-[#e0e0e0]" />
+
+                  {/* Output Column Picker */}
+                  <OutputColumnPicker
+                    columns={crossrefData?.columns || []}
+                    selected={outputColumns}
+                    suggested={computeSuggestedOutputColumns(crossrefData?.columns || [], templateColumns)}
+                    onChange={setOutputColumns}
+                  />
+
+                  {/* Confirm Button */}
+                  <button
+                    onClick={() => {
+                      if (matchKeys.length === 0 || !matchKeys[0]?.extraction || !matchKeys[0]?.crossref) {
+                        return;
+                      }
+                      setCrossrefStatus("mapped");
+                      goNext();
+                    }}
+                    className="w-full bg-action-blue text-white rounded-full py-3 text-[17px] font-medium active-scale"
+                  >
+                    Confirmar correspondencia
+                  </button>
+                  {matchKeys.length === 0 && (
+                    <p className="text-[12px] text-red-500 text-center">
+                      Seleccione al menos una clave de coincidencia
+                    </p>
+                  )}
+                </div>
+              )}
             </ConfiguratorCard>
           )}
 
