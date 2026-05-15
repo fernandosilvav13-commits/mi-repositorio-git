@@ -41,7 +41,12 @@ Plans:
   2. User can upload a cross-reference file (PDF/CSV/PPT/DOCX) from the redesigned page
   3. User can see all uploaded cross-reference files in a clean artifact-based list view
   4. Each file in the list shows a match status indicator (matched, unmatched, processing)
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Add status column to crossref_files + return status in API responses
+- [ ] 02-02-PLAN.md — Extend PillChip with status variant + add uploadWithProgress helper
+- [ ] 02-03-PLAN.md — Redesign crossref page with Apple Design System components
 **UI hint**: yes
 
 ### Phase 03: Wizard Cross-Reference Integration
@@ -71,6 +76,6 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 1. Frontend Overhaul (Apple Design) | v1.0 | 4/4 | Complete | 2026-05-14 |
-| 2. Crossref Page Redesign | v1.1 | 0/0 | Not started | - |
+| 2. Crossref Page Redesign | v1.1 | 0/3 | Planning | - |
 | 3. Wizard Cross-Reference Integration | v1.1 | 0/0 | Not started | - |
 | 4. Cross-Reference Export | v1.1 | 0/0 | Not started | - |
