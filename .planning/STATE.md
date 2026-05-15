@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Cross-Reference Integration
 status: executing
-stopped_at: Phase 03 discuss-phase complete — Wizard Crossref Integration context gathered
-last_updated: "2026-05-15T14:42:00.000Z"
-last_activity: 2026-05-15 -- Phase 03 discuss-phase complete
+stopped_at: Phase 03 UI-SPEC approved — ready for planning
+last_updated: "2026-05-15T15:50:00.000Z"
+last_activity: 2026-05-15 -- Phase 03 UI-SPEC approved
 progress:
   total_phases: 3
   completed_phases: 1
@@ -25,14 +25,14 @@ See: .planning/PROJECT.md (updated 2026-05-15)
 
 ## Current Position
 
-Phase: 03 (wizard-crossref-integration) — DISCUSS COMPLETE
+Phase: 03 (wizard-crossref-integration) — UI-SPEC APPROVED
 Plan: 0 of 0 (not yet planned)
-Status: Phase 03 discuss-phase complete — context gathered
-Last activity: 2026-05-15 -- Phase 03 discuss-phase complete
+Status: Phase 03 UI design contract approved
+Last activity: 2026-05-15 -- Phase 03 UI-SPEC approved
 
 Progress: Next: plan Phase 03
 
-*Calculation: Phase 02 = 3/3 plans complete (shipped). Phase 03 = discuss complete, ready for planning.*
+*Calculation: Phase 02 = 3/3 plans complete (shipped). Phase 03 = discuss + UI-SPEC complete, ready for planning.*
 
 ## Performance Metrics
 
@@ -72,6 +72,7 @@ Progress: Next: plan Phase 03
 - [Phase 03-wizard-crossref]: CrossRef step keeps position at Wizard step 2; all mapping configured at file upload time
 - [Phase 03-wizard-crossref]: Always semantic matching (Gemini), runs during extraction
 - [Phase 03-wizard-crossref]: Match preview shown in review step; auto re-match on mapping change
+- [Phase 03-wizard-crossref]: UI-SPEC approved — spacing 4-80px (4px grid), typography 14/17/21/34px, color 60/30/10 (parchment/white/Action Blue), Spanish locale, 4 new components, compound match keys
 
 ### Pending Todos
 
@@ -83,6 +84,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-15T14:28:00.000Z
-Stopped at: Phase 02 complete — proceeding to Phase 03
-Resume file: None
+Last session: 2026-05-15T15:50:00.000Z
+Stopped at: Phase 03 UI-SPEC approved — ready for planning
+Resume file: .planning/phases/03-wizard-crossref-integration/03-UI-SPEC.md
