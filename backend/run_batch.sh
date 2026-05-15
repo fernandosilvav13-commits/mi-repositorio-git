@@ -1,5 +1,5 @@
 #!/bin/bash
-export GOOGLE_API_KEY=""
+export GOOGLE_API_KEY="your_google_api_key_here"
 export SAMPLE_SIZE=54
 cd /home/fernandosilvav/Proyecto-Prueba/backend
 rm -f outputs/.batch_state.pkl

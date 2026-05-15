@@ -1,5 +1,15 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import httpx
+
+# Monkeypatch httpx for compatibility with supabase-py
+original_init = httpx.Client.__init__
+def new_init(self, *args, **kwargs):
+    if 'proxy' in kwargs:
+        kwargs['proxies'] = kwargs.pop('proxy')
+    return original_init(self, *args, **kwargs)
+httpx.Client.__init__ = new_init
+
 from app.core.config import settings
 from app.api import ingest, templates, extraction, rules, export, crossref
 

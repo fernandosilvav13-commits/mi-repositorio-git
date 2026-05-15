@@ -58,7 +58,12 @@ export const api = {
   },
   extraction: {
     extract: (data: any) =>
-      request<any[]>("/api/extraction/extract", {
+      request<any[]>("/api/extraction/", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    batch: (data: any) =>
+      request<any>("/api/extraction/extract/batch", {
         method: "POST",
         body: JSON.stringify(data),
       }),
@@ -77,7 +82,7 @@ export const api = {
       }),
   },
   export: {
-    excel: (data: any) => downloadBlob("/api/export/excel", data),
+    excel: (data: any) => downloadBlob("/api/export/", data),
   },
   crossref: {
     upload: (file: File) => {

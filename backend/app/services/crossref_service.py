@@ -7,12 +7,40 @@ from typing import Any
 from app.core.config import settings
 
 
+from app.services.llm_service import extract_fields
+
+
 class CrossrefService:
     SUPPORTED_EXTENSIONS = {".pdf", ".csv", ".pptx", ".ppt", ".docx", ".doc"}
 
     def __init__(self):
         self.upload_dir = Path(settings.upload_dir) / "crossref"
         self.upload_dir.mkdir(parents=True, exist_ok=True)
+
+    async def semantic_match(self, query_data: dict, candidates: list[dict], output_columns: list[str]) -> dict:
+        """Usa Gemini 2.0 Flash para encontrar el mejor match semántico."""
+        prompt = f"""
+        Eres un experto en cruce de datos. Debes encontrar cuál de los 'Candidatos' coincide mejor con el 'Origen'.
+        
+        Origen: {json.dumps(query_data)}
+        
+        Candidatos:
+        {json.dumps(candidates[:10], indent=2)}
+        
+        Si encuentras un match claro, devuelve un JSON con los campos solicitados: {output_columns}.
+        Si no hay match, devuelve todos los campos como "NO ENCONTRADO".
+        """
+        
+        schema = {
+            "type": "object",
+            "properties": {col: {"type": "string"} for col in output_columns}
+        }
+        
+        try:
+            result = await extract_fields(prompt, schema, model=settings.gemini_model_crossref)
+            return result
+        except:
+            return {col: "NO ENCONTRADO" for col in output_columns}
 
     def save_file(self, file_content: bytes, filename: str) -> str:
         dest = self.upload_dir / filename

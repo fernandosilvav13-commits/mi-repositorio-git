@@ -31,6 +31,10 @@ async def export_to_excel(data: dict):
         raise HTTPException(404, "Plantilla no encontrada")
 
     columns = [c["name"] for c in template_data.data[0].get("columns", [])]
+    
+    # Agregar columna 'Carpeta' si viene en los datos
+    if rows and "Carpeta" in rows[0] and "Carpeta" not in columns:
+        columns.insert(0, "Carpeta")
 
     consolidated_rows, _ = consolidator.consolidate(columns, rows)
 

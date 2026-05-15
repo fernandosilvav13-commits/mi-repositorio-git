@@ -11,10 +11,10 @@ supabase: Client | None = None
 def get_supabase() -> Client | None:
     global supabase
     if supabase is None:
-        if not settings.SUPABASE_URL or not settings.SUPABASE_KEY:
-            logger.warning("SUPABASE_URL o SUPABASE_KEY no configurados")
+        if not settings.supabase_url or not settings.supabase_key:
+            logger.warning("supabase_url o supabase_key no configurados")
             return None
-        supabase = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
+        supabase = create_client(settings.supabase_url, settings.supabase_key)
         logger.info("Conectado a Supabase")
     return supabase
 
