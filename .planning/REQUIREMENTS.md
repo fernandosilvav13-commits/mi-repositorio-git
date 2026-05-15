@@ -45,18 +45,18 @@ Deferred to future release.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CRSS-01 | — | Pending |
-| CRSS-02 | — | Pending |
-| WIZ-01 | — | Pending |
-| WIZ-02 | — | Pending |
-| WIZ-03 | — | Pending |
-| EXP-01 | — | Pending |
-| EXP-02 | — | Pending |
+| CRSS-01 | Phase 02 | Pending |
+| CRSS-02 | Phase 02 | Pending |
+| WIZ-01 | Phase 03 | Pending |
+| WIZ-02 | Phase 03 | Pending |
+| WIZ-03 | Phase 03 | Pending |
+| EXP-01 | Phase 04 | Pending |
+| EXP-02 | Phase 04 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 7 total
-- Mapped to phases: 0
-- Unmapped: 7 ⚠️
+- Mapped to phases: 7 ✓
+- Unmapped: 0
 
 ---
 
