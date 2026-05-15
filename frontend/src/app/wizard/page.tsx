@@ -40,9 +40,11 @@ export default function WizardPage() {
   const [uploadedPaths, setUploadedPaths] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const crossrefFileRef = useRef<HTMLInputElement>(null);
 
   const [enableCrossref, setEnableCrossref] = useState<boolean | null>(null);
   const [crossrefFiles, setCrossrefFiles] = useState<any[]>([]);
+  const [uploadingCrossref, setUploadingCrossref] = useState(false);
   const [selectedCrossrefId, setSelectedCrossrefId] = useState("");
   const [crossrefData, setCrossrefData] = useState<any>(null);
   const [matchColumn, setMatchColumn] = useState("");
@@ -129,6 +131,22 @@ export default function WizardPage() {
       toast.error("Error al procesar archivos");
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleUploadCrossref = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setUploadingCrossref(true);
+    try {
+      const result = await api.crossref.upload(files[0]);
+      toast.success("Archivo de referencia subido");
+      const updated = await api.crossref.list();
+      setCrossrefFiles(updated);
+      setSelectedCrossrefId(result.id);
+    } catch (e) {
+      toast.error("Error al subir archivo de referencia");
+    } finally {
+      setUploadingCrossref(false);
     }
   };
 
@@ -307,30 +325,46 @@ export default function WizardPage() {
 
           {currentStep === "crossref" && subStep === 1 && (
             <div className="flex flex-col gap-4">
-              {crossrefFiles.length === 0 ? (
-                <ConfiguratorCard>
-                  <div className="flex flex-col items-center py-8 text-center">
-                    <Database size={40} className="text-[#7a7a7a] mb-4" />
-                    <p className="text-[17px] font-semibold text-ink mb-1">No hay archivos de referencia</p>
-                    <p className="text-[14px] text-[#7a7a7a] max-w-sm">
-                      Suba archivos desde la página de Referencia Cruzada antes de continuar.
+              <ConfiguratorCard title="Subir archivo de referencia" subtitle="CSV, PDF, DOCX o PPT con datos maestros para validación.">
+                <div className="flex flex-col items-center py-4 gap-4">
+                  <input
+                    ref={crossrefFileRef}
+                    type="file"
+                    accept=".csv,.pdf,.docx,.ppt,.pptx"
+                    className="hidden"
+                    onChange={(e) => handleUploadCrossref(e.target.files)}
+                  />
+                  <div
+                    onClick={() => crossrefFileRef.current?.click()}
+                    className="w-full aspect-[3/1] rounded-lg border-2 border-dashed border-[#e0e0e0] flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-action-blue transition-colors bg-white/50"
+                  >
+                    <Upload size={24} className="text-[#7a7a7a]" />
+                    <p className="text-[14px] font-medium text-[#7a7a7a]">
+                      {uploadingCrossref ? "Subiendo..." : "Haga clic para seleccionar archivo"}
                     </p>
                   </div>
-                </ConfiguratorCard>
-              ) : (
-                crossrefFiles.map((f: any) => (
-                  <ConfiguratorCard key={f.id}>
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-[17px] font-semibold text-ink">{f.name}</p>
-                            <p className="text-[14px] text-[#7a7a7a]">{f.row_count} registros disponibles</p>
-                        </div>
-                        <PillChip selected={selectedCrossrefId === f.id} onClick={() => handleSelectCrossref(f.id)}>
-                            {selectedCrossrefId === f.id ? "Seleccionado" : "Usar este"}
-                        </PillChip>
-                    </div>
-                  </ConfiguratorCard>
-                ))
+                </div>
+              </ConfiguratorCard>
+
+              {crossrefFiles.length > 0 && (
+                <>
+                  <p className="text-[14px] font-semibold text-[#7a7a7a] uppercase tracking-wide px-1">
+                    Archivos disponibles
+                  </p>
+                  {crossrefFiles.map((f: any) => (
+                    <ConfiguratorCard key={f.id}>
+                      <div className="flex items-center justify-between">
+                          <div>
+                              <p className="text-[17px] font-semibold text-ink">{f.name}</p>
+                              <p className="text-[14px] text-[#7a7a7a]">{f.row_count} registros</p>
+                          </div>
+                          <PillChip selected={selectedCrossrefId === f.id} onClick={() => handleSelectCrossref(f.id)}>
+                              {selectedCrossrefId === f.id ? "Seleccionado" : "Usar este"}
+                          </PillChip>
+                      </div>
+                    </ConfiguratorCard>
+                  ))}
+                </>
               )}
             </div>
           )}
@@ -365,7 +399,13 @@ export default function WizardPage() {
                             <p className="text-[17px] font-semibold text-ink">{t.name}</p>
                             <p className="text-[14px] text-[#7a7a7a]">{t.columns?.length} campos configurados</p>
                         </div>
-                        <PillChip selected={selectedTemplateId === t.id} onClick={() => { setSelectedTemplateId(t.id); setTemplateColumns(t.columns.map((c:any) => c.name)); goNext(); }}>
+                        <PillChip selected={selectedTemplateId === t.id} onClick={() => {
+                            setSelectedTemplateId(t.id);
+                            setTemplateColumns(t.columns.map((c:any) => c.name));
+                            setStepHistory((prev) => [...prev, { step: currentStep, subStep }]);
+                            setCurrentStep("rules");
+                            setSubStep(0);
+                        }}>
                             Seleccionar
                         </PillChip>
                     </div>
