@@ -97,8 +97,11 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. User sees "Template Selection" before "Cross-Reference" in the Wizard flow.
   2. In the "Cross-Reference" step, the dropdown for "Select template field" correctly displays the columns from the previously selected template.
-**Plans**: TBD
+**Plans**: 1 plan
 **UI hint**: yes
+
+Plans:
+- [ ] 05-01-PLAN.md — Reorder Wizard steps + navigation targets + D-01/D-03 guard
 
 ## Progress
 
