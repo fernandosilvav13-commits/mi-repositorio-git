@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Wizard Reordering
-status: planning
-last_updated: "2026-05-16T00:05:52.350Z"
-last_activity: 2026-05-16
+status: Defining requirements
+stopped_at: Phase 05 context gathered
+last_updated: "2026-05-16T00:11:15.818Z"
+last_activity: 2026-05-16 — Milestone v1.2 started
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
-  percent: 0
 ---
 
 # Project State
@@ -82,6 +82,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-15T20:38:00.000Z
-Stopped at: Phase 04 complete, ready to plan Phase 05
-Resume file: None
+Last session: 2026-05-16T00:11:15.801Z
+Stopped at: Phase 05 context gathered
+Resume file: .planning/phases/05-wizard-reordering/05-CONTEXT.md
