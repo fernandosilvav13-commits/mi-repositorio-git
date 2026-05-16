@@ -21,7 +21,16 @@ Requirements for v1.1 Cross-Reference Integration. Each maps to roadmap phases.
 ### Export with Cross-Reference
 
 - [x] **EXP-01**: Exported Excel includes cross-referenced data columns from matched rows
-- [ ] **EXP-02**: Unmatched rows are visually flagged in the exported output
+- [x] **EXP-02**: Unmatched rows are visually flagged in the exported output
+
+## v1.2 Requirements
+
+Requirements for v1.2 Wizard Reordering.
+
+### Wizard Reordering
+
+- [ ] **WIZ-04**: Change the Wizard steps sequence to: Upload -> Template -> CrossRef -> Rules -> Extract -> Export
+- [ ] **WIZ-05**: Ensure Wizard back/next navigation handles the new state dependencies correctly
 
 ## v2 Requirements
 
@@ -32,6 +41,10 @@ Deferred to future release.
 - **AUTH-01**: User can log in with email and password
 - **AUTH-02**: User sessions persist across browser refresh
 - **AUTH-03**: Extraction results are scoped per user
+
+### Backend Refinement
+
+- **PERF-01**: Optimize data fetching and state management
 
 ## Out of Scope
 
@@ -51,11 +64,14 @@ Deferred to future release.
 | WIZ-02 | Phase 03 | Pending |
 | WIZ-03 | Phase 03 | Complete |
 | EXP-01 | Phase 04 | Complete |
-| EXP-02 | Phase 04 | Pending |
+| EXP-02 | Phase 04 | Complete |
+| WIZ-04 | Phase 05 | Pending |
+| WIZ-05 | Phase 05 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 7 total
-- Mapped to phases: 7 ✓
+- v1.2 requirements: 2 total
+- Mapped to phases: 9 ✓
 - Unmapped: 0
 
 ---

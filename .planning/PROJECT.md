@@ -1,14 +1,13 @@
 # CicloAI
 
-## Current Milestone: v1.1 Cross-Reference Integration
+## Current Milestone: v1.2 Wizard Reordering
 
-**Goal:** Polish and integrate the cross-reference data matching feature into the Apple design system and Wizard flow.
+**Goal:** Fix the cross-reference mapping issue by reordering the Wizard steps so Template Selection happens before Cross-Reference.
 
 **Target features:**
-- Redesign crossref page with Apple Design System (Tile, ProductCard, PillChip)
-- Integrate cross-reference file upload + column mapping step into the Wizard flow
-- Connect Wizard crossref step to existing backend merge/semantic match APIs
-- Preview matched results before export
+- Move Template Selection (and column definition) to occur before the Cross-Reference step in the Wizard flow.
+- Ensure the Cross-Reference step correctly loads the selected template's columns for match key selection.
+- Update Wizard navigation and state management to support the new sequence.
 
 ## What This Is
 
@@ -22,6 +21,7 @@ Extract structured CV data with a beautiful, intuitive interface and export-read
 
 ### Validated
 
+- ✓ Cross-reference data from external files (PDF/CSV/PPT/DOCX) — Phase 04
 - ✓ Apple Color System (Action Blue, Parchment, Near-Black) — v1.0
 - ✓ SF Pro / Inter Typographic Hierarchy — v1.0
 - ✓ Full-Bleed Tile Layout components — v1.0
@@ -32,7 +32,6 @@ Extract structured CV data with a beautiful, intuitive interface and export-read
 ### Active
 
 - [ ] Backend Integration Refinement — optimize data fetching and state management
-- [ ] Cross-reference data from external files (PDF/CSV/PPT/DOCX)
 
 ### Out of Scope
 
@@ -49,6 +48,8 @@ Frontend redesigned with Apple "museum gallery" design language.
 
 | Decision | Outcome | Status |
 | -------- | ------- | ------ |
+| Tuple-based composite keys for matching | O(1) matching performance with multiple columns | ✓ Good |
+| pytest for backend testing | Better async support and cleaner syntax | ✓ Good |
 | Apple Design System with Tailwind v4 | Consistent, elegant UI | ✓ Good |
 | Dual-navigation shell (44px + 52px) | Clear information hierarchy | ✓ Good |
 | Museum Gallery artifact presentation | Intuitive data visualization | ✓ Good |
@@ -78,5 +79,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-
-*Last updated: 2026-05-15 after v1.1 milestone started*
+*Last updated: 2026-05-16 after starting Milestone v1.2*

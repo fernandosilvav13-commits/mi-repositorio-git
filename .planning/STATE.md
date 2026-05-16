@@ -1,17 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: Cross-Reference Integration
-status: verifying
-stopped_at: Phase 03 UI-SPEC approved — ready for planning
-last_updated: "2026-05-15T17:02:04.708Z"
-last_activity: 2026-05-15
+milestone: v1.2
+milestone_name: Wizard Reordering
+status: planning
+last_updated: "2026-05-16T00:05:52.350Z"
+last_activity: 2026-05-16
 progress:
-  total_phases: 4
-  completed_phases: 2
-  total_plans: 10
-  completed_plans: 8
-  percent: 80
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -21,18 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-15)
 
 **Core value:** Extract structured CV data with a beautiful, intuitive interface and export-ready results.
-**Current focus:** Phase 04 — Cross-Reference Export
+**Current focus:** Phase 05 — Wizard Reordering
 
 ## Current Position
 
-Phase: 04 — EXECUTING
-Plan: 0 of 0
-Status: Phase complete — ready for verification
-Last activity: 2026-05-15
-
-Progress: 
-
-[████████░░] 80%
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-16 — Milestone v1.2 started
 
 ## Performance Metrics
 
@@ -50,6 +45,7 @@ Progress:
 | 2. Crossref Page Redesign | 3 | complete | ~2min |
 | 3. Wizard Cross-Reference Integration | 3 | complete | ~15min |
 | 4. Cross-Reference Export | 0 | executing | - |
+| 5. Wizard Reordering | 0 | pending | - |
 
 ## Accumulated Context
 
@@ -73,6 +69,8 @@ Progress:
 - [Phase 03-wizard-crossref]: Always semantic matching (Gemini), runs during extraction
 - [Phase 03-wizard-crossref]: Match preview shown in review step; auto re-match on mapping change
 - [Phase 03-wizard-crossref]: UI-SPEC approved — spacing 4-80px (4px grid), typography 14/17/21/34px, color 60/30/10 (parchment/white/Action Blue), Spanish locale, 4 new components, compound match keys
+- [Phase 04-cross-reference-export]: Tuple-based composite keys for matching for O(1) performance with multiple columns
+- [Phase 04-cross-reference-export]: pytest adopted for backend testing for async support and cleaner syntax
 
 ### Pending Todos
 
@@ -84,6 +82,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-15T15:50:00.000Z
-Stopped at: Phase 03 UI-SPEC approved — ready for planning
-Resume file: .planning/phases/03-wizard-crossref-integration/03-UI-SPEC.md
+Last session: 2026-05-15T20:38:00.000Z
+Stopped at: Phase 04 complete, ready to plan Phase 05
+Resume file: None

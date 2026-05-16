@@ -4,6 +4,7 @@
 
 - ✅ **v1.0 MVP** — Phase 1 (shipped 2026-05-15)
 - 🚧 **v1.1 Cross-Reference Integration** — Phases 2–4 (in progress)
+- 📅 **v1.2 Wizard Reordering** — Phase 05 (planned)
 
 ## Phases
 
@@ -28,7 +29,13 @@ Plans:
 
 - [x] **Phase 02: Crossref Page Redesign** — Redesign the cross-reference page with Apple Design System components (Tile, FrostedContainer, PillChip) (completed 2026-05-15)
 - [x] **Phase 03: Wizard Cross-Reference Integration** — Integrate cross-reference upload, column mapping, and preview into the Wizard flow (completed 2026-05-15)
-- [ ] **Phase 04: Cross-Reference Export** — Exported Excel includes cross-referenced columns with unmatched rows flagged (in progress)
+- [x] **Phase 04: Cross-Reference Export** — Exported Excel includes cross-referenced columns with unmatched rows flagged (in progress) (completed 2026-05-15)
+
+### 📅 v1.2 Wizard Reordering (Planned)
+
+**Milestone Goal:** Fix the cross-reference mapping issue by reordering the Wizard steps so Template Selection happens before Cross-Reference.
+
+- [ ] **Phase 05: Wizard Reordering** — Change Wizard sequence and ensure Cross-Reference loads template columns
 
 ## Phase Details
 
@@ -83,6 +90,16 @@ Plans:
 - [ ] 04-03-PLAN.md — Export API orchestration and integration
 **UI hint**: yes
 
+### Phase 05: Wizard Reordering
+**Goal**: Fix the cross-reference mapping issue by reordering the Wizard steps so Template Selection happens before Cross-Reference.
+**Depends on**: Phase 04
+**Requirements**: WIZ-04, WIZ-05
+**Success Criteria** (what must be TRUE):
+  1. User sees "Template Selection" before "Cross-Reference" in the Wizard flow.
+  2. In the "Cross-Reference" step, the dropdown for "Select template field" correctly displays the columns from the previously selected template.
+**Plans**: TBD
+**UI hint**: yes
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -91,13 +108,4 @@ Plans:
 | 2. Crossref Page Redesign | v1.1 | 3/3 | Complete | 2026-05-15 |
 | 3. Wizard Cross-Reference Integration | v1.1 | 3/3 | Complete | 2026-05-15 |
 | 4. Cross-Reference Export | v1.1 | 0/4 | In progress | - |
-
-### Phase 5: 04
-
-**Goal:** [To be planned]
-**Requirements**: TBD
-**Depends on:** Phase 4
-**Plans:** 0 plans
-
-Plans:
-- [ ] TBD (run /gsd-plan-phase 5 to break down)
+| 5. Wizard Reordering | v1.2 | 0/0 | Not started | - |
