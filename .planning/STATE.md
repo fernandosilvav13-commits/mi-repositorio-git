@@ -18,7 +18,7 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-15)
+See: .planning/PROJECT.md (updated 2026-05-17)
 
 **Core value:** Extract structured CV data with a beautiful, intuitive interface and export-ready results.
 **Current focus:** Phase 05 — Wizard Reordering
@@ -45,8 +45,8 @@ Last activity: 2026-05-17 — Milestone v1.2 completed and archived
 | 1. Frontend Overhaul (Apple Design) | 4 | complete | N/A |
 | 2. Crossref Page Redesign | 3 | complete | ~2min |
 | 3. Wizard Cross-Reference Integration | 3 | complete | ~15min |
-| 4. Cross-Reference Export | 0 | executing | - |
-| 5. Wizard Reordering | 0 | pending | - |
+| 4. Cross-Reference Export | 4 | complete | ~5min |
+| 5. Wizard Reordering | 1 | complete | ~2min |
 
 ## Accumulated Context
 
@@ -72,6 +72,9 @@ Last activity: 2026-05-17 — Milestone v1.2 completed and archived
 - [Phase 03-wizard-crossref]: UI-SPEC approved — spacing 4-80px (4px grid), typography 14/17/21/34px, color 60/30/10 (parchment/white/Action Blue), Spanish locale, 4 new components, compound match keys
 - [Phase 04-cross-reference-export]: Tuple-based composite keys for matching for O(1) performance with multiple columns
 - [Phase 04-cross-reference-export]: pytest adopted for backend testing for async support and cleaner syntax
+- [Phase 05-wizard-reordering]: D-01 warning prompt on template change with crossref mapping
+- [Phase 05-wizard-reordering]: D-02 same-template re-selection preserves mapping
+- [Phase 05-wizard-reordering]: D-03 clear mapping on confirmed template switch
 
 ### Pending Todos
 
@@ -83,9 +86,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-16T00:11:15.801Z
-Stopped at: Phase 05 context gathered
-Resume file: .planning/phases/05-wizard-reordering/05-CONTEXT.md
+Last session: 2026-05-17T22:35:00.000Z
+Stopped at: Milestone v1.2 complete, awaiting next milestone
 
 ## Operator Next Steps
 
