@@ -26,8 +26,8 @@ type Step = "upload" | "crossref" | "template" | "rules" | "extract" | "export" 
 
 const STEPS: { key: Step; label: string; icon: any }[] = [
   { key: "upload", label: "Inicio", icon: Upload },
-  { key: "crossref", label: "Referencia", icon: Database },
   { key: "template", label: "Estructura", icon: Layout },
+  { key: "crossref", label: "Referencia", icon: Database },
   { key: "rules", label: "Inteligencia", icon: ShieldCheck },
   { key: "extract", label: "Procesamiento", icon: Cpu },
   { key: "export", label: "Entrega", icon: FileSpreadsheet },
@@ -113,7 +113,7 @@ export default function WizardPage() {
     // Logic for complex steps
     if (currentStep === "crossref") {
       if (enableCrossref === false) {
-        setCurrentStep("template");
+        setCurrentStep("rules");
         setSubStep(0);
         return;
       }
@@ -125,7 +125,7 @@ export default function WizardPage() {
 
     if (currentStep === "template") {
         if (subStep === 0 && selectedTemplateId) {
-            setCurrentStep("rules");
+            setCurrentStep("crossref");
             setSubStep(0);
             return;
         }
@@ -257,7 +257,7 @@ export default function WizardPage() {
     const t = await api.templates.create({ name: newTemplateName, columns: newTemplateColumns });
     setSelectedTemplateId(t.id);
     setTemplateColumns(newTemplateColumns.map((c: any) => c.name));
-    setCurrentStep("rules");
+    setCurrentStep("crossref");
     setSubStep(0);
   };
 
@@ -518,12 +518,12 @@ export default function WizardPage() {
                 subtitle="Continuar solo con los datos extraídos de los currículums seleccionados."
               >
                 <div className="flex justify-end">
-                    <PillChip selected={enableCrossref === false} onClick={() => {
-                        setEnableCrossref(false);
-                        setStepHistory((prev) => [...prev, { step: currentStep, subStep }]);
-                        setCurrentStep("template");
-                        setSubStep(0);
-                    }}>
+                            <PillChip selected={enableCrossref === false} onClick={() => {
+                                        setEnableCrossref(false);
+                                        setStepHistory((prev) => [...prev, { step: currentStep, subStep }]);
+                                        setCurrentStep("rules");
+                                        setSubStep(0);
+                                    }}>
                         Continuar
                     </PillChip>
                 </div>
@@ -677,10 +677,24 @@ export default function WizardPage() {
                         </div>
                         <div className="flex gap-2">
                             <PillChip selected={selectedTemplateId === t.id} onClick={() => {
+                                const newCols = t.columns.map((c:any) => c.name);
+                                if (selectedTemplateId === t.id) {
+                                    setTemplateColumns(newCols);
+                                    setStepHistory((prev) => [...prev, { step: currentStep, subStep }]);
+                                    setCurrentStep("crossref");
+                                    setSubStep(0);
+                                    return;
+                                }
+                                if (matchKeys.length > 0) {
+                                    const confirmed = window.confirm("Cambiar la plantilla eliminará la configuración actual de cruce de datos. ¿Desea continuar?");
+                                    if (!confirmed) return;
+                                    setMatchKeys([]);
+                                    setOutputColumns([]);
+                                }
                                 setSelectedTemplateId(t.id);
-                                setTemplateColumns(t.columns.map((c:any) => c.name));
+                                setTemplateColumns(newCols);
                                 setStepHistory((prev) => [...prev, { step: currentStep, subStep }]);
-                                setCurrentStep("rules");
+                                setCurrentStep("crossref");
                                 setSubStep(0);
                             }}>
                                 Seleccionar
