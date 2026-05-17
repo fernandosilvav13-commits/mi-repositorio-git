@@ -25,8 +25,10 @@ async function downloadBlob(path: string, data: any, filename: string = "resulta
   const a = document.createElement("a");
   a.href = url;
   a.download = filename;
+  document.body.appendChild(a);
   a.click();
-  URL.revokeObjectURL(url);
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 100);
 }
 
 const uploadWithProgress = (
