@@ -29,8 +29,8 @@ Requirements for v1.2 Wizard Reordering.
 
 ### Wizard Reordering
 
-- [ ] **WIZ-04**: Change the Wizard steps sequence to: Upload -> Template -> CrossRef -> Rules -> Extract -> Export
-- [ ] **WIZ-05**: Ensure Wizard back/next navigation handles the new state dependencies correctly
+- [x] **WIZ-04**: Change the Wizard steps sequence to: Upload -> Template -> CrossRef -> Rules -> Extract -> Export
+- [x] **WIZ-05**: Ensure Wizard back/next navigation handles the new state dependencies correctly
 
 ## v2 Requirements
 
@@ -65,8 +65,8 @@ Deferred to future release.
 | WIZ-03 | Phase 03 | Complete |
 | EXP-01 | Phase 04 | Complete |
 | EXP-02 | Phase 04 | Complete |
-| WIZ-04 | Phase 05 | Pending |
-| WIZ-05 | Phase 05 | Pending |
+| WIZ-04 | Phase 05 | Complete |
+| WIZ-05 | Phase 05 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 7 total

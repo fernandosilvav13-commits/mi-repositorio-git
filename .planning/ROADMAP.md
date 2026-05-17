@@ -35,7 +35,7 @@ Plans:
 
 **Milestone Goal:** Fix the cross-reference mapping issue by reordering the Wizard steps so Template Selection happens before Cross-Reference.
 
-- [ ] **Phase 05: Wizard Reordering** — Change Wizard sequence and ensure Cross-Reference loads template columns
+- [x] **Phase 05: Wizard Reordering** — Reorder Wizard steps and add warning guard
 
 ## Phase Details
 
@@ -95,9 +95,12 @@ Plans:
 **Depends on**: Phase 04
 **Requirements**: WIZ-04, WIZ-05
 **Success Criteria** (what must be TRUE):
-  1. User sees "Template Selection" before "Cross-Reference" in the Wizard flow.
-  2. In the "Cross-Reference" step, the dropdown for "Select template field" correctly displays the columns from the previously selected template.
+   1. User sees "Template Selection" before "Cross-Reference" in the Wizard flow.
+   2. In the "Cross-Reference" step, the dropdown for "Select template field" correctly displays the columns from the previously selected template.
 **Plans**: 1 plan
+
+Plans:
+- [x] 05-01-PLAN.md — Reorder Wizard steps + navigation targets + D-01/D-03 guard
 **UI hint**: yes
 
 Plans:
@@ -110,5 +113,5 @@ Plans:
 | 1. Frontend Overhaul (Apple Design) | v1.0 | 4/4 | Complete | 2026-05-14 |
 | 2. Crossref Page Redesign | v1.1 | 3/3 | Complete | 2026-05-15 |
 | 3. Wizard Cross-Reference Integration | v1.1 | 3/3 | Complete | 2026-05-15 |
-| 4. Cross-Reference Export | v1.1 | 0/4 | In progress | - |
-| 5. Wizard Reordering | v1.2 | 0/0 | Not started | - |
+| 4. Cross-Reference Export | v1.1 | 4/4 | Complete | 2026-05-15 |
+| 5. Wizard Reordering | v1.2 | 1/1 | Complete | 2026-05-17 |
