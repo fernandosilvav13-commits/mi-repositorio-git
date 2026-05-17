@@ -1,13 +1,12 @@
 # CicloAI
 
-## Current Milestone: v1.2 Wizard Reordering
+## Current State
 
-**Goal:** Fix the cross-reference mapping issue by reordering the Wizard steps so Template Selection happens before Cross-Reference.
+**Shipped:** v1.2 Wizard Reordering (2026-05-17)
 
-**Target features:**
-- Move Template Selection (and column definition) to occur before the Cross-Reference step in the Wizard flow.
-- Ensure the Cross-Reference step correctly loads the selected template's columns for match key selection.
-- Update Wizard navigation and state management to support the new sequence.
+The Wizard flow now executes Template Selection before Cross-Reference, fixing the crossref mapping auto-suggestion issue. All navigation targets updated, with D-01 warning guard on template change and D-03 mapping invalidation on confirmed switch.
+
+## Next Milestone
 
 ## What This Is
 
@@ -28,6 +27,8 @@ Extract structured CV data with a beautiful, intuitive interface and export-read
 - ✓ Global Nav and Frosted Sub-Nav — v1.0
 - ✓ Wizard flow as a Product Configurator — v1.0
 - ✓ Extraction Results as a Museum Gallery — v1.0
+- ✓ Wizard steps reordered: Upload → Template → CrossRef → Rules → Extract → Export → Review — v1.2
+- ✓ Warning guard on template change with crossref mapping (D-01/D-03) — v1.2
 
 ### Active
 
@@ -40,9 +41,10 @@ Extract structured CV data with a beautiful, intuitive interface and export-read
 
 ## Context
 
-Shipped v1.0 with ~42,654 LOC (TSX/TS/CSS/Python).
+Shipped v1.0–v1.2 with ~42,654 LOC (TSX/TS/CSS/Python).
 Tech stack: Next.js 16, FastAPI, Supabase, Tailwind v4, Gemini AI.
 Frontend redesigned with Apple "museum gallery" design language.
+v1.2: Wizard steps reordered, template-before-crossref with guard on crossref mapping loss.
 
 ## Key Decisions
 
@@ -54,6 +56,9 @@ Frontend redesigned with Apple "museum gallery" design language.
 | Dual-navigation shell (44px + 52px) | Clear information hierarchy | ✓ Good |
 | Museum Gallery artifact presentation | Intuitive data visualization | ✓ Good |
 | Pill-shaped buttons and pill chips | Cohesive Apple aesthetic | ✓ Good |
+| D-01: Warning on template change | Prevents accidental crossref mapping loss | ✓ Good |
+| D-02: Same-template auto-advance | Faster flow when re-selecting same template | ✓ Good |
+| D-03: Clear mapping on template switch | Prevents ghost state in crossref step | ✓ Good |
 
 ## Constraints
 
@@ -79,4 +84,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-16 after starting Milestone v1.2*
+*Last updated: 2026-05-17 after v1.2 milestone*

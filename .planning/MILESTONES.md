@@ -1,5 +1,15 @@
 # Milestones
 
+## v1.2 Wizard Reordering (Shipped: 2026-05-17)
+
+**Phases completed:** 1 phases, 1 plans, 0 tasks
+
+**Key accomplishments:**
+
+- (none recorded)
+
+---
+
 ## v1.0 MVP (Shipped: 2026-05-15)
 
 **Phases completed:** 1 phases, 4 plans, 12 tasks
