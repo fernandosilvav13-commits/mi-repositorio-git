@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Bugfix Pipeline de Extracción
-status: planning
-stopped_at: Phase 6 context gathered
-last_updated: "2026-05-18T02:18:41.143Z"
-last_activity: 2026-05-18 — Roadmap v1.3 created with phases 6–8
+status: completed
+stopped_at: Phase 7 context gathered
+last_updated: "2026-05-18T02:46:41.619Z"
+last_activity: 2026-05-18 -- Phase 06 execution complete
 progress:
   total_phases: 3
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  completed_phases: 1
+  total_plans: 1
+  completed_plans: 1
+  percent: 100
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-18)
 
 **Core value:** Extract structured CV data with a beautiful, intuitive interface and export-ready results.
-**Current focus:** Phase 6 — Preprocessor Proper Noun Fix
+**Current focus:** Phase 06 — preprocessor-proper-noun-fix
 
 ## Current Position
 
-Phase: 6 of 8 (Preprocessor Proper Noun Fix)
-Plan: — (not yet planned)
-Status: Ready to plan
-Last activity: 2026-05-18 — Roadmap v1.3 created with phases 6–8
+Phase: 06 (preprocessor-proper-noun-fix) — COMPLETE
+Plan: 1 of 1 (✓ complete)
+Status: Phase 06 complete
+Last activity: 2026-05-18 -- Phase 06 execution complete
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -55,6 +55,8 @@ Progress: [░░░░░░░░░░] 0%
 ### Decisions
 
 - [Phase 06]: Preprocessor Proper Noun Fix — clean_text() must preserve proper noun casing, not blanket .lower()
+- [Phase 06 exec]: Regex alternation must list longer alternatives first (nombres|nombre -> nombres|nombre)
+- [Phase 06 exec]: Use re.IGNORECASE on re.sub(), not .lower() on text, for case-insensitive matching that preserves original casing
 - [Phase 07]: Post-Processing Pipeline — gender inference via infer_gender() on NOMBRES, phone via normalize_phone(), RUT via RUTFormatter
 - [Phase 07]: Post-processing overrides LLM fields only when value is "NO ENCONTRADO" or empty — never overwrites valid LLM output
 - [Phase 08]: LLM Error Resilience — strip markdown/fences before JSON parse, log warning and retry on malformed JSON
@@ -70,6 +72,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-18T02:18:41.129Z
-Stopped at: Phase 6 context gathered
-Resume file: .planning/phases/06-preprocessor-proper-noun-fix/06-CONTEXT.md
+Last session: 2026-05-18T02:46:41.593Z
+Stopped at: Phase 7 context gathered
+Resume file: .planning/phases/07-post-processing-pipeline/07-CONTEXT.md
