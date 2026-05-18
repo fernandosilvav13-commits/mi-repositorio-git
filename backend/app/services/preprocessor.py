@@ -2,7 +2,7 @@ import re
 from typing import Optional
 
 SECTIONS = {
-    "nombres": r"(?:nombre|nombres|apellido|apellidos|datos personales)[:\s]*([A-Za-záéíóúñÁÉÍÓÚÑ\s]+)",
+    "nombres": r"(?:nombres|nombre|apellidos|apellido|datos personales)[:\s]*([A-Za-záéíóúñÁÉÍÓÚÑ\s]+)",
     "rut": r"(?:rut|run|cedula|cédula)[:\s]*([0-9.]+-[0-9kK])",
     "telefono": r"(?:tel[ée]fono|celular|movil|móvil|contacto)[:\s]*([+\d\s\-()]{7,20})",
     "correo": r"(?:correo|email|e-mail)[:\s]*([\w.+-]+@[\w-]+\.[\w.]+)",
