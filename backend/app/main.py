@@ -5,8 +5,8 @@ import httpx
 # Monkeypatch httpx for compatibility with supabase-py
 original_init = httpx.Client.__init__
 def new_init(self, *args, **kwargs):
-    if 'proxy' in kwargs:
-        kwargs['proxies'] = kwargs.pop('proxy')
+    if 'proxies' in kwargs:
+        kwargs['proxy'] = kwargs.pop('proxies')
     return original_init(self, *args, **kwargs)
 httpx.Client.__init__ = new_init
 
