@@ -1,4 +1,7 @@
 from pathlib import Path
+from app.utils.logger import setup_logger
+
+logger = setup_logger("file_parser")
 import re
 import pdfplumber
 from PIL import Image

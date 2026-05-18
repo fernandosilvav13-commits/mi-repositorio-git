@@ -6,7 +6,21 @@ from app.services.ocr_service import OCRService
 from app.services.cv_extractor import _build_dynamic_schema
 from app.services.rules_engine import RulesEngine
 from app.core.database import require_supabase
+from pathlib import Path
 import os
+
+ALLOWED_DIRS = [
+    Path(settings.upload_dir).resolve(),
+    Path(settings.crossref_upload_dir).resolve(),
+]
+
+
+def _validate_file_path(file_path: str) -> str:
+    resolved = Path(file_path).resolve()
+    for allowed in ALLOWED_DIRS:
+        if allowed in resolved.parents or allowed == resolved.parent:
+            return str(resolved)
+    raise HTTPException(400, f"Ruta no permitida: {file_path}")
 
 router = APIRouter(dependencies=[Depends(require_auth)])
 ocr_service = OCRService()
@@ -21,6 +35,14 @@ async def extract_single(data: dict):
     
     supabase = require_supabase()
     
+    results = []
+    validated_paths = []
+    for fp in file_paths:
+        try:
+            validated_paths.append(_validate_file_path(fp))
+        except HTTPException:
+            results.append({"filename": os.path.basename(fp), "status": "error", "data": {}, "error": "Ruta no permitida"})
+
     # Obtener plantilla
     schema = None
     if template_id:
@@ -32,8 +54,7 @@ async def extract_single(data: dict):
     rules_res = supabase.table("rules").select("*").eq("enabled", True).execute()
     active_rules = rules_res.data if rules_res.data else []
 
-    results = []
-    for fp in file_paths:
+    for fp in validated_paths:
         try:
             if not os.path.exists(fp):
                 results.append({"filename": os.path.basename(fp), "status": "error", "data": {}, "error": "Archivo no encontrado"})
@@ -82,12 +103,20 @@ async def extract_candidate(data: dict):
         if template_res.data:
             schema = _build_dynamic_schema(template_res.data[0]["columns"])
 
-    combined = []
+    # Validate paths
+    validated_files = []
     for fp in files:
+        try:
+            validated_files.append(_validate_file_path(fp))
+        except HTTPException:
+            raise HTTPException(400, f"Ruta no permitida: {fp}")
+
+    combined = []
+    for fp in validated_files:
         try:
             text = ocr_service.process_document(fp)
             combined.append(text)
-        except:
+        except Exception:
             continue
     full_text = "\n\n".join(combined)
     result = await cv_processor.process(full_text, is_retry=is_retry, schema=schema)
@@ -123,14 +152,23 @@ async def extract_batch(data: dict):
         if template_res.data:
             schema = _build_dynamic_schema(template_res.data[0]["columns"])
 
+    # Validate paths
+    validated_paths = []
+    path_errors = []
+    for fp in file_paths:
+        try:
+            validated_paths.append(_validate_file_path(fp))
+        except HTTPException:
+            path_errors.append({"file": fp, "error": "Ruta no permitida"})
+
     # Obtener reglas habilitadas
     rules_res = supabase.table("rules").select("*").eq("enabled", True).execute()
     active_rules = rules_res.data if rules_res.data else []
 
     texts = []
     valid_files = []
-    errors = []
-    for fp in file_paths:
+    errors = list(path_errors)
+    for fp in validated_paths:
         try:
             if not os.path.exists(fp):
                 errors.append({"file": fp, "error": "Archivo no encontrado"})

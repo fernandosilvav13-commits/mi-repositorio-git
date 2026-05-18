@@ -1,9 +1,13 @@
 import json
 import hashlib
-import os
+import tempfile
 from pathlib import Path
-from typing import Any, Optional
+from typing import Optional
 from app.core.config import settings
+from app.utils.logger import setup_logger
+
+logger = setup_logger("cache_service")
+
 
 class CacheService:
     def __init__(self, cache_dir: str = ".cache/extraction"):
@@ -33,9 +37,11 @@ class CacheService:
         cache_file = self.cache_dir / f"{cache_key}.json"
         
         try:
-            with open(cache_file, "w") as f:
+            with tempfile.NamedTemporaryFile(dir=str(self.cache_dir), mode="w", suffix=".json", delete=False) as f:
                 json.dump(result, f)
+                tmp_path = f.name
+            Path(tmp_path).rename(cache_file)
         except Exception as e:
-            print(f"Error saving to cache: {e}")
+            logger.warning("Error saving to cache: %s", e)
 
 cache_service = CacheService()

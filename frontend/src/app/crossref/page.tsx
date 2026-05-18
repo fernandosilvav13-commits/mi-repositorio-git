@@ -45,9 +45,14 @@ export default function CrossrefPage() {
   const [newFileIds, setNewFileIds] = useState<Set<string>>(new Set());
   const [removingId, setRemovingId] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   useEffect(() => {
     loadFiles();
+    return () => {
+      timeoutsRef.current.forEach(clearTimeout);
+      timeoutsRef.current = [];
+    };
   }, []);
 
   const loadFiles = async () => {
@@ -86,18 +91,18 @@ export default function CrossrefPage() {
       setNewFileIds((prev) => new Set(prev).add(result.id));
 
       // Remove from queue after completion display
-      setTimeout(() => {
+      timeoutsRef.current.push(setTimeout(() => {
         setUploadQueue((prev) => prev.filter((q) => q.file !== file));
-      }, 2000);
+      }, 2000));
 
       // Clear new file ID after animation
-      setTimeout(() => {
+      timeoutsRef.current.push(setTimeout(() => {
         setNewFileIds((prev) => {
           const next = new Set(prev);
           next.delete(result.id);
           return next;
         });
-      }, 1500);
+      }, 1500));
     } catch (e: any) {
       setUploadQueue((prev) =>
         prev.map((q) =>
@@ -169,11 +174,11 @@ export default function CrossrefPage() {
       setRemovingId(targetId);
 
       // Animate out then remove from state
-      setTimeout(() => {
+      timeoutsRef.current.push(setTimeout(() => {
         setFiles((prev) => prev.filter((f) => f.id !== targetId));
         setRemovingId(null);
         toast.success("File deleted");
-      }, 300);
+      }, 300));
     } catch (e: any) {
       toast.error(e.message || "Error deleting file");
     }

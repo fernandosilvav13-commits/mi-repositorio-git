@@ -1,6 +1,6 @@
 from pathlib import Path
 from openpyxl import Workbook
-from openpyxl.styles import PatternFill, Font, Alignment, Border, Side
+from openpyxl.styles import PatternFill, Font, Alignment
 from openpyxl.utils import get_column_letter
 from app.core.config import settings
 

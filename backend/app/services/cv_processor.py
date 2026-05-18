@@ -6,6 +6,9 @@ from app.services.gender_service import infer_gender
 from app.services.phone_service import normalize_phone
 from app.services.experience_service import get_top_3_experiences
 from app.utils.rut_formatter import RUTFormatter
+from app.utils.logger import setup_logger
+
+logger = setup_logger("cv_processor")
 
 
 def _titlecase_name(name: str) -> str:
@@ -31,21 +34,21 @@ class CVProcessor:
             # Try in parent if running from app/
             path = Path("backend") / csv_path
             if not path.exists():
-                print(f"Matricula CSV not found at {csv_path}")
+                logger.warning("Matricula CSV not found at %s", csv_path)
                 return {}
         
         try:
-            print(f"Loading matricula data from {path}...")
+            logger.info("Loading matricula data from %s...", path)
             df = pd.read_csv(path, dtype=str)
             df["MAT_TOTAL"] = df["MAT_TOTAL"].fillna("0")
             # Create a lookup by lower-case school name
             # Use vectorized operations instead of iterrows
             df["NOM_RBD_LOWER"] = df["NOM_RBD"].str.strip().str.lower()
             lookup = df.set_index("NOM_RBD_LOWER").to_dict("index")
-            print(f"Loaded {len(lookup)} school records.")
+            logger.info("Loaded %d school records.", len(lookup))
             return lookup
         except Exception as e:
-            print(f"Error loading matricula data: {e}")
+            logger.error("Error loading matricula data: %s", e)
             return {}
 
     def _post_process(self, data: dict) -> dict:

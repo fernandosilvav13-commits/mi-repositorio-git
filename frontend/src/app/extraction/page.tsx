@@ -72,7 +72,7 @@ export default function ExtractionGalleryPage() {
   const handleExport = () => {
     if (results.length === 0) return;
     const rowsToExport = results.map(r => ({ ...r.data, Carpeta: r.folder }));
-    api.export.excel({ template_id: selectedTemplate, rows: rowsToExport });
+    api.export.excel({ template_id: selectedTemplate, rows: rowsToExport }).catch(() => {});
   };
 
   return (

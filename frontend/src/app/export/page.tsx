@@ -20,7 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { api } from "@/lib/api";
+import { api, API_BASE } from "@/lib/api";
 
 export default function ExportPage() {
   const [templates, setTemplates] = useState<any[]>([]);
@@ -43,7 +43,7 @@ export default function ExportPage() {
 
   const loadResults = async (templateId: string) => {
     try {
-      const res = await fetch(`http://localhost:8000/api/extraction/results/${templateId}`);
+      const res = await fetch(`${API_BASE}/api/extraction/results/${templateId}`);
       if (res.ok) setResults(await res.json());
       else setResults([]);
     } catch {
@@ -74,12 +74,12 @@ export default function ExportPage() {
       loadResults(selectedTemplate);
       setExported(false);
     }
-  }, [selectedTemplate]);
+  }, [selectedTemplate, loadResults]);
 
   useEffect(() => {
     loadCrossrefFile(selectedCrossref);
     setExported(false);
-  }, [selectedCrossref]);
+  }, [selectedCrossref, loadCrossrefFile]);
 
   const templateColumns =
     results.length > 0 ? Object.keys(results[0].data) : [];

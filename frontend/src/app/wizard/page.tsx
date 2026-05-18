@@ -254,11 +254,15 @@ export default function WizardPage() {
   };
 
   const handleCreateTemplate = async () => {
-    const t = await api.templates.create({ name: newTemplateName, columns: newTemplateColumns });
-    setSelectedTemplateId(t.id);
-    setTemplateColumns(newTemplateColumns.map((c: any) => c.name));
-    setCurrentStep("crossref");
-    setSubStep(0);
+    try {
+      const t = await api.templates.create({ name: newTemplateName, columns: newTemplateColumns });
+      setSelectedTemplateId(t.id);
+      setTemplateColumns(newTemplateColumns.map((c: any) => c.name));
+      setCurrentStep("crossref");
+      setSubStep(0);
+    } catch {
+      alert("Error al crear plantilla");
+    }
   };
 
   const handleExtract = async () => {

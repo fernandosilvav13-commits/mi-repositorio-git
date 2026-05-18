@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import GlobalNav from "@/components/layout/GlobalNav";
 import SubNav from "@/components/layout/SubNav";
 
@@ -26,7 +27,7 @@ export default function RootLayout({
         <GlobalNav />
         <SubNav />
         <main>
-          {children}
+          <ErrorBoundary>{children}</ErrorBoundary>
         </main>
         <Toaster richColors position="top-right" />
       </body>
