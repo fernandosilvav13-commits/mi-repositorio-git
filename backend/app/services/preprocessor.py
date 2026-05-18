@@ -1,5 +1,4 @@
 import re
-from typing import Optional
 
 SECTIONS = {
     "nombres": r"(?:nombres|nombre|apellidos|apellido|datos personales)[:\s]*([A-Za-záéíóúñÁÉÍÓÚÑ\s]+)",
