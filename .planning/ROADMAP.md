@@ -5,7 +5,7 @@
 - ✅ **v1.0 MVP** — Phase 1 (shipped 2026-05-15)
 - ✅ **v1.1 Cross-Reference Integration** — Phases 2–4 (shipped 2026-05-15)
 - ✅ **v1.2 Wizard Reordering** — Phase 5 (shipped 2026-05-17)
-- 📅 **Next Milestone** — Planned
+- 🚧 **v1.3 Bugfix Pipeline de Extracción** — Phases 6–8 (in progress)
 
 ## Phases
 
@@ -29,9 +29,47 @@
 - [x] Phase 5: Wizard Reordering (1/1 plans) — completed 2026-05-17
 </details>
 
-### 📅 Next Milestone (Planned)
+### 🚧 v1.3 Bugfix Pipeline de Extracción (In Progress)
 
-- [ ] Phase 6: TBD
+- [ ] **Phase 6: Preprocessor Proper Noun Fix** — clean_text() preserves proper noun casing instead of blanket lowercasing
+- [ ] **Phase 7: Post-Processing Pipeline** — CVProcessor applies gender inference, phone normalization, and RUT formatting after LLM extraction
+- [ ] **Phase 8: LLM Error Resilience & Retry** — Robust JSON parsing, schema fallback, and bounded retries within TPM limits
+
+## Phase Details
+
+### Phase 6: Preprocessor Proper Noun Fix
+**Goal**: clean_text() preserves proper noun casing instead of blanket lowercasing, so extracted names are correctly cased
+**Depends on**: Nothing
+**Requirements**: PREP-01
+**Success Criteria** (what must be TRUE):
+  1. User uploads a CV and all proper nouns (names, cities, surnames) in the output maintain correct casing
+  2. User uploads a CV with all-caps names like "MARÍA GARCÍA" — output shows "María García" not "maría garcía"
+  3. User uploads a CV and existing text normalization (whitespace, special characters) still works correctly
+**Plans**: TBD
+
+### Phase 7: Post-Processing Pipeline
+**Goal**: CVProcessor applies gender inference, phone normalization, and RUT formatting after LLM extraction, only overriding fields the LLM couldn't find
+**Depends on**: Nothing
+**Requirements**: POST-01, POST-02, POST-03, POST-04
+**Success Criteria** (what must be TRUE):
+  1. User extracts a CV and the output includes inferred gender based on NOMBRES field
+  2. User extracts a CV with phone variants (+56 X, 09 X, 569 X) — all normalize to consistent format
+  3. User extracts a CV and RUT field is formatted consistently as XX.XXX.XXX-X
+  4. When LLM successfully extracted a field, post-processing does NOT override it
+  5. When LLM returns "NO ENCONTRADO" or empty for a field, post-processing fills the field automatically
+**Plans**: TBD
+
+### Phase 8: LLM Error Resilience & Retry
+**Goal**: llm_service handles malformed JSON gracefully with schema fallback and bounded retries within TPM limits
+**Depends on**: Nothing
+**Requirements**: LLM-01, LLM-02, RETR-01, RETR-02
+**Success Criteria** (what must be TRUE):
+  1. When Gemini returns JSON wrapped in markdown code fences, the parser strips fences and extracts valid JSON
+  2. When Gemini returns malformed JSON, llm_service logs a warning and retries instead of crashing
+  3. When dynamic schema extraction fails after retries, system falls back to EXTRACTION_SCHEMA
+  4. Retry backoff never exceeds configured TPM limits
+  5. User sees extracted data regardless of transient JSON formatting issues from Gemini
+**Plans**: TBD
 
 ## Progress
 
@@ -42,3 +80,6 @@
 | 3. Wizard Cross-Reference Integration | v1.1 | 3/3 | Complete | 2026-05-15 |
 | 4. Cross-Reference Export | v1.1 | 4/4 | Complete | 2026-05-15 |
 | 5. Wizard Reordering | v1.2 | 1/1 | Complete | 2026-05-17 |
+| 6. Preprocessor Proper Noun Fix | v1.3 | 0/0 | Not started | - |
+| 7. Post-Processing Pipeline | v1.3 | 0/0 | Not started | - |
+| 8. LLM Error Resilience & Retry | v1.3 | 0/0 | Not started | - |

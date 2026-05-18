@@ -44,20 +44,20 @@ Requirements for v1.3 bugfix milestone. Each maps to roadmap phases.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| POST-01 | — | Pending |
-| POST-02 | — | Pending |
-| POST-03 | — | Pending |
-| POST-04 | — | Pending |
-| PREP-01 | — | Pending |
-| LLM-01 | — | Pending |
-| LLM-02 | — | Pending |
-| RETR-01 | — | Pending |
-| RETR-02 | — | Pending |
+| POST-01 | Phase 7 | Pending |
+| POST-02 | Phase 7 | Pending |
+| POST-03 | Phase 7 | Pending |
+| POST-04 | Phase 7 | Pending |
+| PREP-01 | Phase 6 | Pending |
+| LLM-01 | Phase 8 | Pending |
+| LLM-02 | Phase 8 | Pending |
+| RETR-01 | Phase 8 | Pending |
+| RETR-02 | Phase 8 | Pending |
 
 **Coverage:**
 - v1.3 requirements: 9 total
-- Mapped to phases: 0
-- Unmapped: 9 ⚠️
+- Mapped to phases: 9
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-05-18*
