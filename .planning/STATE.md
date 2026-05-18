@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Bugfix Pipeline de Extracción
-status: completed
-stopped_at: Phase 8 context gathered
-last_updated: "2026-05-18T03:04:21.369Z"
-last_activity: 2026-05-18 -- Phase 06 execution complete
+status: in_progress
+stopped_at: Phase 7 execution complete
+last_updated: "2026-05-18T05:30:00.000Z"
+last_activity: 2026-05-18 -- Phase 07 execution complete
 progress:
   total_phases: 3
-  completed_phases: 1
-  total_plans: 2
-  completed_plans: 1
-  percent: 50
+  completed_phases: 2
+  total_plans: 3
+  completed_plans: 2
+  percent: 67
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-18)
 
 **Core value:** Extract structured CV data with a beautiful, intuitive interface and export-ready results.
-**Current focus:** Phase 06 — preprocessor-proper-noun-fix
+**Current focus:** Phase 08 — llm-error-resilience-retry
 
 ## Current Position
 
-Phase: 06 (preprocessor-proper-noun-fix) — COMPLETE
-Plan: 1 of 1 (✓ complete)
-Status: Phase 06 complete
-Last activity: 2026-05-18 -- Phase 06 execution complete
+Phase: 07 (post-processing-pipeline) — COMPLETE
+Phase 08: Ready for execution
+Status: Phase 07 complete, Phase 08 next
+Last activity: 2026-05-18 -- Phase 07 execution complete
 
 Progress: [██████████] 100%
 
@@ -36,7 +36,7 @@ Progress: [██████████] 100%
 
 **Velocity:**
 
-- Total plans completed: 16 (across previous milestones)
+- Total plans completed: 17 (across previous milestones)
 - Average duration: N/A
 - Total execution time: N/A
 
@@ -49,6 +49,8 @@ Progress: [██████████] 100%
 | 3. Wizard Cross-Reference Integration | 3 | complete | ~15min |
 | 4. Cross-Reference Export | 4 | complete | ~5min |
 | 5. Wizard Reordering | 1 | complete | ~2min |
+| 6. Preprocessor Proper Noun Fix | 1 | complete | ~2min |
+| 7. Post-Processing Pipeline | 1 | complete | ~2min |
 
 ## Accumulated Context
 
@@ -64,7 +66,7 @@ Progress: [██████████] 100%
 
 ### Pending Todos
 
-None yet.
+- Phase 08: LLM Error Resilience & Retry — plans TBD
 
 ### Blockers/Concerns
 

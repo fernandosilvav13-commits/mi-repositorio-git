@@ -1,12 +1,18 @@
 import pandas as pd
 import asyncio
 from pathlib import Path
-from typing import Optional
 from app.services.cv_extractor import extract_cv_data
 from app.services.gender_service import infer_gender
 from app.services.phone_service import normalize_phone
 from app.services.experience_service import get_top_3_experiences
 from app.utils.rut_formatter import RUTFormatter
+
+
+def _titlecase_name(name: str) -> str:
+    if not name or name == "NO ENCONTRADO":
+        return name
+    return name.strip().title()
+
 
 class CVProcessor:
     def __init__(self, matricula_csv: str = "mineduc_matricula.csv"):
@@ -42,15 +48,43 @@ class CVProcessor:
             print(f"Error loading matricula data: {e}")
             return {}
 
+    def _post_process(self, data: dict) -> dict:
+        genero = data.get("GENERO", "")
+        if not genero or genero == "NO ENCONTRADO":
+            nombres = data.get("NOMBRES", "")
+            if nombres and nombres != "NO ENCONTRADO":
+                data["GENERO"] = infer_gender(nombres)
+
+        for phone_field in ("TELEFONO_CELULAR", "TELEFONO_FIJO"):
+            val = data.get(phone_field, "")
+            if val and val != "NO ENCONTRADO":
+                _type, formatted = normalize_phone(val)
+                if _type != "NO ENCONTRADO":
+                    data[phone_field] = formatted
+
+        rut = data.get("RUT", "")
+        if rut and rut != "NO ENCONTRADO":
+            data["RUT"] = RUTFormatter.format(rut)
+
+        for field in ("NOMBRES", "APELLIDOS"):
+            val = data.get(field, "")
+            if val and val != "NO ENCONTRADO":
+                data[field] = _titlecase_name(val)
+
+        return data
+
     async def process(self, raw_text: str, is_retry: bool = False, schema: dict | None = None) -> dict:
-        # ...
-        # 5. Experience Processing
+        data = await extract_cv_data(raw_text, is_retry=is_retry, schema=schema)
+        if not data:
+            return {}
+
         exp_key = next((k for k in data.keys() if "EXPERIENCIA" in k.upper()), None)
         if exp_key:
             experiences = data.get(exp_key, [])
             if experiences and isinstance(experiences, list):
                 data[exp_key] = get_top_3_experiences(experiences, self.matricula_lookup)
 
+        data = self._post_process(data)
         return data
 
     async def process_many(self, texts: list[str], is_retry: bool = False, schema: dict | None = None) -> list[dict]:

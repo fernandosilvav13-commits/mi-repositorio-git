@@ -5,7 +5,7 @@
 - ✅ **v1.0 MVP** — Phase 1 (shipped 2026-05-15)
 - ✅ **v1.1 Cross-Reference Integration** — Phases 2–4 (shipped 2026-05-15)
 - ✅ **v1.2 Wizard Reordering** — Phase 5 (shipped 2026-05-17)
-- 🚧 **v1.3 Bugfix Pipeline de Extracción** — Phases 6–8 (in progress)
+- 🚧 **v1.3 Bugfix Pipeline de Extracción** — Phases 6–8 (2/3 phases complete)
 
 ## Phases
 
@@ -31,8 +31,8 @@
 
 ### 🚧 v1.3 Bugfix Pipeline de Extracción (In Progress)
 
-- [ ] **Phase 6: Preprocessor Proper Noun Fix** — clean_text() preserves proper noun casing instead of blanket lowercasing
-- [ ] **Phase 7: Post-Processing Pipeline** — CVProcessor applies gender inference, phone normalization, and RUT formatting after LLM extraction
+- [x] **Phase 6: Preprocessor Proper Noun Fix** — clean_text() preserves proper noun casing instead of blanket lowercasing
+- [x] **Phase 7: Post-Processing Pipeline** — CVProcessor applies gender inference, phone normalization, and RUT formatting after LLM extraction
 - [ ] **Phase 8: LLM Error Resilience & Retry** — Robust JSON parsing, schema fallback, and bounded retries within TPM limits
 
 ## Phase Details
@@ -47,7 +47,7 @@
   3. User uploads a CV and existing text normalization (whitespace, special characters) still works correctly
 **Plans**: 1 plan
 Plans:
-- [ ] 06-01-PLAN.md — Fix clean_text() proper noun casing + add tests
+- [x] 06-01-PLAN.md — Fix clean_text() proper noun casing + add tests
 
 ### Phase 7: Post-Processing Pipeline
 **Goal**: CVProcessor applies gender inference, phone normalization, and RUT formatting after LLM extraction, only overriding fields the LLM couldn't find
@@ -59,7 +59,9 @@ Plans:
   3. User extracts a CV and RUT field is formatted consistently as XX.XXX.XXX-X
   4. When LLM successfully extracted a field, post-processing does NOT override it
   5. When LLM returns "NO ENCONTRADO" or empty for a field, post-processing fills the field automatically
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [x] 07-01-PLAN.md — Wire post-processing pipeline into CVProcessor.process() + add tests
 
 ### Phase 8: LLM Error Resilience & Retry
 **Goal**: llm_service handles malformed JSON gracefully with schema fallback and bounded retries within TPM limits
@@ -82,6 +84,6 @@ Plans:
 | 3. Wizard Cross-Reference Integration | v1.1 | 3/3 | Complete | 2026-05-15 |
 | 4. Cross-Reference Export | v1.1 | 4/4 | Complete | 2026-05-15 |
 | 5. Wizard Reordering | v1.2 | 1/1 | Complete | 2026-05-17 |
-| 6. Preprocessor Proper Noun Fix | v1.3 | 0/1 | Planning | - |
-| 7. Post-Processing Pipeline | v1.3 | 0/0 | Not started | - |
+| 6. Preprocessor Proper Noun Fix | v1.3 | 1/1 | Complete | 2026-05-18 |
+| 7. Post-Processing Pipeline | v1.3 | 1/1 | Complete | 2026-05-18 |
 | 8. LLM Error Resilience & Retry | v1.3 | 0/0 | Not started | - |
