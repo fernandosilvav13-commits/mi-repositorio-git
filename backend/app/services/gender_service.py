@@ -1,4 +1,5 @@
 import re
+import unicodedata
 
 GENDER_MAP = {
     "JUAN": "MASCULINO",
@@ -230,7 +231,10 @@ def infer_gender(nombres: str | None) -> str:
     if not nombres:
         return "NO ENCONTRADO"
     first_name = nombres.strip().split()[0]
-    return GENDER_MAP.get(first_name.upper(), "NO ENCONTRADO")
+    # Strip accents for GENDER_MAP lookup (keys are unaccented uppercase)
+    first_name_clean = unicodedata.normalize("NFKD", first_name.upper())
+    first_name_clean = first_name_clean.encode("ascii", "ignore").decode()
+    return GENDER_MAP.get(first_name_clean, "NO ENCONTRADO")
 
 
 def infer_gender_from_text(text: str) -> str:

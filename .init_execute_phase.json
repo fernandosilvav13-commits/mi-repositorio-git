@@ -1,0 +1,47 @@
+{
+  "executor_model": "sonnet",
+  "verifier_model": "sonnet",
+  "tdd_mode": false,
+  "commit_docs": true,
+  "sub_repos": [],
+  "parallelization": true,
+  "context_window": 200000,
+  "branching_strategy": "none",
+  "phase_branch_template": "gsd/phase-{phase}-{slug}",
+  "milestone_branch_template": "gsd/{milestone}-{slug}",
+  "verifier_enabled": true,
+  "phase_found": true,
+  "phase_dir": ".planning/phases/03-wizard-crossref-integration",
+  "phase_number": "03",
+  "phase_name": "wizard-crossref-integration",
+  "phase_slug": "wizard-crossref-integration",
+  "phase_req_ids": "WIZ-01, WIZ-02, WIZ-03",
+  "plans": [
+    "03-01-PLAN.md",
+    "03-02-PLAN.md",
+    "03-03-PLAN.md"
+  ],
+  "summaries": [
+    "03-01-SUMMARY.md"
+  ],
+  "incomplete_plans": [
+    "03-02-PLAN.md",
+    "03-03-PLAN.md"
+  ],
+  "plan_count": 3,
+  "incomplete_count": 2,
+  "branch_name": null,
+  "milestone_version": "v1.1",
+  "milestone_name": "Cross-Reference Integration",
+  "milestone_slug": "cross-reference-integration",
+  "state_exists": true,
+  "roadmap_exists": true,
+  "config_exists": true,
+  "state_path": ".planning/STATE.md",
+  "roadmap_path": ".planning/ROADMAP.md",
+  "config_path": ".planning/config.json",
+  "project_root": "/home/fernandosilvav/Proyecto-Prueba",
+  "agents_installed": true,
+  "missing_agents": [],
+  "project_title": "CicloAI"
+}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "sonner";
 import GlobalNav from "@/components/layout/GlobalNav";
 import SubNav from "@/components/layout/SubNav";
 
@@ -27,6 +28,7 @@ export default function RootLayout({
         <main>
           {children}
         </main>
+        <Toaster richColors position="top-right" />
       </body>
     </html>
   );

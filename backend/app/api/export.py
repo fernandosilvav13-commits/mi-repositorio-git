@@ -53,11 +53,14 @@ async def export_to_excel(data: dict):
             raise HTTPException(404, "Archivo de cruce no encontrado")
 
         full_data = crossref_service.load_file_data(entry["name"])
+        match_keys = [{
+            "extractionKey": column_mapping["match_column"],
+            "crossrefKey": column_mapping["crossref_match_column"],
+        }]
         merged_rows = crossref_service.merge_data(
             rows=consolidated_rows,
             crossref_rows=full_data,
-            match_column=column_mapping["match_column"],
-            crossref_match_column=column_mapping["crossref_match_column"],
+            match_keys=match_keys,
             output_columns=column_mapping["output_columns"],
         )
         all_columns = list(columns)
