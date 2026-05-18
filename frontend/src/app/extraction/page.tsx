@@ -33,10 +33,21 @@ export default function ExtractionGalleryPage() {
   const [templates, setTemplates] = useState<any[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<string>("");
   const fileRef = useRef<HTMLInputElement>(null);
+  const folderRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     api.templates.list().then(setTemplates).catch(() => {});
   }, []);
+
+  const handleFolderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = Array.from(e.target.files || []);
+    const newFiles = selectedFiles.map(f => {
+      const parts = f.webkitRelativePath.split("/");
+      const folder = parts.length > 1 ? parts[0] : "Raíz";
+      return { file: f, folder };
+    });
+    setFiles((prev) => [...prev, ...newFiles]);
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
@@ -50,7 +61,7 @@ export default function ExtractionGalleryPage() {
     setResults([]);
     
     try {
-      const uploaded = await api.ingest.upload(files.map(f => f.file));
+      const uploaded = await api.ingest.upload(files);
       const res = await api.extraction.extract({
         template_id: selectedTemplate,
         file_paths: uploaded.files,
@@ -125,6 +136,21 @@ export default function ExtractionGalleryPage() {
             multiple
             className="hidden"
             onChange={handleFileChange}
+          />
+          <Button 
+            variant="ghost"
+            onClick={() => folderRef.current?.click()}
+            className="rounded-full bg-white/80 hover:bg-white text-ink border-none shadow-sm h-11 px-5 active-scale transition-all flex items-center gap-2"
+          >
+            <Plus size={18} />
+            <span className="text-[14px] font-medium">Add Folder</span>
+          </Button>
+          <input
+            ref={folderRef}
+            type="file"
+            {...({webkitdirectory: ""} as any)}
+            className="hidden"
+            onChange={handleFolderChange}
           />
 
           <Button 

@@ -60,9 +60,12 @@ const uploadWithProgress = (
 
 export const api = {
   ingest: {
-    upload: (files: File[]) => {
+    upload: (files: { file: File; folder: string }[]) => {
       const form = new FormData();
-      files.forEach((f) => form.append("files", f));
+      files.forEach(({ file, folder }) => {
+        form.append("files", file);
+        form.append("folders", folder);
+      });
       return request<{ files: string[]; count: number }>("/api/ingest/upload", {
         method: "POST",
         body: form,

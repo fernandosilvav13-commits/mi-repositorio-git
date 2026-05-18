@@ -14,14 +14,17 @@ upload_dir.mkdir(exist_ok=True)
 
 
 @router.post("/upload")
-async def upload_files(files: list[UploadFile] = File(...)):
+async def upload_files(files: list[UploadFile] = File(...), folders: list[str] = File(default=[])):
     saved = []
-    for file in files:
+    for i, file in enumerate(files):
         ext = Path(file.filename).suffix.lower()
         content = await file.read()
         validate_upload(content, file.filename)
         safe_name = sanitize_filename(file.filename)
-        file_path = upload_dir / safe_name
+        folder_name = folders[i] if i < len(folders) and folders[i] else "Raíz"
+        folder_path = upload_dir / sanitize_filename(folder_name)
+        folder_path.mkdir(exist_ok=True)
+        file_path = folder_path / safe_name
         async with aiofiles.open(str(file_path), "wb") as buffer:
             await buffer.write(content)
         saved.append(str(file_path))

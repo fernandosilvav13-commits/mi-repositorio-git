@@ -40,10 +40,11 @@ export default function WizardPage() {
   const [stepHistory, setStepHistory] = useState<{ step: Step; subStep: number }[]>([]);
 
   // State Management
-  const [uploadFiles, setUploadFiles] = useState<File[]>([]);
+  const [uploadFiles, setUploadFiles] = useState<{ file: File; folder: string }[]>([]);
   const [uploadedPaths, setUploadedPaths] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const folderRef = useRef<HTMLInputElement>(null);
   const crossrefFileRef = useRef<HTMLInputElement>(null);
 
   const [enableCrossref, setEnableCrossref] = useState<boolean | null>(null);
@@ -473,21 +474,46 @@ export default function WizardPage() {
           {currentStep === "upload" && (
             <ConfiguratorCard>
               <div 
-                onClick={() => fileRef.current?.click()}
                 className="w-full aspect-[2/1] rounded-lg border-2 border-dashed border-[#e0e0e0] flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-action-blue group transition-colors bg-white/50"
               >
-                <input ref={fileRef} type="file" multiple className="hidden" onChange={(e) => setUploadFiles(Array.from(e.target.files || []))} />
+                <input ref={fileRef} type="file" multiple className="hidden" onChange={(e) => {
+                  const files = Array.from(e.target.files || []);
+                  setUploadFiles((prev) => [...prev, ...files.map(f => ({ file: f, folder: "Raíz" }))]);
+                }} />
                 <div className="w-16 h-16 rounded-full bg-parchment flex items-center justify-center group-hover:bg-action-blue group-hover:text-white transition-all">
                     <Upload size={28} />
                 </div>
                 <p className="text-[17px] font-semibold text-ink">Seleccionar archivos</p>
+                <Button
+                  variant="outline"
+                  onClick={(e) => { e.stopPropagation(); folderRef.current?.click(); }}
+                  className="rounded-full border border-[#e0e0e0] bg-white text-[#333] hover:bg-[#f5f5f5] h-11 px-5 text-[14px] gap-2"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                  Subir Carpeta
+                </Button>
+                <input
+                  ref={folderRef}
+                  type="file"
+                  {...({webkitdirectory: ""} as any)}
+                  className="hidden"
+                  onChange={(e) => {
+                    const files = Array.from(e.target.files || []);
+                    const newFiles = files.map(f => {
+                      const parts = f.webkitRelativePath.split("/");
+                      const folder = parts.length > 1 ? parts[0] : "Raíz";
+                      return { file: f, folder };
+                    });
+                    setUploadFiles((prev) => [...prev, ...newFiles]);
+                  }}
+                />
                 <div className="flex flex-wrap justify-center gap-2 max-w-md px-6">
                     {uploadFiles.slice(0, 5).map((f, i) => (
                         <Badge key={i} variant="secondary" className="bg-parchment text-ink rounded-full px-3 py-1 border-none font-normal text-[12px]">
-                            {f.name}
+                            {f.file.name}
                         </Badge>
                     ))}
-                    {uploadFiles.length > 5 && <span className="text-[12px] text-[#7a7a7a]">+{uploadFiles.length - 5} más</span>}
+                    {uploadFiles.length > 5 && <span className="text-[12px] text-[#7a7a7a]">+{uploadFiles.length - 5} archivos más</span>}
                 </div>
               </div>
               
