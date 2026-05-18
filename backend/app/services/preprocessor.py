@@ -21,9 +21,8 @@ REDUNDANT_PHRASES = [
 
 def clean_text(text: str) -> str:
     """Basic cleaning to remove double spaces and redundant phrases."""
-    text = text.lower()
     for phrase in REDUNDANT_PHRASES:
-        text = re.sub(phrase, "", text)
+        text = re.sub(phrase, "", text, flags=re.IGNORECASE)
     text = re.sub(r"\s+", " ", text)
     return text.strip()
 
