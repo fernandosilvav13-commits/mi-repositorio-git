@@ -66,7 +66,7 @@ export const api = {
         form.append("files", file);
         form.append("folders", folder);
       });
-      return request<{ files: string[]; count: number }>("/api/ingest/upload", {
+      return request<{ files: string[]; count: number; errors?: { file: string; error: string }[] }>("/api/ingest/upload", {
         method: "POST",
         body: form,
       });

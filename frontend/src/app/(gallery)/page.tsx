@@ -13,6 +13,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { FileText, Download, Play, Plus } from "lucide-react";
+
+const SUPPORTED_EXTS = new Set([".pdf", ".docx", ".doc", ".xlsx", ".csv", ".jpg", ".jpeg", ".png", ".ppt", ".pptx"]);
+
+const HIDDEN_PREFIXES = ["Thumbs.db", "desktop.ini", ".DS_Store", "~$"];
+
+function isUploadable(file: File): boolean {
+  const name = file.name.toLowerCase();
+  if (HIDDEN_PREFIXES.some(p => name === p.toLowerCase() || name.startsWith(p.toLowerCase()))) return false;
+  const ext = name.substring(name.lastIndexOf("."));
+  return SUPPORTED_EXTS.has(ext);
+}
 import { cn } from "@/lib/utils";
 
 interface Result {
@@ -40,12 +51,17 @@ export default function GalleryPage() {
 
   const handleFolderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
-    const newFiles = selectedFiles.map(f => {
+    const filtered = selectedFiles.filter(isUploadable);
+    const skipped = selectedFiles.length - filtered.length;
+    const newFiles = filtered.map(f => {
       const parts = f.webkitRelativePath.split("/");
       const folder = parts.length > 1 ? parts[0] : "Raíz";
       return { file: f, folder };
     });
     setFiles((prev) => [...prev, ...newFiles]);
+    if (skipped > 0) {
+      alert(`Se omitieron ${skipped} archivo(s) no soportado(s) (Thumbs.db, .DS_Store, etc.)`);
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,6 +77,10 @@ export default function GalleryPage() {
     
     try {
       const uploaded = await api.ingest.upload(files);
+      if (uploaded.errors && uploaded.errors.length > 0) {
+        const msgs = uploaded.errors.map(e => `${e.file}: ${e.error}`).join('\n');
+        alert(`Archivos omitidos:\n${msgs}`);
+      }
       const res = await api.extraction.extract({
         template_id: selectedTemplate,
         file_paths: uploaded.files,

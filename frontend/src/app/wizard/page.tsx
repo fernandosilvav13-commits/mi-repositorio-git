@@ -22,6 +22,17 @@ import MatchSummaryBar from "@/components/apple/MatchSummaryBar";
 import MatchTable from "@/components/apple/MatchTable";
 import { cn } from "@/lib/utils";
 
+const SUPPORTED_EXTS = new Set([".pdf", ".docx", ".doc", ".xlsx", ".csv", ".jpg", ".jpeg", ".png", ".ppt", ".pptx"]);
+
+const HIDDEN_PREFIXES = ["Thumbs.db", "desktop.ini", ".DS_Store", "~$"];
+
+function isUploadable(file: File): boolean {
+  const name = file.name.toLowerCase();
+  if (HIDDEN_PREFIXES.some(p => name === p.toLowerCase() || name.startsWith(p.toLowerCase()))) return false;
+  const ext = name.substring(name.lastIndexOf("."));
+  return SUPPORTED_EXTS.has(ext);
+}
+
 type Step = "upload" | "crossref" | "template" | "rules" | "extract" | "export" | "review";
 
 const STEPS: { key: Step; label: string; icon: any }[] = [
@@ -499,12 +510,17 @@ export default function WizardPage() {
                   className="hidden"
                   onChange={(e) => {
                     const files = Array.from(e.target.files || []);
-                    const newFiles = files.map(f => {
+                    const filtered = files.filter(isUploadable);
+                    const skipped = files.length - filtered.length;
+                    const newFiles = filtered.map(f => {
                       const parts = f.webkitRelativePath.split("/");
                       const folder = parts.length > 1 ? parts[0] : "Raíz";
                       return { file: f, folder };
                     });
                     setUploadFiles((prev) => [...prev, ...newFiles]);
+                    if (skipped > 0) {
+                      alert(`Se omitieron ${skipped} archivo(s) no soportado(s) (Thumbs.db, .DS_Store, etc.)`);
+                    }
                   }}
                 />
                 <div className="flex flex-wrap justify-center gap-2 max-w-md px-6">
