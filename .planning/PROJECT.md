@@ -1,5 +1,15 @@
 # CicloAI
 
+## Current Milestone: v1.3 Bugfix Pipeline de Extracción
+
+**Goal:** Corregir bugs en el pipeline de extracción que causan campos faltantes o incorrectos en los datos extraídos de CVs.
+
+**Target features:**
+- Post-procesamiento en cv_processor.py (gender, teléfono, RUT)
+- Preprocessor: no hacer .lower() que daña nombres propios
+- Robustez en parseo JSON de Gemini
+- Cache y reintentos inteligentes
+
 ## Current State
 
 **Shipped:** v1.2 Wizard Reordering (2026-05-17)
@@ -32,7 +42,10 @@ Extract structured CV data with a beautiful, intuitive interface and export-read
 
 ### Active
 
-- [ ] Backend Integration Refinement — optimize data fetching and state management
+- [ ] Post-process cv_processor output (gender, phone, RUT)
+- [ ] Fix preprocessor .lower() damage to proper names
+- [ ] Add robust JSON error handling in llm_service
+- [ ] Add smart retry with schema fallback on TPM errors
 
 ### Out of Scope
 
@@ -84,4 +97,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-17 after v1.2 milestone*
+*Last updated: 2026-05-18 after starting v1.3 milestone*
