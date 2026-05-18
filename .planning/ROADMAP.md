@@ -45,7 +45,9 @@
   1. User uploads a CV and all proper nouns (names, cities, surnames) in the output maintain correct casing
   2. User uploads a CV with all-caps names like "MARÍA GARCÍA" — output shows "María García" not "maría garcía"
   3. User uploads a CV and existing text normalization (whitespace, special characters) still works correctly
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 06-01-PLAN.md — Fix clean_text() proper noun casing + add tests
 
 ### Phase 7: Post-Processing Pipeline
 **Goal**: CVProcessor applies gender inference, phone normalization, and RUT formatting after LLM extraction, only overriding fields the LLM couldn't find
@@ -80,6 +82,6 @@
 | 3. Wizard Cross-Reference Integration | v1.1 | 3/3 | Complete | 2026-05-15 |
 | 4. Cross-Reference Export | v1.1 | 4/4 | Complete | 2026-05-15 |
 | 5. Wizard Reordering | v1.2 | 1/1 | Complete | 2026-05-17 |
-| 6. Preprocessor Proper Noun Fix | v1.3 | 0/0 | Not started | - |
+| 6. Preprocessor Proper Noun Fix | v1.3 | 0/1 | Planning | - |
 | 7. Post-Processing Pipeline | v1.3 | 0/0 | Not started | - |
 | 8. LLM Error Resilience & Retry | v1.3 | 0/0 | Not started | - |
