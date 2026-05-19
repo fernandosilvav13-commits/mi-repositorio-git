@@ -1,64 +1,71 @@
 # Requirements: CicloAI
 
-**Defined:** 2026-05-18
+**Defined:** 2026-05-19
 **Core Value:** Extract structured CV data with a beautiful, intuitive interface and export-ready results.
 
-## v1.3 Requirements
+## v1.4 Requirements
 
-Requirements for v1.3 bugfix milestone. Each maps to roadmap phases.
+Requirements for v1.4 — Extracción Inteligente. Each maps to roadmap phases.
 
-### Post-Processing
+### Prompt Infrastructure
 
-- [ ] **POST-01**: CVProcessor.process() applies gender inference via infer_gender() on extracted NOMBRES
-- [ ] **POST-02**: CVProcessor.process() normalizes phone numbers via normalize_phone()
-- [ ] **POST-03**: CVProcessor.process() formats RUT via RUTFormatter
-- [ ] **POST-04**: Post-processing only overrides LLM output when field is "NO ENCONTRADO" or empty
+- [ ] **PROMPT-01**: System supports version-controlled prompt registry with YAML files, resolver, and Git tracking
 
-### Preprocessor
+### Document Classification
 
-- [ ] **PREP-01**: clean_text() preserves proper noun casing instead of blanket .lower()
+- [ ] **CLASS-01**: System classifies documents using TF-IDF + SVM (scikit-learn) to detect document type before extraction
 
-### LLM Robustness
+### Post-Processing Rules
 
-- [ ] **LLM-01**: llm_service handles malformed JSON gracefully (logs warning, retries)
-- [ ] **LLM-02**: llm_service strips markdown/code fences before JSON parse
+- [ ] **RULES-01**: System expands field coverage with pattern-based inference rules beyond gender/phone/RUT
+- [ ] **RULES-02**: New post-processing rules deploy in shadow mode with 90% precision floor before activation
 
-### Retry Strategy
+### Advanced Preprocessing
 
-- [ ] **RETR-01**: On dynamic schema failure, attempt fallback to EXTRACTION_SCHEMA
-- [ ] **RETR-02**: Backoff waits are bounded and respect TPM limits
+- [ ] **PREP-01**: System applies structural cleanup (section detection, layout normalization) before extraction
+- [ ] **PREP-02**: System filters noise (page headers, page numbers, artifacts) before extraction
 
-## Future Requirements
+### OCR Augmentation
 
-(Deferred — not in current scope)
+- [ ] **OCR-01**: System integrates PaddleOCR 3.0 as alternative OCR backend for image-based documents
+- [ ] **OCR-02**: System fuses Tesseract + PaddleOCR results with per-line confidence scoring
+- [ ] **OCR-03**: System applies layout analysis (PP-StructureV3) for reading order recovery
+
+### Two-Pass Pipeline
+
+- [ ] **PIPE-01**: System wires classifier output into extraction with type-specific prompts
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Frontend UI changes | Purely backend bugs this milestone |
-| New extraction fields | Bugfix only, no schema expansion |
-| Performance optimization | Only if related to bugs above |
+| Field-level confidence scoring UI | Deferred to v1.5 — design data model now, implement later |
+| Fine-tuned LLM | Prompt engineering + schema optimization sufficient for current needs |
+| Cloud OCR APIs | Cost-prohibitive at scale — PaddleOCR self-hosted is sufficient |
+| Real-time extraction streaming | Batch extraction is the workflow |
+| Mobile app | Web-first PWA approach maintained |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| POST-01 | Phase 7 | Pending |
-| POST-02 | Phase 7 | Pending |
-| POST-03 | Phase 7 | Pending |
-| POST-04 | Phase 7 | Pending |
-| PREP-01 | Phase 6 | Pending |
-| LLM-01 | Phase 8 | Pending |
-| LLM-02 | Phase 8 | Pending |
-| RETR-01 | Phase 8 | Pending |
-| RETR-02 | Phase 8 | Pending |
+| PROMPT-01 | Phase N | Pending |
+| CLASS-01 | Phase N | Pending |
+| RULES-01 | Phase N | Pending |
+| RULES-02 | Phase N | Pending |
+| PREP-01 | Phase N | Pending |
+| PREP-02 | Phase N | Pending |
+| OCR-01 | Phase N | Pending |
+| OCR-02 | Phase N | Pending |
+| OCR-03 | Phase N | Pending |
+| PIPE-01 | Phase N | Pending |
 
 **Coverage:**
-- v1.3 requirements: 9 total
-- Mapped to phases: 9
-- Unmapped: 0 ✓
+- v1.4 requirements: 10 total
+- Mapped to phases: 0
+- Unmapped: 10 ⚠️
 
 ---
-*Requirements defined: 2026-05-18*
-*Last updated: 2026-05-18 after initial definition*
+
+*Requirements defined: 2026-05-19*
+*Last updated: 2026-05-19 after initial definition*
