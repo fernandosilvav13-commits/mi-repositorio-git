@@ -34,7 +34,7 @@ def _repair_json(raw: str) -> str:
     raw = raw.strip()
     raw = raw.removeprefix("```json").removeprefix("```").removesuffix("```").strip()
     raw = re.sub(r",\s*([}\]])", r"\1", raw)
-    raw = re.sub(r"(?<!\\)'", '"', raw)
+    raw = re.sub(r"(?<=[{,:\[ ])'|'(?=[,:}\] \n])", '"', raw)
     return raw
 
 
