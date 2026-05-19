@@ -6,7 +6,16 @@
 
 v1.3 improved extraction reliability through: post-processing pipeline (gender inference, phone normalization, RUT formatting), preprocessor proper noun casing fix, LLM JSON error resilience with schema fallback, and TPM-aware bounded retries. All 9 requirements validated.
 
-## Next Milestone
+## Current Milestone: v1.4 Extracción Inteligente
+
+**Goal:** Mejorar drásticamente la precisión de extracción reduciendo los campos "NO ENCONTRADO" mediante mejoras en múltiples frentes.
+
+**Target features:**
+- Optimizar prompt de Gemini para extracción más precisa
+- Mejorar OCR para mejor calidad de texto extraído
+- Preprocesamiento avanzado (mejor limpieza y estructuración)
+- Post-procesamiento más agresivo (inferir más campos con reglas)
+- Pipeline en dos pasos (clasificar CV → extraer con contexto)
 
 ## What This Is
 
@@ -88,4 +97,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-19 after completing v1.3 milestone*
+*Last updated: 2026-05-19 after starting v1.4 milestone*
