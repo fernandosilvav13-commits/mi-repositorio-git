@@ -2,15 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Extracción Inteligente
-status: planning
-last_updated: "2026-05-19T18:45:00.000Z"
-last_activity: 2026-05-19
+status: Roadmap defined, awaiting `/gsd-plan-phase 9`
+last_updated: "2026-05-19T19:03:39.775Z"
+last_activity: 2026-05-19 — v1.4 roadmap created with 6 phases (9–14)
 progress:
-  total_phases: 6
+  total_phases: 9
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
-  percent: 0
 ---
 
 # Project State
