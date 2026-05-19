@@ -1,20 +1,10 @@
 # CicloAI
 
-## Current Milestone: v1.3 Bugfix Pipeline de Extracción
-
-**Goal:** Corregir bugs en el pipeline de extracción que causan campos faltantes o incorrectos en los datos extraídos de CVs.
-
-**Target features:**
-- Post-procesamiento en cv_processor.py (gender, teléfono, RUT)
-- Preprocessor: no hacer .lower() que daña nombres propios
-- Robustez en parseo JSON de Gemini
-- Cache y reintentos inteligentes
-
 ## Current State
 
-**Shipped:** v1.2 Wizard Reordering (2026-05-17)
+**Shipped:** v1.3 Bugfix Pipeline de Extracción (2026-05-19)
 
-The Wizard flow now executes Template Selection before Cross-Reference, fixing the crossref mapping auto-suggestion issue. All navigation targets updated, with D-01 warning guard on template change and D-03 mapping invalidation on confirmed switch.
+v1.3 improved extraction reliability through: post-processing pipeline (gender inference, phone normalization, RUT formatting), preprocessor proper noun casing fix, LLM JSON error resilience with schema fallback, and TPM-aware bounded retries. All 9 requirements validated.
 
 ## Next Milestone
 
@@ -39,13 +29,14 @@ Extract structured CV data with a beautiful, intuitive interface and export-read
 - ✓ Extraction Results as a Museum Gallery — v1.0
 - ✓ Wizard steps reordered: Upload → Template → CrossRef → Rules → Extract → Export → Review — v1.2
 - ✓ Warning guard on template change with crossref mapping (D-01/D-03) — v1.2
+- ✓ Post-processing pipeline (gender, phone, RUT) — Phase 7 (v1.3)
+- ✓ Preprocessor proper noun casing fix — Phase 6 (v1.3)
+- ✓ LLM JSON error resilience with schema fallback — Phase 8 (v1.3)
+- ✓ TPM-aware bounded retries — Phase 8 (v1.3)
 
 ### Active
 
-- [ ] Post-process cv_processor output (gender, phone, RUT)
-- [ ] Fix preprocessor .lower() damage to proper names
-- [ ] Add robust JSON error handling in llm_service
-- [ ] Add smart retry with schema fallback on TPM errors
+(Defined in next milestone)
 
 ### Out of Scope
 
@@ -97,4 +88,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-18 after starting v1.3 milestone*
+*Last updated: 2026-05-19 after completing v1.3 milestone*

@@ -5,7 +5,7 @@
 - ✅ **v1.0 MVP** — Phase 1 (shipped 2026-05-15)
 - ✅ **v1.1 Cross-Reference Integration** — Phases 2–4 (shipped 2026-05-15)
 - ✅ **v1.2 Wizard Reordering** — Phase 5 (shipped 2026-05-17)
-- 🚧 **v1.3 Bugfix Pipeline de Extracción** — Phases 6–8 (2/3 phases complete)
+- ✅ **v1.3 Bugfix Pipeline de Extracción** — Phases 6–8 (shipped 2026-05-19)
 
 ## Phases
 
@@ -29,11 +29,11 @@
 - [x] Phase 5: Wizard Reordering (1/1 plans) — completed 2026-05-17
 </details>
 
-### 🚧 v1.3 Bugfix Pipeline de Extracción (In Progress)
+### ✅ v1.3 Bugfix Pipeline de Extracción (Shipped)
 
 - [x] **Phase 6: Preprocessor Proper Noun Fix** — clean_text() preserves proper noun casing instead of blanket lowercasing
 - [x] **Phase 7: Post-Processing Pipeline** — CVProcessor applies gender inference, phone normalization, and RUT formatting after LLM extraction
-- [ ] **Phase 8: LLM Error Resilience & Retry** — Robust JSON parsing, schema fallback, and bounded retries within TPM limits
+- [x] **Phase 8: LLM Error Resilience & Retry** — Robust JSON parsing, schema fallback, and bounded retries within TPM limits
 
 ## Phase Details
 
@@ -86,4 +86,4 @@ Plans:
 | 5. Wizard Reordering | v1.2 | 1/1 | Complete | 2026-05-17 |
 | 6. Preprocessor Proper Noun Fix | v1.3 | 1/1 | Complete | 2026-05-18 |
 | 7. Post-Processing Pipeline | v1.3 | 1/1 | Complete | 2026-05-18 |
-| 8. LLM Error Resilience & Retry | v1.3 | 0/0 | Not started | - |
+| 8. LLM Error Resilience & Retry | v1.3 | 1/1 | Complete | 2026-05-19 |
