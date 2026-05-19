@@ -21,3 +21,6 @@ olefile
 PyJWT
 pytest
 pytest-asyncio
+pyyaml
+jinja2
+semver
