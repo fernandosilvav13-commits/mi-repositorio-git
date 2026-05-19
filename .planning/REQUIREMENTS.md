@@ -49,23 +49,23 @@ Requirements for v1.4 — Extracción Inteligente. Each maps to roadmap phases.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PROMPT-01 | Phase N | Pending |
-| CLASS-01 | Phase N | Pending |
-| RULES-01 | Phase N | Pending |
-| RULES-02 | Phase N | Pending |
-| PREP-01 | Phase N | Pending |
-| PREP-02 | Phase N | Pending |
-| OCR-01 | Phase N | Pending |
-| OCR-02 | Phase N | Pending |
-| OCR-03 | Phase N | Pending |
-| PIPE-01 | Phase N | Pending |
+| PROMPT-01 | Phase 9 | Pending |
+| CLASS-01 | Phase 11 | Pending |
+| RULES-01 | Phase 12 | Pending |
+| RULES-02 | Phase 12 | Pending |
+| PREP-01 | Phase 10 | Pending |
+| PREP-02 | Phase 10 | Pending |
+| OCR-01 | Phase 14 | Pending |
+| OCR-02 | Phase 14 | Pending |
+| OCR-03 | Phase 14 | Pending |
+| PIPE-01 | Phase 13 | Pending |
 
 **Coverage:**
 - v1.4 requirements: 10 total
-- Mapped to phases: 0
-- Unmapped: 10 ⚠️
+- Mapped to phases: 10 ✓
+- Unmapped: 0
 
 ---
 
 *Requirements defined: 2026-05-19*
-*Last updated: 2026-05-19 after initial definition*
+*Last updated: 2026-05-19 after roadmap creation for v1.4*
