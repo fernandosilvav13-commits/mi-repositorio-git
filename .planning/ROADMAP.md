@@ -94,7 +94,10 @@ Plans:
   2. `PromptResolver` returns the correct prompt version for a given document type and version tag (e.g., `cv-extraction@v1.2`)
   3. Git tracking shows clean diffs when a prompt YAML changes — code and prompt changes are independently traceable
   4. System logs which prompt version was used for each extraction, enabling A/B comparison of prompt versions
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [x] 09-01-PLAN.md — PromptVersion Pydantic model + YAML baseline
+- [x] 09-02-PLAN.md — PromptResolver with semver, fallback, Jinja2, git tags
 **UI hint**: no
 
 ### Phase 10: Advanced Preprocessing
@@ -171,7 +174,7 @@ Plans:
 | 6. Preprocessor Proper Noun Fix | v1.3 | 1/1 | Complete | 2026-05-18 |
 | 7. Post-Processing Pipeline | v1.3 | 1/1 | Complete | 2026-05-18 |
 | 8. LLM Error Resilience & Retry | v1.3 | 1/1 | Complete | 2026-05-19 |
-| 9. Prompt Infrastructure & Foundation | v1.4 | 0/0 | Not started | - |
+| 9. Prompt Infrastructure & Foundation | v1.4 | 2/2 | Complete | 2026-05-21 |
 | 10. Advanced Preprocessing | v1.4 | 0/0 | Not started | - |
 | 11. Document Classification | v1.4 | 0/0 | Not started | - |
 | 12. Post-Processing Rules Expansion | v1.4 | 0/0 | Not started | - |
