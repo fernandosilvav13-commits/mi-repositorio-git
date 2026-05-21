@@ -83,7 +83,11 @@ Plans:
   3. When dynamic schema extraction fails after retries, system falls back to EXTRACTION_SCHEMA
   4. Retry backoff never exceeds configured TPM limits
   5. User sees extracted data regardless of transient JSON formatting issues from Gemini
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 10-01-PLAN.md — Pydantic schemas + section-detection prompt YAML
+- [ ] 10-02-PLAN.md — SectionDetector, NoiseFilter, LayoutNormalizer + unit tests
+- [ ] 10-03-PLAN.md — PreprocessingPipeline orchestrator + integration tests
 
 ### Phase 9: Prompt Infrastructure & Foundation
 **Goal**: Version-controlled prompt registry that tracks every prompt change, enables reproducible extractions, and decouples prompt engineering from code changes
@@ -109,7 +113,11 @@ Plans:
   2. Page headers, page numbers, footers, and document artifacts are removed from document text before extraction
   3. Layout normalization collapses inconsistent whitespace and line breaks into a uniform structure regardless of original formatting
   4. An uploaded CV with mixed content (body + artifacts) yields clean text with only meaningful sections preserved
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 10-01-PLAN.md — Pydantic schemas + section-detection prompt YAML
+- [ ] 10-02-PLAN.md — SectionDetector, NoiseFilter, LayoutNormalizer + unit tests
+- [ ] 10-03-PLAN.md — PreprocessingPipeline orchestrator + integration tests
 **UI hint**: no
 
 ### Phase 11: Document Classification
@@ -121,7 +129,11 @@ Plans:
   2. Classification completes in under 2 seconds per document (dominated by TF-IDF transform time)
   3. Classifier output includes confidence score and top-3 category predictions for downstream decision-making
   4. Non-CV documents are flagged and routed to appropriate handling or rejection with clear messaging
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 10-01-PLAN.md — Pydantic schemas + section-detection prompt YAML
+- [ ] 10-02-PLAN.md — SectionDetector, NoiseFilter, LayoutNormalizer + unit tests
+- [ ] 10-03-PLAN.md — PreprocessingPipeline orchestrator + integration tests
 **UI hint**: no
 
 ### Phase 12: Post-Processing Rules Expansion
@@ -134,7 +146,11 @@ Plans:
   3. A rule auto-activates only when shadow-mode evaluation shows ≥90% precision over 100+ samples
   4. Each rule operates independently — one rule failure does not cascade or block other rules
   5. System logs per-rule precision, recall, count, and activation status for monitoring and debugging
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 10-01-PLAN.md — Pydantic schemas + section-detection prompt YAML
+- [ ] 10-02-PLAN.md — SectionDetector, NoiseFilter, LayoutNormalizer + unit tests
+- [ ] 10-03-PLAN.md — PreprocessingPipeline orchestrator + integration tests
 **UI hint**: no
 
 ### Phase 13: Two-Pass Pipeline
@@ -146,7 +162,11 @@ Plans:
   2. A CV document classified as "CV-Ecuadorian" receives a prompt optimized for Ecuadorian CV formats (e.g., cédula instead of RUT)
   3. Two-pass extraction (classify → extract) shows ≥5% improvement in field detection rate over single-pass baseline
   4. Pipeline logs both the classification decision and the prompt version used, enabling end-to-end traceability per extraction
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 10-01-PLAN.md — Pydantic schemas + section-detection prompt YAML
+- [ ] 10-02-PLAN.md — SectionDetector, NoiseFilter, LayoutNormalizer + unit tests
+- [ ] 10-03-PLAN.md — PreprocessingPipeline orchestrator + integration tests
 **UI hint**: no
 
 ### Phase 14: OCR Augmentation
@@ -159,7 +179,11 @@ Plans:
   3. PP-StructureV3 layout analysis recovers correct reading order for multi-column or complex-layout CVs
   4. OCR-augmented documents show measurably lower "NO ENCONTRADO" rate than Tesseract-only processing
   5. Spanish diacritics (tildes, ñ, accents) are preserved through OCR processing with <1% loss rate
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 10-01-PLAN.md — Pydantic schemas + section-detection prompt YAML
+- [ ] 10-02-PLAN.md — SectionDetector, NoiseFilter, LayoutNormalizer + unit tests
+- [ ] 10-03-PLAN.md — PreprocessingPipeline orchestrator + integration tests
 **UI hint**: no
 
 ## Progress
