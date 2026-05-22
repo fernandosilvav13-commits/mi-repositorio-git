@@ -22,8 +22,8 @@ Requirements for v1.4 — Extracción Inteligente. Each maps to roadmap phases.
 
 ### Advanced Preprocessing
 
-- [ ] **PREP-01**: System applies structural cleanup (section detection, layout normalization) before extraction
-- [ ] **PREP-02**: System filters noise (page headers, page numbers, artifacts) before extraction
+- [x] **PREP-01**: System applies structural cleanup (section detection, layout normalization) before extraction
+- [x] **PREP-02**: System filters noise (page headers, page numbers, artifacts) before extraction
 
 ### OCR Augmentation
 
@@ -53,8 +53,8 @@ Requirements for v1.4 — Extracción Inteligente. Each maps to roadmap phases.
 | CLASS-01 | Phase 11 | Pending |
 | RULES-01 | Phase 12 | Pending |
 | RULES-02 | Phase 12 | Pending |
-| PREP-01 | Phase 10 | Pending |
-| PREP-02 | Phase 10 | Pending |
+| PREP-01 | Phase 10 | Complete |
+| PREP-02 | Phase 10 | Complete |
 | OCR-01 | Phase 14 | Pending |
 | OCR-02 | Phase 14 | Pending |
 | OCR-03 | Phase 14 | Pending |

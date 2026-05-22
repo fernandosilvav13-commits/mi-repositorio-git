@@ -598,18 +598,13 @@ async def extract_fields(
 | A3 | Jinja2 autoescape=False safe for prompt templates | Code Examples | LOW — dev-authored content, not user input |
 | A4 | semver Version comparison works with ^/~ shim boundaries | Architecture Patterns | MEDIUM — pre-release edge cases |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Should Git tag creation be automatic (CLI script) or manual (documented git command)?**
-   - D-10 requires git tag per prompt version. Tag name format is locked.
-   - Build a small CLI entry point `python -m app.services.prompt_resolver tag cv-extraction v1.0.0`.
+1. **Should Git tag creation be automatic (CLI script) or manual (documented git command)?** — RESOLVED: Plan 02 implements `create_prompt_tag()` and `list_prompt_tags()` as static methods on PromptResolver, scriptable via `python3 -c` or import.
 
-2. **Module-level singleton or dependency injection for PromptResolver?**
-   - D-11 says "simple synchronous class". Existing services use singletons.
-   - Constructor accepts path for testability, module-level instance for production.
+2. **Module-level singleton or dependency injection for PromptResolver?** — RESOLVED: Plan 02 creates a sync class with `prompts_dir` constructor arg for testability. Singleton instantiation deferred to llm_service.py integration (future phase).
 
-3. **Does adding prompt_version to extraction_results require a Supabase migration?**
-   - D-04 requires version in Supabase. Verify if column exists or needs `ALTER TABLE`.
+3. **Does adding prompt_version to extraction_results require a Supabase migration?** — RESOLVED: D-04 is partially addressed in Plan 02 via `tag_name` property for logging. Actual Supabase schema migration for the `prompt_version` column is deferred to the phase that wires PromptResolver into llm_service.py (Phase 13 or Phase 9 follow-up).
 
 ## Environment Availability
 

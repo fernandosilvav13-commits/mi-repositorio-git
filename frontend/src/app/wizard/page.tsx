@@ -45,6 +45,29 @@ const STEPS: { key: Step; label: string; icon: any }[] = [
   { key: "review", label: "Calidad", icon: Star },
 ];
 
+async function readEntry(entry: FileSystemEntry, path: string): Promise<{ file: File; folder: string }[]> {
+  if (entry.isFile) {
+    const fileEntry = entry as FileSystemFileEntry;
+    return new Promise((resolve) => {
+      fileEntry.file((file) => {
+        const folder = path.split("/")[0] || "Raíz";
+        resolve([{ file, folder }]);
+      });
+    });
+  } else if (entry.isDirectory) {
+    const dirEntry = entry as FileSystemDirectoryEntry;
+    const reader = dirEntry.createReader();
+    const entries = await new Promise<FileSystemEntry[]>((resolve) => {
+      reader.readEntries((results) => resolve(results));
+    });
+    const results = await Promise.all(
+      entries.map((child) => readEntry(child, path ? `${path}/${entry.name}` : entry.name))
+    );
+    return results.flat();
+  }
+  return [];
+}
+
 export default function WizardPage() {
   const [currentStep, setCurrentStep] = useState<Step>("upload");
   const [subStep, setSubStep] = useState(0);
@@ -54,6 +77,7 @@ export default function WizardPage() {
   const [uploadFiles, setUploadFiles] = useState<{ file: File; folder: string }[]>([]);
   const [uploadedPaths, setUploadedPaths] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [dragging, setDragging] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const folderRef = useRef<HTMLInputElement>(null);
   const crossrefFileRef = useRef<HTMLInputElement>(null);
@@ -484,46 +508,60 @@ export default function WizardPage() {
         <div className="w-full flex flex-col gap-6">
           {currentStep === "upload" && (
             <ConfiguratorCard>
-              <div 
-                className="w-full aspect-[2/1] rounded-lg border-2 border-dashed border-[#e0e0e0] flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-action-blue group transition-colors bg-white/50"
+              <div
+                role="button"
+                tabIndex={0}
+                onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+                onDragLeave={() => setDragging(false)}
+                onDrop={async (e) => {
+                  e.preventDefault();
+                  setDragging(false);
+                  const items = Array.from(e.dataTransfer.items);
+                  if (items.length === 0) return;
+                  const allFiles: { file: File; folder: string }[] = [];
+                  for (const item of items) {
+                    const entry = item.webkitGetAsEntry();
+                    if (entry) {
+                      const files = await readEntry(entry, "");
+                      allFiles.push(...files);
+                    }
+                  }
+                  setUploadFiles((prev) => [...prev, ...allFiles]);
+                }}
+                className={cn("relative w-full aspect-[2/1] rounded-lg border-2 border-dashed flex flex-col items-center justify-center gap-4 group transition-colors bg-white/50", dragging ? "border-action-blue bg-action-blue/5" : "border-[#e0e0e0] hover:border-action-blue")}
               >
-                <input ref={fileRef} type="file" multiple className="hidden" onChange={(e) => {
-                  const files = Array.from(e.target.files || []);
-                  setUploadFiles((prev) => [...prev, ...files.map(f => ({ file: f, folder: "Raíz" }))]);
-                }} />
-                <div className="w-16 h-16 rounded-full bg-parchment flex items-center justify-center group-hover:bg-action-blue group-hover:text-white transition-all">
-                    <Upload size={28} />
+                <div className="flex flex-col items-center justify-center gap-4 pointer-events-none">
+                  <div className="w-16 h-16 rounded-full bg-parchment flex items-center justify-center group-hover:bg-action-blue group-hover:text-white transition-all">
+                      <Upload size={28} />
+                  </div>
+                  <p className="text-[17px] font-semibold text-ink">{dragging ? "Suelte los archivos aquí" : "Seleccionar archivos"}</p>
                 </div>
-                <p className="text-[17px] font-semibold text-ink">Seleccionar archivos</p>
-                <Button
-                  variant="outline"
-                  onClick={(e) => { e.stopPropagation(); folderRef.current?.click(); }}
-                  className="rounded-full border border-[#e0e0e0] bg-white text-[#333] hover:bg-[#f5f5f5] h-11 px-5 text-[14px] gap-2"
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                  Subir Carpeta
-                </Button>
+                <input
+                  type="file"
+                  multiple
+                  className="absolute inset-0 opacity-0 cursor-pointer"
+                  onChange={(e) => {
+                    const files = Array.from(e.target.files || []);
+                    setUploadFiles((prev) => [...prev, ...files.map(f => ({ file: f, folder: "Raíz" }))]);
+                  }}
+                />
                 <input
                   ref={folderRef}
                   type="file"
-                  {...({webkitdirectory: ""} as any)}
+                  multiple
                   className="hidden"
                   onChange={(e) => {
                     const files = Array.from(e.target.files || []);
                     const filtered = files.filter(isUploadable);
                     const skipped = files.length - filtered.length;
-                    const newFiles = filtered.map(f => {
-                      const parts = f.webkitRelativePath.split("/");
-                      const folder = parts.length > 1 ? parts[0] : "Raíz";
-                      return { file: f, folder };
-                    });
+                    const newFiles = filtered.map(f => ({ file: f, folder: "Raíz" }));
                     setUploadFiles((prev) => [...prev, ...newFiles]);
                     if (skipped > 0) {
                       alert(`Se omitieron ${skipped} archivo(s) no soportado(s) (Thumbs.db, .DS_Store, etc.)`);
                     }
                   }}
                 />
-                <div className="flex flex-wrap justify-center gap-2 max-w-md px-6">
+                <div className="flex flex-wrap justify-center gap-2 max-w-md px-6 pointer-events-none">
                     {uploadFiles.slice(0, 5).map((f, i) => (
                         <Badge key={i} variant="secondary" className="bg-parchment text-ink rounded-full px-3 py-1 border-none font-normal text-[12px]">
                             {f.file.name}

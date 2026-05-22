@@ -39,7 +39,7 @@
 ### 🔄 v1.4 Extracción Inteligente (In Progress)
 
 - [ ] **Phase 9: Prompt Infrastructure & Foundation** — Version-controlled prompt registry with YAML files, resolver, and Git tracking
-- [ ] **Phase 10: Advanced Preprocessing** — Structural cleanup (section detection, layout normalization) and noise filtering before extraction
+- [x] **Phase 10: Advanced Preprocessing** — Structural cleanup (section detection, layout normalization) and noise filtering before extraction (completed 2026-05-22)
 - [ ] **Phase 11: Document Classification** — TF-IDF + SVM document classifier using scikit-learn
 - [ ] **Phase 12: Post-Processing Rules Expansion** — Pattern-based inference rules beyond gender/phone/RUT with shadow-mode deployment
 - [ ] **Phase 13: Two-Pass Pipeline** — Classifier output wired into extraction with type-specific prompts
@@ -85,9 +85,9 @@ Plans:
   5. User sees extracted data regardless of transient JSON formatting issues from Gemini
 **Plans**: 3 plans
 Plans:
-- [ ] 10-01-PLAN.md — Pydantic schemas + section-detection prompt YAML
-- [ ] 10-02-PLAN.md — SectionDetector, NoiseFilter, LayoutNormalizer + unit tests
-- [ ] 10-03-PLAN.md — PreprocessingPipeline orchestrator + integration tests
+- [x] 10-01-PLAN.md — Pydantic schemas + section-detection prompt YAML
+- [x] 10-02-PLAN.md — SectionDetector, NoiseFilter, LayoutNormalizer + unit tests
+- [x] 10-03-PLAN.md — PreprocessingPipeline orchestrator + integration tests
 
 ### Phase 9: Prompt Infrastructure & Foundation
 **Goal**: Version-controlled prompt registry that tracks every prompt change, enables reproducible extractions, and decouples prompt engineering from code changes
@@ -199,7 +199,7 @@ Plans:
 | 7. Post-Processing Pipeline | v1.3 | 1/1 | Complete | 2026-05-18 |
 | 8. LLM Error Resilience & Retry | v1.3 | 1/1 | Complete | 2026-05-19 |
 | 9. Prompt Infrastructure & Foundation | v1.4 | 2/2 | Complete | 2026-05-21 |
-| 10. Advanced Preprocessing | v1.4 | 0/0 | Not started | - |
+| 10. Advanced Preprocessing | v1.4 | 3/3 | Complete    | 2026-05-22 |
 | 11. Document Classification | v1.4 | 0/0 | Not started | - |
 | 12. Post-Processing Rules Expansion | v1.4 | 0/0 | Not started | - |
 | 13. Two-Pass Pipeline | v1.4 | 0/0 | Not started | - |
