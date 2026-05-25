@@ -41,7 +41,7 @@
 - [ ] **Phase 9: Prompt Infrastructure & Foundation** — Version-controlled prompt registry with YAML files, resolver, and Git tracking
 - [x] **Phase 10: Advanced Preprocessing** — Structural cleanup (section detection, layout normalization) and noise filtering before extraction (completed 2026-05-22)
 - [x] **Phase 11: Document Classification** — TF-IDF + SVM document classifier using scikit-learn (completed 2026-05-24)
-- [ ] **Phase 12: Post-Processing Rules Expansion** — Pattern-based inference rules beyond gender/phone/RUT with shadow-mode deployment
+- [x] **Phase 12: Post-Processing Rules Expansion** — Pattern-based inference rules beyond gender/phone/RUT with shadow-mode deployment (completed 2026-05-24)
 - [ ] **Phase 13: Two-Pass Pipeline** — Classifier output wired into extraction with type-specific prompts
 - [ ] **Phase 14: OCR Augmentation** — PaddleOCR 3.0 integration, dual-engine fusion, and PP-StructureV3 layout analysis
 
@@ -201,6 +201,6 @@ Plans:
 | 9. Prompt Infrastructure & Foundation | v1.4 | 2/2 | Complete | 2026-05-21 |
 | 10. Advanced Preprocessing | v1.4 | 3/3 | Complete    | 2026-05-22 |
 | 11. Document Classification | v1.4 | 3/3 | Complete | 2026-05-24 |
-| 12. Post-Processing Rules Expansion | v1.4 | 0/0 | Not started | - |
+| 12. Post-Processing Rules Expansion | v1.4 | 3/3 | Complete | 2026-05-24 |
 | 13. Two-Pass Pipeline | v1.4 | 0/0 | Not started | - |
 | 14. OCR Augmentation | v1.4 | 0/0 | Not started | - |

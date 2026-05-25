@@ -20,13 +20,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-19)
 
 **Core value:** Extract structured CV data with a beautiful, intuitive interface and export-ready results.
-**Current focus:** Phase 12 — Post-Processing Rules Expansion
+**Current focus:** Phase 13 — Two-Pass Pipeline
 
 ## Current Position
 
-Phase: 12
+Phase: 13
 Plan: Not started
-Status: Executing Phase 12
+Status: Executing Phase 13
 Last activity: 2026-05-24
 
 ## Performance Metrics
@@ -52,7 +52,7 @@ Last activity: 2026-05-24
 | 9. Prompt Infrastructure & Foundation | 2 | complete | ~10min |
 | 10. Advanced Preprocessing | 3 | complete | ~5min |
 | 11. Document Classification | 3 | complete | ~5min |
-| 12. Post-Processing Rules Expansion | 0 | not started | — |
+| 12. Post-Processing Rules Expansion | 3 | complete | ~2min |
 | 13. Two-Pass Pipeline | 0 | not started | — |
 | 14. OCR Augmentation | 0 | not started | — |
 
@@ -70,11 +70,12 @@ Last activity: 2026-05-24
 - [Phase 08]: Retry Strategy — fallback to EXTRACTION_SCHEMA on dynamic schema failure, bounded backoff within TPM limits
 - [Phase 10]: Advanced Preprocessing — SectionDetector, NoiseFilter, LayoutNormalizer, PreprocessingPipeline orchestrator
 - [Phase 11]: Document Classification — binary CV vs Non-CV with LinearSVC, TF-IDF, 0.7 confidence threshold, synthetic training data
+- [Phase 12]: Post-Processing Rules Expansion — BaseRule ABC, RuleRegistry singleton, 5 inference rules (nationality, DOB, experience, education, email), shadow mode with precision tracking
 - [v1.4 Roadmap]: Phase order respects dependency chain: Prompt Infrastructure → Preprocessing → Classification → Rules (parallel) → Two-Pass → OCR (independent, last)
 
 ### Pending Todos
 
-None — Phase 11 complete.
+None — Phase 12 complete.
 
 ### Blockers/Concerns
 
@@ -82,6 +83,6 @@ None.
 
 ## Session Continuity
 
-v1.4 milestone in progress. Phases 9-11 complete. Proceeding to Phase 12 (Post-Processing Rules Expansion).
+v1.4 milestone in progress. Phases 9-12 complete. Proceeding to Phase 13 (Two-Pass Pipeline).
 
-**Next recommended action:** Execute Phase 12 (Post-Processing Rules Expansion)
+**Next recommended action:** Execute Phase 13 (Two-Pass Pipeline)
