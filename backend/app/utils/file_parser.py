@@ -7,9 +7,19 @@ import pdfplumber
 from PIL import Image
 from docx import Document as DocxDocument
 import pandas as pd
-from tesserocr import PyTessBaseAPI
+import os
+import pytesseract
+from app.core.config import settings
 
-TESSDATA_PATH = str(Path.home() / ".local/share/tessdata")
+# Set tesseract environment for local install
+_tess_dir = os.path.dirname(os.path.dirname(getattr(settings, "tesseract_cmd", "")))
+_lib_dir = os.path.join(os.path.dirname(_tess_dir), "lib")
+_tessdata_dir = getattr(settings, "tesseract_data_dir", "")
+if _lib_dir and os.path.isdir(_lib_dir):
+    os.environ.setdefault("LD_LIBRARY_PATH", _lib_dir)
+    os.environ.setdefault("TESSDATA_PREFIX", _tessdata_dir or os.path.join(os.path.dirname(_lib_dir), "tessdata"))
+if _tessdata_dir:
+    os.environ["TESSDATA_PREFIX"] = _tessdata_dir
 
 
 class FileParser:
@@ -121,6 +131,8 @@ class FileParser:
     @staticmethod
     def _ocr_image(file_path: str) -> str:
         image = Image.open(file_path)
-        with PyTessBaseAPI(path=TESSDATA_PATH, lang="spa+eng") as api:
-            api.SetImage(image)
-            return api.GetUTF8Text().strip()
+        if hasattr(settings, "tesseract_cmd") and settings.tesseract_cmd:
+            pytesseract.pytesseract.tesseract_cmd = settings.tesseract_cmd
+        lang = getattr(settings, "ocr_lang", "spa+eng")
+        text = pytesseract.image_to_string(image, lang=lang)
+        return text.strip()

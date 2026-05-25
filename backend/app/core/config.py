@@ -24,6 +24,11 @@ class Settings(BaseSettings):
     fuzzy_threshold_default: int = 70
     llm_retry_count: int = 3
     
+    tesseract_cmd: str = "/home/fernandosilvav/Proyecto-Prueba/.tesseract/bin/tesseract"
+    tesseract_data_dir: str = "/home/fernandosilvav/Proyecto-Prueba/.tesseract/tessdata"
+    ocr_lang: str = "spa+eng"
+    ocr_enabled: bool = True
+
     rate_limit_max: int = 60
     rate_limit_window: int = 60
 
