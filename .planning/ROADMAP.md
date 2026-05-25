@@ -40,7 +40,7 @@
 
 - [ ] **Phase 9: Prompt Infrastructure & Foundation** — Version-controlled prompt registry with YAML files, resolver, and Git tracking
 - [x] **Phase 10: Advanced Preprocessing** — Structural cleanup (section detection, layout normalization) and noise filtering before extraction (completed 2026-05-22)
-- [ ] **Phase 11: Document Classification** — TF-IDF + SVM document classifier using scikit-learn
+- [x] **Phase 11: Document Classification** — TF-IDF + SVM document classifier using scikit-learn (completed 2026-05-24)
 - [ ] **Phase 12: Post-Processing Rules Expansion** — Pattern-based inference rules beyond gender/phone/RUT with shadow-mode deployment
 - [ ] **Phase 13: Two-Pass Pipeline** — Classifier output wired into extraction with type-specific prompts
 - [ ] **Phase 14: OCR Augmentation** — PaddleOCR 3.0 integration, dual-engine fusion, and PP-StructureV3 layout analysis
@@ -131,9 +131,9 @@ Plans:
   4. Non-CV documents are flagged and routed to appropriate handling or rejection with clear messaging
 **Plans**: 3 plans
 Plans:
-- [ ] 10-01-PLAN.md — Pydantic schemas + section-detection prompt YAML
-- [ ] 10-02-PLAN.md — SectionDetector, NoiseFilter, LayoutNormalizer + unit tests
-- [ ] 10-03-PLAN.md — PreprocessingPipeline orchestrator + integration tests
+- [x] 11-01-PLAN.md — Classification schemas + training data + TF-IDF vectorizer
+- [x] 11-02-PLAN.md — DocClassifier with LinearSVC, prediction, confidence scoring
+- [x] 11-03-PLAN.md — Integration tests and API endpoint
 **UI hint**: no
 
 ### Phase 12: Post-Processing Rules Expansion
@@ -200,7 +200,7 @@ Plans:
 | 8. LLM Error Resilience & Retry | v1.3 | 1/1 | Complete | 2026-05-19 |
 | 9. Prompt Infrastructure & Foundation | v1.4 | 2/2 | Complete | 2026-05-21 |
 | 10. Advanced Preprocessing | v1.4 | 3/3 | Complete    | 2026-05-22 |
-| 11. Document Classification | v1.4 | 0/0 | Not started | - |
+| 11. Document Classification | v1.4 | 3/3 | Complete | 2026-05-24 |
 | 12. Post-Processing Rules Expansion | v1.4 | 0/0 | Not started | - |
 | 13. Two-Pass Pipeline | v1.4 | 0/0 | Not started | - |
 | 14. OCR Augmentation | v1.4 | 0/0 | Not started | - |

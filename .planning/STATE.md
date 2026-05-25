@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Extracción Inteligente
 status: executing
-last_updated: "2026-05-22T00:12:23.655Z"
-last_activity: 2026-05-22
+last_updated: "2026-05-24T12:00:00.000Z"
+last_activity: 2026-05-24
 progress:
-  total_phases: 9
-  completed_phases: 2
-  total_plans: 5
-  completed_plans: 5
-  percent: 22
+  total_phases: 6
+  completed_phases: 3
+  total_plans: 11
+  completed_plans: 8
+  percent: 50
 ---
 
 # Project State
@@ -20,20 +20,20 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-19)
 
 **Core value:** Extract structured CV data with a beautiful, intuitive interface and export-ready results.
-**Current focus:** Phase 10 — Advanced Preprocessing
+**Current focus:** Phase 12 — Post-Processing Rules Expansion
 
 ## Current Position
 
-Phase: 11
+Phase: 12
 Plan: Not started
-Status: Executing Phase 10
-Last activity: 2026-05-22
+Status: Executing Phase 12
+Last activity: 2026-05-24
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 21 (across all milestones)
+- Total plans completed: 24 (across all milestones)
 - Average duration: N/A
 - Total execution time: N/A
 
@@ -50,12 +50,11 @@ Last activity: 2026-05-22
 | 7. Post-Processing Pipeline | 1 | complete | ~2min |
 | 8. LLM Error Resilience & Retry | 1 | complete | ~2min |
 | 9. Prompt Infrastructure & Foundation | 2 | complete | ~10min |
-| 10. Advanced Preprocessing | 0 | not started | — |
-| 11. Document Classification | 0 | not started | — |
+| 10. Advanced Preprocessing | 3 | complete | ~5min |
+| 11. Document Classification | 3 | complete | ~5min |
 | 12. Post-Processing Rules Expansion | 0 | not started | — |
 | 13. Two-Pass Pipeline | 0 | not started | — |
 | 14. OCR Augmentation | 0 | not started | — |
-| 10 | 3 | - | - |
 
 ## Accumulated Context
 
@@ -69,11 +68,13 @@ Last activity: 2026-05-22
 - [Phase 07]: Post-processing overrides LLM fields only when value is "NO ENCONTRADO" or empty — never overwrites valid LLM output
 - [Phase 08]: LLM Error Resilience — strip markdown/fences before JSON parse, log warning and retry on malformed JSON
 - [Phase 08]: Retry Strategy — fallback to EXTRACTION_SCHEMA on dynamic schema failure, bounded backoff within TPM limits
+- [Phase 10]: Advanced Preprocessing — SectionDetector, NoiseFilter, LayoutNormalizer, PreprocessingPipeline orchestrator
+- [Phase 11]: Document Classification — binary CV vs Non-CV with LinearSVC, TF-IDF, 0.7 confidence threshold, synthetic training data
 - [v1.4 Roadmap]: Phase order respects dependency chain: Prompt Infrastructure → Preprocessing → Classification → Rules (parallel) → Two-Pass → OCR (independent, last)
 
 ### Pending Todos
 
-None — Phase 9 complete.
+None — Phase 11 complete.
 
 ### Blockers/Concerns
 
@@ -81,6 +82,6 @@ None.
 
 ## Session Continuity
 
-v1.4 milestone in progress. Phase 9 completed 2026-05-21. Phase 10 context gathered 2026-05-21 with 12 decisions across 4 areas. Ready for Phase 10 planning.
+v1.4 milestone in progress. Phases 9-11 complete. Proceeding to Phase 12 (Post-Processing Rules Expansion).
 
-**Next recommended action:** `/gsd-plan-phase 10` — create a plan for Phase 10
+**Next recommended action:** Execute Phase 12 (Post-Processing Rules Expansion)
