@@ -2,6 +2,7 @@ import pandas as pd
 import asyncio
 from pathlib import Path
 from app.services.cv_extractor import extract_cv_data
+from app.services.extraction_pipeline import extraction_pipeline
 from app.services.gender_service import infer_gender
 from app.services.phone_service import normalize_phone
 from app.services.experience_service import get_top_3_experiences
@@ -19,8 +20,9 @@ def _titlecase_name(name: str) -> str:
 
 
 class CVProcessor:
-    def __init__(self, matricula_csv: str = "mineduc_matricula.csv"):
+    def __init__(self, matricula_csv: str = "mineduc_matricula.csv", use_two_pass: bool = False):
         self.matricula_csv = matricula_csv
+        self.use_two_pass = use_two_pass
         self._matricula_lookup = None
 
     @property
@@ -82,6 +84,19 @@ class CVProcessor:
         return data
 
     async def process(self, raw_text: str, is_retry: bool = False, schema: dict | None = None) -> dict:
+        if self.use_two_pass:
+            pipeline_result = await extraction_pipeline.process(raw_text)
+            if pipeline_result.get("classification_warning"):
+                logger.warning("Classification warning: %s (%.4f)",
+                               pipeline_result.get("category"),
+                               pipeline_result.get("confidence", 0.0))
+                return {}
+            data = pipeline_result.get("extraction")
+            if not data:
+                return {}
+            data = self._post_process(data, raw_text=raw_text)
+            return data
+
         data = await extract_cv_data(raw_text, is_retry=is_retry, schema=schema)
         if not data:
             return {}

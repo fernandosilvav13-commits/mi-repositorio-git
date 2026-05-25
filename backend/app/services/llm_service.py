@@ -53,10 +53,12 @@ async def _track_tpm(estimated_tokens: int):
 
 async def extract_fields(text: str, schema: dict, model: str | None = None,
                          fallback_schema: dict | None = None,
-                         fallback_model: str | None = None) -> dict:
+                         fallback_model: str | None = None,
+                         prompt_override: str | None = None) -> dict:
     llm_client = _get_client()
     model_name = model or settings.gemini_model_extract
     retry_model = fallback_model or settings.gemini_model_retry
+    base_prompt = prompt_override or EXTRACTION_PROMPT
 
     for phase, current_schema, current_model, max_attempts in [
         ("primary", schema, model_name, settings.llm_retry_count),
@@ -67,7 +69,7 @@ async def extract_fields(text: str, schema: dict, model: str | None = None,
         for attempt in range(max_attempts):
             try:
                 await _track_tpm(len(text) // 4 + len(json.dumps(current_schema)) // 4)
-                prompt = f"{EXTRACTION_PROMPT}\nSchema: {json.dumps(current_schema)}\nText: {text}"
+                prompt = f"{base_prompt}\nSchema: {json.dumps(current_schema)}\nText: {text}"
                 response = llm_client.models.generate_content(
                     model=current_model,
                     contents=prompt,
