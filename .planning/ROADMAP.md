@@ -42,8 +42,8 @@
 - [x] **Phase 10: Advanced Preprocessing** — Structural cleanup (section detection, layout normalization) and noise filtering before extraction (completed 2026-05-22)
 - [x] **Phase 11: Document Classification** — TF-IDF + SVM document classifier using scikit-learn (completed 2026-05-24)
 - [x] **Phase 12: Post-Processing Rules Expansion** — Pattern-based inference rules beyond gender/phone/RUT with shadow-mode deployment (completed 2026-05-24)
-- [ ] **Phase 13: Two-Pass Pipeline** — Classifier output wired into extraction with type-specific prompts
-- [ ] **Phase 14: OCR Augmentation** — PaddleOCR 3.0 integration, dual-engine fusion, and PP-StructureV3 layout analysis
+- [x] **Phase 13: Two-Pass Pipeline** — Classifier output wired into extraction with type-specific prompts
+- [x] **Phase 14: OCR Augmentation** — Tesseract integration, coordinate-based layout analysis, and fallback chain
 
 ## Phase Details
 
@@ -202,5 +202,5 @@ Plans:
 | 10. Advanced Preprocessing | v1.4 | 3/3 | Complete    | 2026-05-22 |
 | 11. Document Classification | v1.4 | 3/3 | Complete | 2026-05-24 |
 | 12. Post-Processing Rules Expansion | v1.4 | 3/3 | Complete | 2026-05-24 |
-| 13. Two-Pass Pipeline | v1.4 | 0/0 | Not started | - |
-| 14. OCR Augmentation | v1.4 | 0/0 | Not started | - |
+| 13. Two-Pass Pipeline | v1.4 | 3/3 | Complete | 2026-05-24 |
+| 14. OCR Augmentation | v1.4 | 4/4 | Complete | 2026-05-25 |

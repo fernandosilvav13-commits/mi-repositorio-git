@@ -20,13 +20,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-19)
 
 **Core value:** Extract structured CV data with a beautiful, intuitive interface and export-ready results.
-**Current focus:** Phase 13 — Two-Pass Pipeline
+**Current focus:** v1.4 milestone complete
 
 ## Current Position
 
-Phase: 13
-Plan: Not started
-Status: Executing Phase 13
+Phase: —
+Plan: —
+Status: v1.4 milestone complete
 Last activity: 2026-05-24
 
 ## Performance Metrics
@@ -53,6 +53,8 @@ Last activity: 2026-05-24
 | 10. Advanced Preprocessing | 3 | complete | ~5min |
 | 11. Document Classification | 3 | complete | ~5min |
 | 12. Post-Processing Rules Expansion | 3 | complete | ~2min |
+| 13. Two-Pass Pipeline | 3 | complete | ~5min |
+| 14. OCR Augmentation | 4 | complete | ~10min |
 | 13. Two-Pass Pipeline | 0 | not started | — |
 | 14. OCR Augmentation | 0 | not started | — |
 
@@ -71,11 +73,13 @@ Last activity: 2026-05-24
 - [Phase 10]: Advanced Preprocessing — SectionDetector, NoiseFilter, LayoutNormalizer, PreprocessingPipeline orchestrator
 - [Phase 11]: Document Classification — binary CV vs Non-CV with LinearSVC, TF-IDF, 0.7 confidence threshold, synthetic training data
 - [Phase 12]: Post-Processing Rules Expansion — BaseRule ABC, RuleRegistry singleton, 5 inference rules (nationality, DOB, experience, education, email), shadow mode with precision tracking
+- [Phase 13]: Two-Pass Pipeline — ExtractionPipeline orchestrator chaining preprocess → classify → extract with type-specific prompts, integrated into CVProcessor with use_two_pass flag
+- [Phase 14]: OCR Augmentation — Tesseract via pytesseract, LayoutAnalyzer with column detection, OCRService enhanced with extract_with_layout and fallback chain
 - [v1.4 Roadmap]: Phase order respects dependency chain: Prompt Infrastructure → Preprocessing → Classification → Rules (parallel) → Two-Pass → OCR (independent, last)
 
 ### Pending Todos
 
-None — Phase 12 complete.
+None — v1.4 milestone complete.
 
 ### Blockers/Concerns
 
@@ -83,6 +87,6 @@ None.
 
 ## Session Continuity
 
-v1.4 milestone in progress. Phases 9-12 complete. Proceeding to Phase 13 (Two-Pass Pipeline).
+v1.4 milestone complete. All 6 phases (9-14) executed successfully: 17 plans, 184 tests.
 
-**Next recommended action:** Execute Phase 13 (Two-Pass Pipeline)
+**Next recommended action:** v1.4 release audit — tag, branch, and merge to main
