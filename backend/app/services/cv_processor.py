@@ -7,6 +7,7 @@ from app.services.phone_service import normalize_phone
 from app.services.experience_service import get_top_3_experiences
 from app.utils.rut_formatter import RUTFormatter
 from app.utils.logger import setup_logger
+from app.services.rules.evaluator import evaluate_rules
 
 logger = setup_logger("cv_processor")
 
@@ -51,7 +52,7 @@ class CVProcessor:
             logger.error("Error loading matricula data: %s", e)
             return {}
 
-    def _post_process(self, data: dict) -> dict:
+    def _post_process(self, data: dict, raw_text: str = "") -> dict:
         genero = data.get("GENERO", "")
         if not genero or genero == "NO ENCONTRADO":
             nombres = data.get("NOMBRES", "")
@@ -74,6 +75,10 @@ class CVProcessor:
             if val and val != "NO ENCONTRADO":
                 data[field] = _titlecase_name(val)
 
+        if raw_text:
+            rule_updates = evaluate_rules(raw_text, data)
+            data.update(rule_updates)
+
         return data
 
     async def process(self, raw_text: str, is_retry: bool = False, schema: dict | None = None) -> dict:
@@ -87,7 +92,7 @@ class CVProcessor:
             if experiences and isinstance(experiences, list):
                 data[exp_key] = get_top_3_experiences(experiences, self.matricula_lookup)
 
-        data = self._post_process(data)
+        data = self._post_process(data, raw_text=raw_text)
         return data
 
     async def process_many(self, texts: list[str], is_retry: bool = False, schema: dict | None = None) -> list[dict]:
