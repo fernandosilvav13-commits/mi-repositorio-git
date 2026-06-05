@@ -17,3 +17,4 @@ outputs/
 *.xlsx
 *.log
 everything-claude-code/
+.tesseract/
