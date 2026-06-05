@@ -1,0 +1,31 @@
+type: cv-extraction
+version: 1.0.0
+description: Baseline CV extraction prompt — mirrors the original hardcoded EXTRACTION_PROMPT and schema from llm_service.py
+author: system
+system_prompt: |
+  Extrae datos del texto según el esquema JSON.
+  Responde SOLO con el JSON. Si falta algo, usa "NO ENCONTRADO".
+  No inventes datos. Respeta nombres de claves.
+schema:
+  nombres: ""
+  apellidos: ""
+  rut: ""
+  telefono: ""
+  email: ""
+  direccion: ""
+  fecha_nacimiento: ""
+  nacionalidad: ""
+  estado_civil: ""
+  profesion: ""
+  resumen_profesional: ""
+  educacion: []
+  experiencia_laboral: []
+  idiomas: []
+  habilidades: []
+model_params:
+  model: gemini-2.5-flash-lite
+  temperature: 0.1
+tags:
+  - cv
+  - extraction
+  - baseline

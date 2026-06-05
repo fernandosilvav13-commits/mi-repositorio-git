@@ -2,7 +2,11 @@ from pydantic import BaseModel
 from typing import Optional
 
 
+class MatchKey(BaseModel):
+    extractionKey: str
+    crossrefKey: str
+
+
 class ColumnMapping(BaseModel):
-    match_column: str
-    crossref_match_column: str
+    matchKeys: list[MatchKey]
     output_columns: list[str]

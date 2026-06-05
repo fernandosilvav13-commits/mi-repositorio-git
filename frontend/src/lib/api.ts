@@ -1,4 +1,4 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+export const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const isFormData = options?.body instanceof FormData;
@@ -25,16 +25,48 @@ async function downloadBlob(path: string, data: any, filename: string = "resulta
   const a = document.createElement("a");
   a.href = url;
   a.download = filename;
+  document.body.appendChild(a);
   a.click();
-  URL.revokeObjectURL(url);
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 100);
 }
+
+const uploadWithProgress = (
+  file: File,
+  onProgress: (percent: number) => void
+): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    const form = new FormData();
+    form.append("file", file);
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", `${API_BASE}/api/crossref/upload`);
+    xhr.upload.onprogress = (e: ProgressEvent) => {
+      if (e.lengthComputable) {
+        onProgress(Math.round((e.loaded / e.total) * 100));
+      }
+    };
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve(JSON.parse(xhr.responseText));
+      } else {
+        reject(new Error(xhr.responseText));
+      }
+    };
+    xhr.onerror = () => reject(new Error("Upload failed"));
+    xhr.onabort = () => reject(new Error("Upload cancelled"));
+    xhr.send(form);
+  });
+};
 
 export const api = {
   ingest: {
-    upload: (files: File[]) => {
+    upload: (files: { file: File; folder: string }[]) => {
       const form = new FormData();
-      files.forEach((f) => form.append("files", f));
-      return request<{ files: string[]; count: number }>("/api/ingest/upload", {
+      files.forEach(({ file, folder }) => {
+        form.append("files", file);
+        form.append("folders", folder);
+      });
+      return request<{ files: string[]; count: number; errors?: { file: string; error: string }[] }>("/api/ingest/upload", {
         method: "POST",
         body: form,
       });
@@ -58,7 +90,12 @@ export const api = {
   },
   extraction: {
     extract: (data: any) =>
-      request<any[]>("/api/extraction/extract", {
+      request<any[]>("/api/extraction/", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    batch: (data: any) =>
+      request<any>("/api/extraction/extract/batch", {
         method: "POST",
         body: JSON.stringify(data),
       }),
@@ -77,7 +114,7 @@ export const api = {
       }),
   },
   export: {
-    excel: (data: any) => downloadBlob("/api/export/excel", data),
+    excel: (data: any) => downloadBlob("/api/export/", data),
   },
   crossref: {
     upload: (file: File) => {
@@ -94,3 +131,5 @@ export const api = {
       request<any>(`/api/crossref/files/${id}`, { method: "DELETE" }),
   },
 };
+
+export { uploadWithProgress };

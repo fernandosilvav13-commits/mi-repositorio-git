@@ -5,6 +5,8 @@ from app.services.rules_engine import RulesEngine
 from app.services.consolidator import Consolidator
 from app.services.crossref_service import CrossrefService
 from app.core.database import require_supabase
+from pathlib import Path
+import json
 
 router = APIRouter()
 excel_service = ExcelService()
@@ -31,25 +33,34 @@ async def export_to_excel(data: dict):
         raise HTTPException(404, "Plantilla no encontrada")
 
     columns = [c["name"] for c in template_data.data[0].get("columns", [])]
+    
+    # Agregar columna 'Carpeta' si viene en los datos
+    if rows and "Carpeta" in rows[0] and "Carpeta" not in columns:
+        columns.insert(0, "Carpeta")
 
     consolidated_rows, _ = consolidator.consolidate(columns, rows)
 
     if crossref_file_id and column_mapping:
-        crossref_result = (
-            supabase.table("crossref_files")
-            .select("data,columns")
-            .eq("id", crossref_file_id)
-            .execute()
-        )
-        if not crossref_result.data:
+        manifest_path = Path("uploads/crossref/manifest.json")
+        entry = None
+        if manifest_path.exists():
+            manifest = json.loads(manifest_path.read_text())
+            for e in manifest:
+                if e["id"] == crossref_file_id:
+                    entry = e
+                    break
+        if not entry:
             raise HTTPException(404, "Archivo de cruce no encontrado")
 
-        crossref_data = crossref_result.data[0]
+        full_data = crossref_service.load_file_data(entry["name"])
+        match_keys = [{
+            "extractionKey": column_mapping["match_column"],
+            "crossrefKey": column_mapping["crossref_match_column"],
+        }]
         merged_rows = crossref_service.merge_data(
             rows=consolidated_rows,
-            crossref_rows=crossref_data["data"],
-            match_column=column_mapping["match_column"],
-            crossref_match_column=column_mapping["crossref_match_column"],
+            crossref_rows=full_data,
+            match_keys=match_keys,
             output_columns=column_mapping["output_columns"],
         )
         all_columns = list(columns)

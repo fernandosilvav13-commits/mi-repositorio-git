@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File, Depends
+from fastapi import APIRouter, UploadFile, File, Form, Depends
 from pathlib import Path
 import aiofiles
 from app.core.config import settings
@@ -13,16 +13,26 @@ upload_dir = Path(settings.UPLOAD_DIR) if hasattr(settings, 'UPLOAD_DIR') else P
 upload_dir.mkdir(exist_ok=True)
 
 
-@router.post("/")
-async def upload_file(file: UploadFile = File(...)):
-    ext = Path(file.filename).suffix.lower()
-    content = await file.read()
-    validate_upload(content, file.filename)
-    safe_name = sanitize_filename(file.filename)
-    file_path = upload_dir / safe_name
-    async with aiofiles.open(str(file_path), "wb") as buffer:
-        await buffer.write(content)
-    return {"files": [str(file_path)], "count": 1}
+@router.post("/upload")
+async def upload_files(files: list[UploadFile] = File(...), folders: list[str] = Form(default=[])):
+    saved = []
+    errors = []
+    for i, file in enumerate(files):
+        try:
+            ext = Path(file.filename).suffix.lower()
+            content = await file.read()
+            validate_upload(content, file.filename)
+            safe_name = sanitize_filename(file.filename)
+            folder_name = folders[i] if i < len(folders) and folders[i] else "Raíz"
+            folder_path = upload_dir / sanitize_filename(folder_name)
+            folder_path.mkdir(exist_ok=True)
+            file_path = folder_path / safe_name
+            async with aiofiles.open(str(file_path), "wb") as buffer:
+                await buffer.write(content)
+            saved.append(str(file_path))
+        except Exception as e:
+            errors.append({"file": file.filename, "error": str(e.detail) if hasattr(e, "detail") else str(e)})
+    return {"files": saved, "count": len(saved), "errors": errors}
 
 
 @router.post("/process")

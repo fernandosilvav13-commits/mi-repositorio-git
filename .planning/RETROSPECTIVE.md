@@ -45,4 +45,46 @@
 
 ---
 
-*Last updated: 2026-05-15 after v1.0 milestone*
+---
+
+## Milestone: v1.2 — Wizard Reordering
+
+**Shipped:** 2026-05-17
+**Phases:** 1 | **Plans:** 1
+
+### What Was Built
+
+- Reordered Wizard steps: Template Selection now happens before Cross-Reference
+- D-01 warning guard on template change when crossref mapping exists
+- D-02 same-template re-selection preserves mapping, updates columns
+- D-03 clears matchKeys/outputColumns on confirmed template switch
+
+### What Worked
+
+- Phase context was already gathered (05-CONTEXT.md), making execution straightforward
+- Single file change (wizard/page.tsx), 10 edits across 6 locations — precise and contained
+- Plan was thorough with exact code references and verification steps
+
+### What Was Inefficient
+
+- Phase 05 was planned but never executed in the original session — had to come back and apply the changes
+- SUMMARY.md was pre-written with "TODO" for commits (planning artifact, not execution artifact)
+
+### Patterns Established
+
+- `window.confirm` for simple warning dialogs (keeps code minimal for agent's discretion items)
+- D-01/D-03 guard pattern: warn first, clear downstream state, then navigate
+
+### Key Lessons
+
+- Always verify that planned changes were actually applied to code, not just documented in SUMMARY.md
+- Pre-written SUMMARY.md files should include a clear execution/commit section to distinguish planning from execution
+
+### Cost Observations
+
+- **Duration:** ~15min for execution (phase was fully planned, just needed code application + commit)
+- **Commits:** 4 commits for milestone (Phase 05, ROADMAP update, archive, requirements removal)
+
+---
+
+*Last updated: 2026-05-17 after v1.2 milestone*

@@ -1,0 +1,66 @@
+{
+  "phase": "03",
+  "plans": [
+    {
+      "id": "03-01",
+      "wave": 1,
+      "depends_on": [],
+      "autonomous": false,
+      "objective": "Enhance the Wizard's cross-reference step with proper sub-step flow for enabling, uploading, and selecting cross-reference files.",
+      "files_modified": [
+        "frontend/src/app/wizard/page.tsx"
+      ],
+      "task_count": 1,
+      "has_summary": true
+    },
+    {
+      "id": "03-02",
+      "wave": 2,
+      "depends_on": [
+        "03-01"
+      ],
+      "autonomous": false,
+      "objective": "Build the column mapping configuration UI within the Wizard crossref step. Users can define compound match keys and select output columns with smart suggestions.",
+      "files_modified": [
+        "frontend/src/app/wizard/page.tsx",
+        "frontend/src/components/apple/MatchKeySelector.tsx",
+        "frontend/src/components/apple/OutputColumnPicker.tsx",
+        "frontend/src/components/apple/SmartSuggestionChip.tsx"
+      ],
+      "task_count": 4,
+      "has_summary": false
+    },
+    {
+      "id": "03-03",
+      "wave": 3,
+      "depends_on": [
+        "03-02"
+      ],
+      "autonomous": false,
+      "objective": "Add match preview to the Wizard review step showing matched and unmatched cross-reference results.",
+      "files_modified": [
+        "frontend/src/app/wizard/page.tsx",
+        "frontend/src/components/apple/MatchSummaryBar.tsx",
+        "frontend/src/components/apple/MatchTable.tsx"
+      ],
+      "task_count": 3,
+      "has_summary": false
+    }
+  ],
+  "waves": {
+    "1": [
+      "03-01"
+    ],
+    "2": [
+      "03-02"
+    ],
+    "3": [
+      "03-03"
+    ]
+  },
+  "incomplete": [
+    "03-02",
+    "03-03"
+  ],
+  "has_checkpoints": true
+}

@@ -1,0 +1,66 @@
+type: section-detection
+version: "1.0.0"
+description: |
+  Batched prompt for advanced preprocessing: identifies document sections and
+  noise lines in a single LLM call before extraction.
+author: system
+
+system_prompt: |
+  Analiza el siguiente documento CV línea por línea y devuelve:
+
+  1. **sections**: Identifica las secciones del documento y sus límites
+     (número de línea inicial y final, 0-indexed). Secciones esperadas:
+     - Educacion (formación académica)
+     - Experiencia_Laboral (experiencia profesional)
+     - Idiomas
+     - Habilidades / Habilidades_Tecnicas
+     - Certificaciones
+     - Informacion_Adicional / Resumen
+
+     Incluye SOLO las secciones que encuentres. Si una sección no existe,
+     no la incluyas. Si el documento no tiene estructura clara de secciones,
+     establece can_identify como false.
+
+  2. **noisy_lines**: Identifica líneas que NO son contenido real del CV:
+     - Encabezados de página (nombre del documento, "CV", "Curriculum")
+     - Números de página
+     - Pies de página (disclaimers, fechas de impresión)
+     - Metadatos del documento (nombre de archivo, ruta, fecha de generación)
+     - Líneas de elementos decorativos (líneas de guiones, asteriscos)
+
+  3. **can_identify**: true si pudiste identificar claramente la estructura
+     del documento, false si el documento es ambiguo o no tiene secciones claras.
+
+  Documento:
+  {{ document_text }}
+
+schema:
+  type: object
+  properties:
+    sections:
+      type: object
+      description: "Mapa de nombre de sección a límites de línea"
+      additionalProperties:
+        type: object
+        properties:
+          start_line: { type: integer, description: "Primera línea (0-indexed)" }
+          end_line: { type: integer, description: "Última línea (inclusive)" }
+        required: [start_line, end_line]
+    noisy_lines:
+      type: array
+      items: { type: integer }
+      description: "Índices de línea (0-indexed) con ruido a eliminar"
+    can_identify:
+      type: boolean
+      description: "true si el documento tiene estructura identificable"
+  required: [sections, noisy_lines, can_identify]
+
+model_params:
+  model: gemini-2.5-flash-lite
+  temperature: 0.1
+  response_mime_type: application/json
+
+tags:
+  - baseline
+  - preprocessing
+  - section-detection

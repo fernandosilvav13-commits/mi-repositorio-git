@@ -1,5 +1,22 @@
 # CicloAI
 
+## Current State
+
+**Shipped:** v1.3 Bugfix Pipeline de Extracción (2026-05-19)
+
+v1.3 improved extraction reliability through: post-processing pipeline (gender inference, phone normalization, RUT formatting), preprocessor proper noun casing fix, LLM JSON error resilience with schema fallback, and TPM-aware bounded retries. All 9 requirements validated.
+
+## Current Milestone: v1.4 Extracción Inteligente
+
+**Goal:** Mejorar drásticamente la precisión de extracción reduciendo los campos "NO ENCONTRADO" mediante mejoras en múltiples frentes.
+
+**Target features:**
+- Optimizar prompt de Gemini para extracción más precisa
+- Mejorar OCR para mejor calidad de texto extraído
+- Preprocesamiento avanzado (mejor limpieza y estructuración)
+- Post-procesamiento más agresivo (inferir más campos con reglas)
+- Pipeline en dos pasos (clasificar CV → extraer con contexto)
+
 ## What This Is
 
 A CV data extraction system with Apple-inspired frontend design, multi-step ingestion wizard, and Excel export. Extracts structured data from CVs using AI (Gemini), applies conditional rules, and exports to formatted Excel files.
@@ -12,17 +29,23 @@ Extract structured CV data with a beautiful, intuitive interface and export-read
 
 ### Validated
 
+- ✓ Cross-reference data from external files (PDF/CSV/PPT/DOCX) — Phase 04
 - ✓ Apple Color System (Action Blue, Parchment, Near-Black) — v1.0
 - ✓ SF Pro / Inter Typographic Hierarchy — v1.0
 - ✓ Full-Bleed Tile Layout components — v1.0
 - ✓ Global Nav and Frosted Sub-Nav — v1.0
 - ✓ Wizard flow as a Product Configurator — v1.0
 - ✓ Extraction Results as a Museum Gallery — v1.0
+- ✓ Wizard steps reordered: Upload → Template → CrossRef → Rules → Extract → Export → Review — v1.2
+- ✓ Warning guard on template change with crossref mapping (D-01/D-03) — v1.2
+- ✓ Post-processing pipeline (gender, phone, RUT) — Phase 7 (v1.3)
+- ✓ Preprocessor proper noun casing fix — Phase 6 (v1.3)
+- ✓ LLM JSON error resilience with schema fallback — Phase 8 (v1.3)
+- ✓ TPM-aware bounded retries — Phase 8 (v1.3)
 
 ### Active
 
-- [ ] Backend Integration Refinement — optimize data fetching and state management
-- [ ] Cross-reference data from external files (PDF/CSV/PPT/DOCX)
+(Defined in next milestone)
 
 ### Out of Scope
 
@@ -31,18 +54,24 @@ Extract structured CV data with a beautiful, intuitive interface and export-read
 
 ## Context
 
-Shipped v1.0 with ~42,654 LOC (TSX/TS/CSS/Python).
+Shipped v1.0–v1.2 with ~42,654 LOC (TSX/TS/CSS/Python).
 Tech stack: Next.js 16, FastAPI, Supabase, Tailwind v4, Gemini AI.
 Frontend redesigned with Apple "museum gallery" design language.
+v1.2: Wizard steps reordered, template-before-crossref with guard on crossref mapping loss.
 
 ## Key Decisions
 
 | Decision | Outcome | Status |
 | -------- | ------- | ------ |
+| Tuple-based composite keys for matching | O(1) matching performance with multiple columns | ✓ Good |
+| pytest for backend testing | Better async support and cleaner syntax | ✓ Good |
 | Apple Design System with Tailwind v4 | Consistent, elegant UI | ✓ Good |
 | Dual-navigation shell (44px + 52px) | Clear information hierarchy | ✓ Good |
 | Museum Gallery artifact presentation | Intuitive data visualization | ✓ Good |
 | Pill-shaped buttons and pill chips | Cohesive Apple aesthetic | ✓ Good |
+| D-01: Warning on template change | Prevents accidental crossref mapping loss | ✓ Good |
+| D-02: Same-template auto-advance | Faster flow when re-selecting same template | ✓ Good |
+| D-03: Clear mapping on template switch | Prevents ghost state in crossref step | ✓ Good |
 
 ## Constraints
 
@@ -50,6 +79,22 @@ Frontend redesigned with Apple "museum gallery" design language.
 - RUT consolidation occurs server-side during export, not in Supabase
 - Single-command launch via `./start.sh`
 
----
+## Evolution
 
-*Last updated: 2026-05-15 after v1.0 milestone*
+This document evolves at phase transitions and milestone boundaries.
+
+**After each phase transition** (via `/gsd-transition`):
+1. Requirements invalidated? → Move to Out of Scope with reason
+2. Requirements validated? → Move to Validated with phase reference
+3. New requirements emerged? → Add to Active
+4. Decisions to log? → Add to Key Decisions
+5. "What This Is" still accurate? → Update if drifted
+
+**After each milestone** (via `/gsd-complete-milestone`):
+1. Full review of all sections
+2. Core Value check — still the right priority?
+3. Audit Out of Scope — reasons still valid?
+4. Update Context with current state
+
+---
+*Last updated: 2026-05-19 after starting v1.4 milestone*
