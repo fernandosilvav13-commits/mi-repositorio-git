@@ -1,5 +1,6 @@
 from app.services.preprocessor import preprocessing_pipeline
 from app.services.classifier import doc_classifier
+from pathlib import Path
 from app.services.prompt_resolver import PromptResolver
 from app.services.llm_service import extract_fields
 from app.services.cv_extractor import EXTRACTION_SCHEMA
@@ -7,7 +8,7 @@ from app.utils.logger import setup_logger
 
 logger = setup_logger("extraction_pipeline")
 
-prompt_resolver = PromptResolver()
+prompt_resolver = PromptResolver(Path(__file__).resolve().parent.parent.parent / "prompts")
 
 
 class ExtractionPipeline:

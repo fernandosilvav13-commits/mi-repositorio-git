@@ -1,30 +1,44 @@
+---
+phase: 09-prompt-infrastructure-foundation
+plan: 02
+requirements-completed: [PROMPT-01]
+---
 # Plan 09-02 Summary
 
 **Phase:** 09 - Prompt Infrastructure & Foundation
 **Plan:** 02 - Create PromptResolver class with semver, Jinja2, fallback
-**Status:** Complete ✓
+**Status:** Complete
 **Date:** 2026-05-21
 
 ## What was built
 
-- `backend/app/services/prompt_resolver.py` — PromptResolver class with:
-  - `_scan_all()` — load and validate YAMLs at instantiation
-  - `get()` — semver range matching (`^`, `~`, `>=`, exact)
-  - `render()` — Jinja2 templating with `{{document_text}}` and `{{schema}}`
-  - `create_prompt_tag()` / `list_prompt_tags()` — git tag helpers
-  - `build_fallback_prompt()` — dual fallback to hardcoded constants
-- `backend/tests/test_prompt_resolver.py` — appended 11 resolver tests (18 total)
-- `backend/app/services/__init__.py` — exported PromptResolver
+-  — PromptResolver class with:
+  -  — load and validate YAMLs at instantiation
+  -  — semver range matching (, , , exact)
+  -  — Jinja2 templating with  and 
+  -  /  — git tag helpers
+  -  — dual fallback to hardcoded constants
+-  — appended 11 resolver tests (18 total)
+-  — exported PromptResolver
 
 ## Key decisions
 
 - BaseLoader for Jinja2 (no filesystem access from templates), autoescape=True
-- `_match_version` supports caret-zero (`^0.1.0` locks minor)
+-  supports caret-zero ( locks minor)
 - Fallback constants mirror original EXTRACTION_PROMPT and EXTRACTION_SCHEMA from llm_service.py
 - Subprocess for git tag operations (developer-only path)
 
 ## Verification
 
-- All 18 tests pass with `python3 -m pytest tests/test_prompt_resolver.py -x -v`
+- All 18 tests pass with ============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0 -- /usr/bin/python3
+cachedir: .pytest_cache
+rootdir: /mnt/c
+plugins: asyncio-1.3.0, anyio-3.7.1
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 0 items
+
+============================ no tests ran in 0.02s =============================
 - PromptResolver imports and instantiates correctly
-- Resolver loads prompts from `backend/prompts/` directory
+- Resolver loads prompts from  directory
+

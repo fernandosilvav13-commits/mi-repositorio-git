@@ -57,11 +57,18 @@ async function readEntry(entry: FileSystemEntry, path: string): Promise<{ file: 
   } else if (entry.isDirectory) {
     const dirEntry = entry as FileSystemDirectoryEntry;
     const reader = dirEntry.createReader();
-    const entries = await new Promise<FileSystemEntry[]>((resolve) => {
-      reader.readEntries((results) => resolve(results));
-    });
+    const allEntries: FileSystemEntry[] = [];
+    const readBatch = (): Promise<void> =>
+      new Promise((resolve) => {
+        reader.readEntries((results) => {
+          if (results.length === 0) return resolve();
+          allEntries.push(...results);
+          resolve(readBatch());
+        });
+      });
+    await readBatch();
     const results = await Promise.all(
-      entries.map((child) => readEntry(child, path ? `${path}/${entry.name}` : entry.name))
+      allEntries.map((child) => readEntry(child, path ? `${path}/${entry.name}` : entry.name))
     );
     return results.flat();
   }
@@ -526,7 +533,8 @@ export default function WizardPage() {
                       allFiles.push(...files);
                     }
                   }
-                  setUploadFiles((prev) => [...prev, ...allFiles]);
+                  const filtered = allFiles.filter(({ file }) => isUploadable(file));
+                  setUploadFiles((prev) => [...prev, ...filtered]);
                 }}
                 className={cn("relative w-full aspect-[2/1] rounded-lg border-2 border-dashed flex flex-col items-center justify-center gap-4 group transition-colors bg-white/50", dragging ? "border-action-blue bg-action-blue/5" : "border-[#e0e0e0] hover:border-action-blue")}
               >
@@ -534,27 +542,52 @@ export default function WizardPage() {
                   <div className="w-16 h-16 rounded-full bg-parchment flex items-center justify-center group-hover:bg-action-blue group-hover:text-white transition-all">
                       <Upload size={28} />
                   </div>
-                  <p className="text-[17px] font-semibold text-ink">{dragging ? "Suelte los archivos aquí" : "Seleccionar archivos"}</p>
+                  <p className="text-[17px] font-semibold text-ink">{dragging ? "Suelte los archivos aquí" : "Arrastre archivos o carpetas aquí"}</p>
+                </div>
+                <div className="flex gap-3 mt-2 pointer-events-auto">
+                  <button
+                    type="button"
+                    onClick={() => fileRef.current?.click()}
+                    className="bg-action-blue text-white rounded-full px-5 py-2 text-[14px] font-medium active-scale"
+                  >
+                    Seleccionar archivos
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => folderRef.current?.click()}
+                    className="bg-white text-action-blue border border-action-blue rounded-full px-5 py-2 text-[14px] font-medium active-scale"
+                  >
+                    Seleccionar carpeta
+                  </button>
                 </div>
                 <input
-                  type="file"
-                  multiple
-                  className="absolute inset-0 opacity-0 cursor-pointer"
-                  onChange={(e) => {
-                    const files = Array.from(e.target.files || []);
-                    setUploadFiles((prev) => [...prev, ...files.map(f => ({ file: f, folder: "Raíz" }))]);
-                  }}
-                />
-                <input
-                  ref={folderRef}
+                  ref={fileRef}
                   type="file"
                   multiple
                   className="hidden"
                   onChange={(e) => {
                     const files = Array.from(e.target.files || []);
                     const filtered = files.filter(isUploadable);
-                    const skipped = files.length - filtered.length;
                     const newFiles = filtered.map(f => ({ file: f, folder: "Raíz" }));
+                    setUploadFiles((prev) => [...prev, ...newFiles]);
+                  }}
+                />
+                <input
+                  ref={folderRef}
+                  type="file"
+                  // @ts-expect-error - non-standard attr for folder picker
+                  webkitdirectory="true"
+                  multiple
+                  className="hidden"
+                  onChange={(e) => {
+                    const files = Array.from(e.target.files || []);
+                    const filtered = files.filter(isUploadable);
+                    const skipped = files.length - filtered.length;
+                    const newFiles = filtered.map(f => {
+                    const parts = (f as any).webkitRelativePath?.split("/") || [];
+                    const folder = parts.length > 1 ? parts[0] : "Raíz";
+                    return { file: f, folder };
+                  });
                     setUploadFiles((prev) => [...prev, ...newFiles]);
                     if (skipped > 0) {
                       alert(`Se omitieron ${skipped} archivo(s) no soportado(s) (Thumbs.db, .DS_Store, etc.)`);

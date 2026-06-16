@@ -6,7 +6,7 @@
 - ✅ **v1.1 Cross-Reference Integration** — Phases 2–4 (shipped 2026-05-15)
 - ✅ **v1.2 Wizard Reordering** — Phase 5 (shipped 2026-05-17)
 - ✅ **v1.3 Bugfix Pipeline de Extracción** — Phases 6–8 (shipped 2026-05-19)
-- 🔄 **v1.4 Extracción Inteligente** — Phases 9–14 (in progress)
+- 🔄 **v1.4 Extracción Inteligente** — Phases 9–15 (in progress)
 
 ## Phases
 
@@ -44,6 +44,7 @@
 - [x] **Phase 12: Post-Processing Rules Expansion** — Pattern-based inference rules beyond gender/phone/RUT with shadow-mode deployment (completed 2026-05-24)
 - [x] **Phase 13: Two-Pass Pipeline** — Classifier output wired into extraction with type-specific prompts
 - [x] **Phase 14: OCR Augmentation** — Tesseract integration, coordinate-based layout analysis, and fallback chain
+- [ ] **Phase 15: Close Gap — Register /api/classify in main.py** — Register the classify router and activate the two-pass pipeline (INSERTED — urgent gap closure from audit)
 
 ## Phase Details
 
@@ -186,6 +187,19 @@ Plans:
 - [ ] 10-03-PLAN.md — PreprocessingPipeline orchestrator + integration tests
 **UI hint**: no
 
+### Phase 15: Close Gap — Register /api/classify in main.py
+**Goal**: Register the classify router in FastAPI main.py and activate the two-pass pipeline so CLASS-01 and PIPE-01 are production-ready
+**Depends on**: Phase 11, Phase 13
+**Requirements**: CLASS-01, PIPE-01
+**Success Criteria** (what must be TRUE):
+  1. POST /api/classify returns ClassificationResult with category, confidence, and top_categories
+  2. Two-pass pipeline activates in production path — CVProcessor uses use_two_pass=True
+  3. All existing tests continue to pass with no regressions
+  4. Extraction pipeline uses type-specific prompts via PromptResolver for CV-classified documents
+**Plans**: 0 plans
+Plans:
+**UI hint**: no
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -204,3 +218,4 @@ Plans:
 | 12. Post-Processing Rules Expansion | v1.4 | 3/3 | Complete | 2026-05-24 |
 | 13. Two-Pass Pipeline | v1.4 | 3/3 | Complete | 2026-05-24 |
 | 14. OCR Augmentation | v1.4 | 4/4 | Complete | 2026-05-25 |
+| 15. Close Gap — Register /api/classify in main.py | v1.4 | 0/0 | INSERTED | — |

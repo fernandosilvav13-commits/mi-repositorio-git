@@ -18,3 +18,4 @@ outputs/
 *.log
 everything-claude-code/
 .tesseract/
+backend/local.db

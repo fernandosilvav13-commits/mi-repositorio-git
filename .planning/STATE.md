@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Extracción Inteligente
-status: executing
-last_updated: "2026-05-24T12:00:00.000Z"
-last_activity: 2026-05-24
+status: auditing
+last_updated: "2026-06-14T00:06:00.000Z"
+last_activity: 2026-06-14
 progress:
-  total_phases: 6
-  completed_phases: 3
+  total_phases: 7
+  completed_phases: 7
   total_plans: 11
-  completed_plans: 8
-  percent: 50
+  completed_plans: 11
+  percent: 100
 ---
 
 # Project State
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-19)
 
 ## Current Position
 
-Phase: —
+Phase: 15
 Plan: —
-Status: v1.4 milestone complete
-Last activity: 2026-05-24
+Status: Phase 15 inserted (urgent gap closure — register /api/classify in main.py)
+Last activity: 2026-06-13
 
 ## Performance Metrics
 
@@ -59,6 +59,10 @@ Last activity: 2026-05-24
 | 14. OCR Augmentation | 0 | not started | — |
 
 ## Accumulated Context
+
+### Roadmap Evolution
+
+- Phase 15 inserted after Phase 14 (2026-06-13) — "Close gap: CLASS-01 — Register /api/classify in main.py" (URGENT — gap closure from v1.4 audit)
 
 ### Decisions
 

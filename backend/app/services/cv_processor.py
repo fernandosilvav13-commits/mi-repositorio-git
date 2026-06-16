@@ -20,7 +20,7 @@ def _titlecase_name(name: str) -> str:
 
 
 class CVProcessor:
-    def __init__(self, matricula_csv: str = "mineduc_matricula.csv", use_two_pass: bool = False):
+    def __init__(self, matricula_csv: str = "mineduc_matricula.csv", use_two_pass: bool = True):
         self.matricula_csv = matricula_csv
         self.use_two_pass = use_two_pass
         self._matricula_lookup = None

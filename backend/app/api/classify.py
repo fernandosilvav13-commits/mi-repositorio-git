@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 
 from app.services.classifier import doc_classifier
+from app.services.preprocessor import preprocessing_pipeline
 from app.schemas.classification import ClassificationResult
 
 router = APIRouter()
@@ -19,7 +20,8 @@ class ClassifyResponse(BaseModel):
 
 @router.post("/classify", response_model=ClassifyResponse)
 async def classify_document(req: ClassifyRequest):
-    result = doc_classifier.classify(req.text)
+    preprocessed = preprocessing_pipeline.process(req.text)
+    result = doc_classifier.classify(preprocessed.cleaned_text)
     return ClassifyResponse(
         category=result.category,
         confidence=result.confidence,

@@ -11,7 +11,7 @@ def new_init(self, *args, **kwargs):
 httpx.Client.__init__ = new_init
 
 from app.core.config import settings
-from app.api import ingest, templates, extraction, rules, export, crossref
+from app.api import ingest, templates, extraction, rules, export, crossref, classify
 
 app = FastAPI(title=settings.app_name, version="0.1.0")
 
@@ -29,6 +29,7 @@ app.include_router(extraction.router, prefix="/api/extraction", tags=["Extracci�
 app.include_router(rules.router, prefix="/api/rules", tags=["Reglas"])
 app.include_router(export.router, prefix="/api/export", tags=["Exportación"])
 app.include_router(crossref.router, prefix="/api/crossref", tags=["Cruzar Datos"])
+app.include_router(classify.router, prefix="/api/classify", tags=["Clasificación"])
 
 
 @app.get("/health")

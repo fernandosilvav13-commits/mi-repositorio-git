@@ -5,20 +5,20 @@
 
 ## v1.4 Requirements
 
-Requirements for v1.4 — Extracción Inteligente. Each maps to roadmap phases.
+Requirements for v1.4 — Extraccion Inteligente. Each maps to roadmap phases.
 
 ### Prompt Infrastructure
 
-- [ ] **PROMPT-01**: System supports version-controlled prompt registry with YAML files, resolver, and Git tracking
+- [x] **PROMPT-01**: System supports version-controlled prompt registry with YAML files, resolver, and Git tracking
 
 ### Document Classification
 
-- [ ] **CLASS-01**: System classifies documents using TF-IDF + SVM (scikit-learn) to detect document type before extraction
+- [x] **CLASS-01**: System classifies documents using TF-IDF + SVM (scikit-learn) to detect document type before extraction
 
 ### Post-Processing Rules
 
-- [ ] **RULES-01**: System expands field coverage with pattern-based inference rules beyond gender/phone/RUT
-- [ ] **RULES-02**: New post-processing rules deploy in shadow mode with 90% precision floor before activation
+- [x] **RULES-01**: System expands field coverage with pattern-based inference rules beyond gender/phone/RUT
+- [x] **RULES-02**: New post-processing rules deploy in shadow mode with 90% precision floor before activation
 
 ### Advanced Preprocessing
 
@@ -33,7 +33,7 @@ Requirements for v1.4 — Extracción Inteligente. Each maps to roadmap phases.
 
 ### Two-Pass Pipeline
 
-- [ ] **PIPE-01**: System wires classifier output into extraction with type-specific prompts
+- [x] **PIPE-01**: System wires classifier output into extraction with type-specific prompts
 
 ## Out of Scope
 
@@ -49,16 +49,16 @@ Requirements for v1.4 — Extracción Inteligente. Each maps to roadmap phases.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PROMPT-01 | Phase 9 | Pending |
-| CLASS-01 | Phase 11 | Pending |
-| RULES-01 | Phase 12 | Pending |
-| RULES-02 | Phase 12 | Pending |
+| PROMPT-01 | Phase 9 | Complete |
+| CLASS-01 | Phase 11 | Complete |
+| RULES-01 | Phase 12 | Complete |
+| RULES-02 | Phase 12 | Complete |
 | PREP-01 | Phase 10 | Complete |
 | PREP-02 | Phase 10 | Complete |
 | OCR-01 | Phase 14 | Pending |
 | OCR-02 | Phase 14 | Pending |
 | OCR-03 | Phase 14 | Pending |
-| PIPE-01 | Phase 13 | Pending |
+| PIPE-01 | Phase 13 | Complete |
 
 **Coverage:**
 - v1.4 requirements: 10 total
@@ -68,4 +68,5 @@ Requirements for v1.4 — Extracción Inteligente. Each maps to roadmap phases.
 ---
 
 *Requirements defined: 2026-05-19*
-*Last updated: 2026-05-19 after roadmap creation for v1.4*
+*Last updated: 2026-06-14 after milestone gap closure*
+
