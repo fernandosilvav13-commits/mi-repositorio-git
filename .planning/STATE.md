@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Extracción Inteligente
-status: auditing
-last_updated: "2026-06-14T00:06:00.000Z"
-last_activity: 2026-06-14
+status: shipped
+last_updated: "2026-06-16T00:00:00.000Z"
+last_activity: 2026-06-16
 progress:
   total_phases: 7
   completed_phases: 7
-  total_plans: 11
-  completed_plans: 11
+  total_plans: 20
+  completed_plans: 20
   percent: 100
 ---
 
@@ -17,23 +17,23 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-19)
+See: .planning/PROJECT.md (updated 2026-06-16)
 
 **Core value:** Extract structured CV data with a beautiful, intuitive interface and export-ready results.
-**Current focus:** v1.4 milestone complete
+**Current focus:** Planning next milestone
 
 ## Current Position
 
-Phase: 15
+Phase: —
 Plan: —
-Status: Phase 15 inserted (urgent gap closure — register /api/classify in main.py)
-Last activity: 2026-06-13
+Status: v1.4 milestone complete and shipped
+Last activity: 2026-06-16
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 24 (across all milestones)
+- Total plans completed: 44 (across all milestones)
 - Average duration: N/A
 - Total execution time: N/A
 
@@ -55,42 +55,23 @@ Last activity: 2026-06-13
 | 12. Post-Processing Rules Expansion | 3 | complete | ~2min |
 | 13. Two-Pass Pipeline | 3 | complete | ~5min |
 | 14. OCR Augmentation | 4 | complete | ~10min |
-| 13. Two-Pass Pipeline | 0 | not started | — |
-| 14. OCR Augmentation | 0 | not started | — |
+| 15. Close Gap — Register /api/classify in main.py | 2 | complete | ~2min |
 
 ## Accumulated Context
 
-### Roadmap Evolution
+### Milestone Evolution
 
-- Phase 15 inserted after Phase 14 (2026-06-13) — "Close gap: CLASS-01 — Register /api/classify in main.py" (URGENT — gap closure from v1.4 audit)
+- v1.4 shipped 2026-06-16 — 7 phases, 20 plans
+- Phase 15 inserted after milestone audit (urgent gap closure for classify router + two-pass activation)
+- 3 OCR requirements deferred to v1.5: PaddleOCR 3.0 (OCR-01), Tesseract+PaddleOCR fusion (OCR-02), PP-StructureV3 layout (OCR-03)
 
-### Decisions
+### Deferred Items
 
-- [Phase 09]: Prompt Infrastructure & Foundation — PromptVersion Pydantic model, YAML baseline at backend/prompts/, PromptResolver with semver range matching, Jinja2 templates, dual fallback to hardcoded constants, git tag integration
-- [Phase 06]: Preprocessor Proper Noun Fix — clean_text() must preserve proper noun casing, not blanket .lower()
-- [Phase 06 exec]: Regex alternation must list longer alternatives first (nombres|nombre -> nombres|nombre)
-- [Phase 06 exec]: Use re.IGNORECASE on re.sub(), not .lower() on text, for case-insensitive matching that preserves original casing
-- [Phase 07]: Post-Processing Pipeline — gender inference via infer_gender() on NOMBRES, phone via normalize_phone(), RUT via RUTFormatter
-- [Phase 07]: Post-processing overrides LLM fields only when value is "NO ENCONTRADO" or empty — never overwrites valid LLM output
-- [Phase 08]: LLM Error Resilience — strip markdown/fences before JSON parse, log warning and retry on malformed JSON
-- [Phase 08]: Retry Strategy — fallback to EXTRACTION_SCHEMA on dynamic schema failure, bounded backoff within TPM limits
-- [Phase 10]: Advanced Preprocessing — SectionDetector, NoiseFilter, LayoutNormalizer, PreprocessingPipeline orchestrator
-- [Phase 11]: Document Classification — binary CV vs Non-CV with LinearSVC, TF-IDF, 0.7 confidence threshold, synthetic training data
-- [Phase 12]: Post-Processing Rules Expansion — BaseRule ABC, RuleRegistry singleton, 5 inference rules (nationality, DOB, experience, education, email), shadow mode with precision tracking
-- [Phase 13]: Two-Pass Pipeline — ExtractionPipeline orchestrator chaining preprocess → classify → extract with type-specific prompts, integrated into CVProcessor with use_two_pass flag
-- [Phase 14]: OCR Augmentation — Tesseract via pytesseract, LayoutAnalyzer with column detection, OCRService enhanced with extract_with_layout and fallback chain
-- [v1.4 Roadmap]: Phase order respects dependency chain: Prompt Infrastructure → Preprocessing → Classification → Rules (parallel) → Two-Pass → OCR (independent, last)
+Items acknowledged and deferred at milestone close on 2026-06-16:
 
-### Pending Todos
-
-None — v1.4 milestone complete.
-
-### Blockers/Concerns
-
-None.
-
-## Session Continuity
-
-v1.4 milestone complete. All 6 phases (9-14) executed successfully: 17 plans, 184 tests.
-
-**Next recommended action:** v1.4 release audit — tag, branch, and merge to main
+| Category | Item | Status |
+|----------|------|--------|
+| requirement | OCR-01 — PaddleOCR 3.0 integration | deferred to v1.5 |
+| requirement | OCR-02 — Tesseract+PaddleOCR fusion | deferred to v1.5 |
+| requirement | OCR-03 — PP-StructureV3 layout analysis | deferred to v1.5 |
+| tech_debt | Phase 9-15 process docs (VALIDATION.md, Nyquist) | deferred |

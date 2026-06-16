@@ -2,20 +2,17 @@
 
 ## Current State
 
-**Shipped:** v1.3 Bugfix Pipeline de Extracción (2026-05-19)
+**Shipped:** v1.4 Extracción Inteligente (2026-06-16)
 
-v1.3 improved extraction reliability through: post-processing pipeline (gender inference, phone normalization, RUT formatting), preprocessor proper noun casing fix, LLM JSON error resilience with schema fallback, and TPM-aware bounded retries. All 9 requirements validated.
+v1.4 dramatically improved extraction accuracy through: version-controlled prompt infrastructure with PromptResolver, advanced preprocessing pipeline (SectionDetector, NoiseFilter, LayoutNormalizer), document classification (TF-IDF + SVM), 5 new post-processing inference rules in shadow mode, two-pass pipeline (classify → type-specific extraction), OCR augmentation with Tesseract + layout analysis, and gap closure wiring the classify router into production. 7 phases, 20 plans, 184+ tests.
 
-## Current Milestone: v1.4 Extracción Inteligente
+## Current Milestone: v1.4 Extracción Inteligente ✅ (Shipped 2026-06-16)
 
 **Goal:** Mejorar drásticamente la precisión de extracción reduciendo los campos "NO ENCONTRADO" mediante mejoras en múltiples frentes.
 
-**Target features:**
-- Optimizar prompt de Gemini para extracción más precisa
-- Mejorar OCR para mejor calidad de texto extraído
-- Preprocesamiento avanzado (mejor limpieza y estructuración)
-- Post-procesamiento más agresivo (inferir más campos con reglas)
-- Pipeline en dos pasos (clasificar CV → extraer con contexto)
+**Target features:** All delivered ✓
+
+**Deferred to v1.5:** OCR-01 (PaddleOCR 3.0), OCR-02 (Tesseract+PaddleOCR fusion), OCR-03 (PP-StructureV3 layout analysis for reading order)
 
 ## What This Is
 
@@ -42,10 +39,22 @@ Extract structured CV data with a beautiful, intuitive interface and export-read
 - ✓ Preprocessor proper noun casing fix — Phase 6 (v1.3)
 - ✓ LLM JSON error resilience with schema fallback — Phase 8 (v1.3)
 - ✓ TPM-aware bounded retries — Phase 8 (v1.3)
+- ✓ Version-controlled prompt registry with PromptResolver — v1.4
+- ✓ Advanced preprocessing (SectionDetector, NoiseFilter, LayoutNormalizer) — v1.4
+- ✓ Document classification (TF-IDF + SVM, 0.7 confidence threshold) — v1.4
+- ✓ 5 inference rules (nationality, DOB, experience, education, email) in shadow mode — v1.4
+- ✓ Two-pass pipeline (classify → type-specific extraction) — v1.4
+- ✓ OCR augmentation (Tesseract + layout analysis, fallback chain) — v1.4
 
 ### Active
 
-(Defined in next milestone)
+(Defined in next milestone — v1.5)
+
+Potential candidates:
+- PaddleOCR 3.0 integration (OCR-01)
+- Tesseract + PaddleOCR fusion (OCR-02)
+- PP-StructureV3 layout analysis (OCR-03)
+- Field-level confidence scoring UI
 
 ### Out of Scope
 
@@ -97,4 +106,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-19 after starting v1.4 milestone*
+*Last updated: 2026-06-16 after completing v1.4 milestone*
