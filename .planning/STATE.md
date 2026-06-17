@@ -7,10 +7,10 @@ last_updated: "2026-06-17T00:00:00.000Z"
 last_activity: 2026-06-17
 progress:
   total_phases: 6
-  completed_phases: 1
-  total_plans: 1
-  completed_plans: 1
-  percent: 17
+  completed_phases: 2
+  total_plans: 2
+  completed_plans: 2
+  percent: 33
 ---
 
 # Project State
@@ -24,9 +24,9 @@ See: .planning/PROJECT.md (updated 2026-06-17)
 
 ## Current Position
 
-Phase: 17 (Deduplicate batch_process.py)
+Phase: 18 (Config Orphans Cleanup)
 Plan: N/A
-Status: v1.5 milestone active — Phase 16 complete (2026-06-17)
+Status: v1.5 milestone active — Phases 16-17 complete (2026-06-17)
 Last activity: 2026-06-17
 
 ## Performance Metrics
@@ -41,7 +41,7 @@ Last activity: 2026-06-17
 | Phase | Plans | Total | Status |
 |-------|-------|-------|--------|
 | 16. LLM Provider Abstraction | 6/6 UAT | Complete | 2026-06-17 |
-| 17. Deduplicate batch_process.py | — | pending | — |
+| 17. Deduplicate batch_process.py | 1/1 | Complete | 2026-06-17 |
 | 18. Config Orphans Cleanup | — | pending | — |
 | 19. Config Orphans Cleanup | — | pending | — |
 | 20. Real-CV Validation | — | pending | — |
@@ -55,6 +55,12 @@ Last activity: 2026-06-17
   - Bug fixed: section_detector.py render() args + None guard
   - 6/6 UAT tests passing
   - All Phase 16 changes committed to main
+- v1.5 Phase 17 completed 2026-06-17 — batch_process.py deduplication
+  - Replaced hardcoded extract_with_llm() with llm_service.extract_fields()
+  - Removed direct LLM client initialization (_llm_client, _llm_api_key)
+  - Removed hardcoded prompt/retry/JSON repair logic
+  - Fixed test_section_detector.py DEFAULT_MODEL assertion
+  - 183/183 tests passing
 
 ### Deferred Items
 

@@ -29,7 +29,7 @@ class TestSectionDetector:
 
     def test_detector_default_constants(self):
         """Verify DEFAULT_MODEL and DEFAULT_PROMPT_VERSION constants."""
-        assert DEFAULT_MODEL == "gemini-2.5-flash-lite"
+        assert DEFAULT_MODEL == "fast"
         assert DEFAULT_PROMPT_VERSION == "^v1.0.0"
 
     def test_detector_has_module_singletons(self):
