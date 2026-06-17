@@ -16,7 +16,6 @@ class Settings(BaseSettings):
     supabase_key: str = ""
     supabase_jwt_secret: str = ""
 
-    llm_provider: str = "auto"
     llm_api_key: str = ""
 
     google_api_key: str = ""
@@ -26,10 +25,6 @@ class Settings(BaseSettings):
     llm_model_extract: str = "fast"
     llm_model_retry: str = "accurate"
     llm_model_crossref: str = "accurate"
-
-    gemini_model_extract: str = "gemini-2.5-flash-lite"
-    gemini_model_crossref: str = "gemini-2.5-flash"
-    gemini_model_retry: str = "gemini-2.5-flash"
 
     fuzzy_threshold_default: int = 70
     llm_retry_count: int = 3

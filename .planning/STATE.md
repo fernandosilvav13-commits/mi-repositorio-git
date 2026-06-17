@@ -7,10 +7,10 @@ last_updated: "2026-06-17T00:00:00.000Z"
 last_activity: 2026-06-17
 progress:
   total_phases: 6
-  completed_phases: 2
-  total_plans: 2
-  completed_plans: 2
-  percent: 33
+  completed_phases: 3
+  total_plans: 3
+  completed_plans: 3
+  percent: 50
 ---
 
 # Project State
@@ -24,9 +24,9 @@ See: .planning/PROJECT.md (updated 2026-06-17)
 
 ## Current Position
 
-Phase: 18 (Config Orphans Cleanup)
+Phase: 19 (Real-CV Validation)
 Plan: N/A
-Status: v1.5 milestone active — Phases 16-17 complete (2026-06-17)
+Status: v1.5 milestone active — Phases 16-18 complete (2026-06-17)
 Last activity: 2026-06-17
 
 ## Performance Metrics
@@ -42,7 +42,8 @@ Last activity: 2026-06-17
 |-------|-------|-------|--------|
 | 16. LLM Provider Abstraction | 6/6 UAT | Complete | 2026-06-17 |
 | 17. Deduplicate batch_process.py | 1/1 | Complete | 2026-06-17 |
-| 18. Config Orphans Cleanup | — | pending | — |
+| 18. Config Orphans Cleanup | 1/1 | Complete | 2026-06-17 |
+| 19. Real-CV Validation | — | pending | — |
 | 19. Config Orphans Cleanup | — | pending | — |
 | 20. Real-CV Validation | — | pending | — |
 | 21. Post-Processing Refinement | — | pending | — |
@@ -60,6 +61,12 @@ Last activity: 2026-06-17
   - Removed direct LLM client initialization (_llm_client, _llm_api_key)
   - Removed hardcoded prompt/retry/JSON repair logic
   - Fixed test_section_detector.py DEFAULT_MODEL assertion
+  - 183/183 tests passing
+- v1.5 Phase 18 completed 2026-06-17 — config orphans cleanup
+  - Removed gemini_model_extract, gemini_model_crossref, gemini_model_retry from config.py
+  - Removed llm_provider = "auto" from config.py (never read)
+  - Removed GEMINI_MODEL_* env vars from .env
+  - Verified 0 references remain in backend/app/
   - 183/183 tests passing
 
 ### Deferred Items
