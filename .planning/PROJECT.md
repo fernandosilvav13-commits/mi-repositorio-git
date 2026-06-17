@@ -3,16 +3,23 @@
 ## Current State
 
 **Shipped:** v1.4 Extracción Inteligente (2026-06-16)
+**Active:** v1.5 Consolidación de Extracción (started 2026-06-17)
 
 v1.4 dramatically improved extraction accuracy through: version-controlled prompt infrastructure with PromptResolver, advanced preprocessing pipeline (SectionDetector, NoiseFilter, LayoutNormalizer), document classification (TF-IDF + SVM), 5 new post-processing inference rules in shadow mode, two-pass pipeline (classify → type-specific extraction), OCR augmentation with Tesseract + layout analysis, and gap closure wiring the classify router into production. 7 phases, 20 plans, 184+ tests.
 
-## Current Milestone: v1.4 Extracción Inteligente ✅ (Shipped 2026-06-16)
+v1.5 picks up from Phase 16 (llm-provider) — a multi-provider LLM abstraction (Anthropic, OpenAI, Gemini with auto-detection) that was implemented but never UAT-tested or committed. The milestone stabilizes the extraction pipeline: UAT signoff, deduplication of batch_process.py, config cleanup, real-CV validation, and post-processing refinement.
 
-**Goal:** Mejorar drásticamente la precisión de extracción reduciendo los campos "NO ENCONTRADO" mediante mejoras en múltiples frentes.
+## Current Milestone: v1.5 Consolidación de Extracción (Active)
 
-**Target features:** All delivered ✓
+**Goal:** Cerrar Phase 16 (llm-provider), consolidar el pipeline de extracción eliminando duplicación y config legacy, validar con documentos reales, y refinar post-procesamiento.
 
-**Deferred to v1.5:** OCR-01 (PaddleOCR 3.0), OCR-02 (Tesseract+PaddleOCR fusion), OCR-03 (PP-StructureV3 layout analysis for reading order)
+**Target features:**
+- ✅ Phase 16 (llm-provider) — code complete (provider abstraction, bugfixes, model resolution)
+- ⏳ Phase 17: UAT execution + commit of Phase 16
+- ⏳ Phase 18: Deduplicate batch_process.py extraction logic
+- ⏳ Phase 19: Config orphans cleanup (remove gemini_model_* legacy vars)
+- ⏳ Phase 20: End-to-end validation with real CV documents
+- ⏳ Phase 21: Post-processing refinement (gender, phone, RUT, shadow rules)
 
 ## What This Is
 
@@ -46,11 +53,16 @@ Extract structured CV data with a beautiful, intuitive interface and export-read
 - ✓ Two-pass pipeline (classify → type-specific extraction) — v1.4
 - ✓ OCR augmentation (Tesseract + layout analysis, fallback chain) — v1.4
 
-### Active
+### Active (v1.5)
 
-(Defined in next milestone — v1.5)
+- UAT signoff for Phase 16 (llm-provider): provider auto-detection, factory, section detector, model resolution
+- Deduplicate extraction logic in batch_process.py — reuse llm_service.extract_fields()
+- Remove legacy config orphans (gemini_model_*, unused llm_provider field)
+- End-to-end validation with 5+ real CV documents through the wizard
+- Improve post-processing precision: gender inference, phone normalization, RUT formatting, shadow rules (nationality, DOB, experience, education, email)
 
-Potential candidates:
+### Deferred (post-v1.5)
+
 - PaddleOCR 3.0 integration (OCR-01)
 - Tesseract + PaddleOCR fusion (OCR-02)
 - PP-StructureV3 layout analysis (OCR-03)
@@ -106,4 +118,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-16 after completing v1.4 milestone*
+*Last updated: 2026-06-17 — v1.5 Consolidación de Extracción started*

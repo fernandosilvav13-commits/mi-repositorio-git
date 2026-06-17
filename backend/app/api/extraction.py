@@ -60,7 +60,7 @@ async def extract_single(data: dict):
                 results.append({"filename": os.path.basename(fp), "status": "error", "data": {}, "error": "Archivo no encontrado"})
                 continue
             
-            text = ocr_service.process_document(fp)
+            text = ocr_service.extract_with_fallback(fp)
             extracted = await cv_processor.process(text, is_retry=is_retry, schema=schema)
             
             if not extracted:

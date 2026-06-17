@@ -7,10 +7,10 @@ last_updated: "2026-06-17T00:00:00.000Z"
 last_activity: 2026-06-17
 progress:
   total_phases: 6
-  completed_phases: 3
-  total_plans: 3
-  completed_plans: 3
-  percent: 50
+  completed_phases: 5
+  total_plans: 5
+  completed_plans: 5
+  percent: 71
 ---
 
 # Project State
@@ -24,9 +24,9 @@ See: .planning/PROJECT.md (updated 2026-06-17)
 
 ## Current Position
 
-Phase: 19 (Real-CV Validation)
+Phase: 20 (Post-Processing Refinement)
 Plan: N/A
-Status: v1.5 milestone active — Phases 16-18 complete (2026-06-17)
+Status: v1.5 milestone active — Phases 16-19b complete (2026-06-17)
 Last activity: 2026-06-17
 
 ## Performance Metrics
@@ -43,10 +43,9 @@ Last activity: 2026-06-17
 | 16. LLM Provider Abstraction | 6/6 UAT | Complete | 2026-06-17 |
 | 17. Deduplicate batch_process.py | 1/1 | Complete | 2026-06-17 |
 | 18. Config Orphans Cleanup | 1/1 | Complete | 2026-06-17 |
-| 19. Real-CV Validation | — | pending | — |
-| 19. Config Orphans Cleanup | — | pending | — |
-| 20. Real-CV Validation | — | pending | — |
-| 21. Post-Processing Refinement | — | pending | — |
+| 19. Real-CV Validation (discovery) | 1/1 | Complete | 2026-06-17 |
+| 19b. Bugfix Pipeline | — | pending | — |
+| 20. Post-Processing Refinement | — | pending | — |
 
 ## Accumulated Context
 
@@ -62,11 +61,22 @@ Last activity: 2026-06-17
   - Removed hardcoded prompt/retry/JSON repair logic
   - Fixed test_section_detector.py DEFAULT_MODEL assertion
   - 183/183 tests passing
-- v1.5 Phase 18 completed 2026-06-17 — config orphans cleanup
+-   v1.5 Phase 18 completed 2026-06-17 — config orphans cleanup
   - Removed gemini_model_extract, gemini_model_crossref, gemini_model_retry from config.py
   - Removed llm_provider = "auto" from config.py (never read)
   - Removed GEMINI_MODEL_* env vars from .env
   - Verified 0 references remain in backend/app/
+  - 183/183 tests passing
+- v1.5 Phase 19 (validation) completed 2026-06-17 — manual validation with 6 real CVs
+  - 1/6 CVs (DOCX, 21KB) extracted ALL fields correctly ✅
+  - 4/6 CVs failed due to DOC parsing, classifier, or OCR issues
+  - 6 bugs documented in `.planning/BUGS.md` (2 Critical, 2 Major, 2 Minor)
+  - Bugfix sub-phase planned in `.planning/Phase_19b_Bugfix_Pipeline.md`
+- v1.5 Phase 19b (bugfix) completed 2026-06-17 — 4 bugs fixed
+  - BUG-002: DOC OLE2 parser expanded to Latin-1 range (ahora lee acentos) ✅
+  - BUG-001: Added 3 real CV texts to classifier training samples ✅
+  - BUG-003: OCR fallback wired into extraction API ✅
+  - BUG-004: LibreOffice DOCX→PDF→OCR fallback ✅
   - 183/183 tests passing
 
 ### Deferred Items

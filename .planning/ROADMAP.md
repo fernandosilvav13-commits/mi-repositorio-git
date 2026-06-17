@@ -56,7 +56,8 @@ See: `.planning/milestones/v1.4-ROADMAP.md` for full archive
 - [x] **Phase 16: LLM Provider Abstraction** — Multi-provider abstraction (Gemini, Anthropic, OpenAI) with auto-detection, factory, model resolution, TPM tracking, section_detector.py bugfix, and 6/6 UAT tests. Completed 2026-06-17.
 - [x] **Phase 17: Deduplicate batch_process.py** — Refactored to use llm_service.extract_fields(), removed hardcoded prompt/retry/JSON repair. Completed 2026-06-17.
 - [x] **Phase 18: Config Orphans Cleanup** — Removed gemini_model_* legacy vars, unused llm_provider field. Completed 2026-06-17.
-- [ ] **Phase 19: Real-CV Validation** — End-to-end test with 5+ real CVs through the wizard, fix discovered bugs.
+- [x] **Phase 19: Real-CV Validation (discovery)** — Manual validation with 6 real CVs. 6 bugs documented (2 Critical, 2 Major, 2 Minor). Completed 2026-06-17.
+- [ ] **Phase 19b: Bugfix Pipeline** — Fix BUG-001 (classifier), BUG-002 (DOC accents), BUG-003 (OCR fallback), BUG-004 (DOCX images). See `.planning/BUGS.md` and `.planning/Phase_19b_Bugfix_Pipeline.md`.
 - [ ] **Phase 20: Post-Processing Refinement** — Improve gender inference, phone normalization, RUT formatting, evaluate shadow rules for promotion.
 
 ## Progress
@@ -81,7 +82,6 @@ See: `.planning/milestones/v1.4-ROADMAP.md` for full archive
 | 16. LLM Provider Abstraction | v1.5 | 6/6 UAT | Complete | 2026-06-17 |
 | 17. Deduplicate batch_process.py | v1.5 | 1/1 | Complete | 2026-06-17 |
 | 18. Config Orphans Cleanup | v1.5 | 1/1 | Complete | 2026-06-17 |
-| 19. Real-CV Validation | v1.5 | — | Pending | — |
-| 19. Config Orphans Cleanup | v1.5 | — | Pending | — |
-| 20. Real-CV Validation | v1.5 | — | Pending | — |
-| 21. Post-Processing Refinement | v1.5 | — | Pending | — |
+| 19. Real-CV Validation (discovery) | v1.5 | 1/1 | Complete | 2026-06-17 |
+| 19b. Bugfix Pipeline | v1.5 | — | Pending | — |
+| 20. Post-Processing Refinement | v1.5 | — | Pending | — |

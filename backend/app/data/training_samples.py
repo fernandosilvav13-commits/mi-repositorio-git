@@ -1013,4 +1013,22 @@ Preparado por: Departamento de Analisis
 """,
         "label": "non-cv"
     },
+    {
+        "text": """
+Patricio Henry Parra Jimenez Carrera Docente Avanzado Experiencia Directiva Liderazgo Director Escuela Pablo Correa Montt Desde Agosto 2022 Director Liceo Fray Pablo de Royo Desde Abril 2021 a Julio de 2022 Coordinador Red Avance Autonomia Red de escuelas en contexto de encierro region del Bio Bio Director Escuela Carcelaria Centro Penitenciario Yumbel Jefe Tecnico Escuela carcelaria Centro Penitenciario Yumbel Coordinador Tecnico PSU Profesor Guia Preprofesional Docente Universidad de Concepcion Docencia Universitaria Universidad del Bio Bio Alumno Ayudante en Finanzas Contabilidad y Estadistica Formacion Profesional Universidad Autonoma Diplomado Gestion de la Convivencia Escolar Pontificia Universidad Catolica de Chile Diplomado Direccion y Liderazgo Escolar Universidad Andres Bello Magister en Direccion y Liderazgo para Gestion Educacional Universidad del Bio Bio Contador Auditor Universidad de Concepcion Licenciado en Educacion mencion Historia y Geografia Diplomados y Postitulos Universidad Andres Bello Diplomado en Gestion Estrategica en Organizaciones Diplomado en Politica y Gestion Educacional Universidad Santo Tomas Diplomado en Gestion Directiva Educacional Universidad Tecnologica Metropolitana Postitulo Administracion de Organizaciones Educativas Distinciones Tercer lugar en el Diplomado Direccion y Liderazgo Escolar por la PUC Seleccionado en la Pasantia Nacional por el CPEIP Tercer Lugar Nacional concurso MERCOSUR Primer seleccionado en la Carrera de Auditoria Universidad del Bio Bio
+""",
+        "label": "cv"
+    },
+    {
+        "text": """
+Rodrigo Rene Pardo Inzulza Profesor de Educacion General Basica Universidad de los Lagos Resumen Docente Educador interesado en Relatorias Investigacion Educacional Razonamiento Logico Matematico Ortografia Redaccion Antecedentes Academicos Magister en Educacion Mencion Gestion de Calidad Universidad Miguel de Cervantes Postitulo de Mencion en Gestion de la Convivencia Escolar Universidad Miguel de Cervantes Postitulo de Mencion en Administracion Educacional Universidad Miguel de Cervantes Diplomado en Convivencia Escolar para Lideres Educativos CEDLE Profesor Educacion General Basica Licenciado en Educacion Universidad de Los Lagos Actividades Academicas Docencia escolar DAEM Talca Escuela Prosperidad Coordinador SEP Docente Aula Encargado de Inventarios DAEM Talca Escuela Prosperidad Coordinador SEP Docente Aula Apoyo UTP Biblioteca CRA DAEM Pencahue Escuela Banos de Tanhuao Coordinador SEP Colegio Lyon School Profesor Encargado DEM Concepcion Escuela Luis David Cruz Ocampo Docente Educacion Artistica DEM Concepcion Colegio Bio Bio Encargado Unidad Tecnica Pedagogica DAEM Constitucion Escuela Gilda Bernal Docente Educacion Matematicas Datos Personales Fecha de nacimiento 02 de Marzo 1981 Carnet de identidad 14.018.012-2 Nacionalidad Chilena Estado Civil Soltero
+""",
+        "label": "cv"
+    },
+    {
+        "text": """
+Carlos Andres Munoz Soto Ingeniero Civil Informatico Universidad Tecnica Federico Santa Maria Resumen Profesional Experiencia en desarrollo de software arquitectura de microservicios y liderazgo de equipos tecnologicos Experiencia Laboral Lider Tecnico Empresa Innovacion Tecnologica Agosto 2020 Presente Diseno e implementacion de arquitectura cloud nativa con AWS Kubernetes y Terraform Liderazgo de equipo de 8 desarrolladores frontend y backend Reduccion de costos de infraestructura en 40 porcentaje mediante optimizacion de recursos Desarrollador Senior Soluciones Digitales SpA Enero 2017 Julio 2020 Desarrollo de APIs RESTful con Python FastAPI y PostgreSQL Implementacion de pipelines CI CD con GitLab y Docker Colaboracion en migracion de monolitos a microservicios Formacion Academica Ingenieria Civil Informatica Universidad Tecnica Federico Santa Maria 2011 2016 Certificaciones AWS Solutions Architect Professional 2023 Kubernetes Administrator CKA 2022 Competencias Python FastAPI Django AWS Docker Kubernetes Terraform PostgreSQL Git CI CD Idiomas Espanol Nativo Ingles Avanzado C1
+""",
+        "label": "cv"
+    },
 ]

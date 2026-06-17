@@ -58,7 +58,27 @@ class FileParser:
     @staticmethod
     def _parse_docx(file_path: str) -> str:
         doc = DocxDocument(file_path)
-        return "\n".join(p.text for p in doc.paragraphs if p.text.strip())
+        text = "\n".join(p.text for p in doc.paragraphs if p.text.strip())
+        if text.strip():
+            return text
+        try:
+            import subprocess, tempfile, os
+            with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
+                pdf_path = tmp.name
+            subprocess.run(
+                ["libreoffice", "--headless", "--convert-to", "pdf", file_path,
+                 "--outdir", os.path.dirname(pdf_path)],
+                capture_output=True, timeout=30, check=True
+            )
+            pdf_result = os.path.join(os.path.dirname(pdf_path),
+                                       os.path.splitext(os.path.basename(file_path))[0] + ".pdf")
+            if os.path.exists(pdf_result):
+                text = FileParser._parse_pdf(pdf_result)
+                os.unlink(pdf_result)
+                return text.strip()
+        except Exception:
+            pass
+        return text
 
     @staticmethod
     def _parse_doc_ole(file_path: str) -> str:
@@ -80,12 +100,12 @@ class FileParser:
                 continue
             if i + 1 < len(data) and data[i + 1] == 0:
                 c = chr(data[i])
-                if 32 <= ord(c) <= 126 or ord(c) in (10, 13, 9):
+                if 32 <= ord(c) <= 255 or ord(c) in (10, 13, 9):
                     text += c
                 i += 2
             else:
                 c = chr(data[i])
-                if 32 <= ord(c) <= 126 or ord(c) in (10, 13, 9):
+                if 32 <= ord(c) <= 255 or ord(c) in (10, 13, 9):
                     text += c
                 i += 1
         lines = [l.strip() for l in text.split("\n") if l.strip()]

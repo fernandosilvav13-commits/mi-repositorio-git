@@ -10,4 +10,4 @@ from app.schemas.layout import TextBlock, LayoutResult
 from app.core.config import settings
 from app.utils.logger import setup_logger
 
-logger = setup_logger(" paddleocr_service)
+logger = setup_logger("paddleocr_service")
