@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from app.core.auth import require_auth
 from app.core.database import require_supabase
 
@@ -24,7 +24,7 @@ async def get_template(template_id: str):
     supabase = require_supabase()
     result = supabase.table("templates").select("*").eq("id", template_id).execute()
     if not result.data:
-        return {"error": "not found"}
+        raise HTTPException(status_code=404, detail="Plantilla no encontrada")
     return result.data[0]
 
 
@@ -32,6 +32,8 @@ async def get_template(template_id: str):
 async def update_template(template_id: str, data: dict):
     supabase = require_supabase()
     result = supabase.table("templates").update(data).eq("id", template_id).execute()
+    if not result.data:
+        raise HTTPException(status_code=404, detail="Plantilla no encontrada")
     return result.data[0]
 
 

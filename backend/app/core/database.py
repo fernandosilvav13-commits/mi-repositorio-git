@@ -4,7 +4,6 @@ import json
 import uuid
 from datetime import datetime
 from fastapi import HTTPException
-from app.core.config import settings
 from app.utils.logger import setup_logger
 
 logger = setup_logger(__name__)
@@ -164,21 +163,26 @@ class QueryBuilder:
             data = dict(self._update_data) if self._update_data else {}
             data["updated_at"] = datetime.now().isoformat()
             serialized = self._serialize(data)
-            params: list[object] = list(serialized.values())
+            set_params: list[object] = list(serialized.values())
             set_clause = ", ".join(f"{k} = ?" for k in serialized)
+            where_params: list[object] = []
+            where_conds: list[str] = []
             for op, field, val in self._filters:
                 if op == "eq":
-                    params.append(1 if val is True else (0 if val is False else val))
-            where_conds = []
-            for op, field, _ in self._filters:
-                if op == "eq":
                     where_conds.append(f"{field} = ?")
+                    where_params.append(1 if val is True else (0 if val is False else val))
             sql = f"UPDATE {self._table} SET {set_clause}"
             if where_conds:
                 sql += " WHERE " + " AND ".join(where_conds)
-            cur.execute(sql, params)
+            cur.execute(sql, [*set_params, *where_params])
             conn.commit()
-            return QueryResult([])
+            # Return updated row(s)
+            select_sql = f"SELECT {self._columns} FROM {self._table}"
+            if where_conds:
+                select_sql += " WHERE " + " AND ".join(where_conds)
+            cur.execute(select_sql, where_params)
+            rows = [self._deserialize(dict(row)) for row in cur.fetchall()]
+            return QueryResult(rows)
 
         elif self._method == "delete":
             sql = f"DELETE FROM {self._table}"

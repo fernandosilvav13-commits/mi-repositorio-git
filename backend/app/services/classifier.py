@@ -11,7 +11,7 @@ from app.data.training_samples import TRAINING_SAMPLES
 
 logger = logging.getLogger(__name__)
 
-CLASSIFICATION_THRESHOLD = 0.7
+CLASSIFICATION_THRESHOLD = 0.5
 CATEGORIES: list[DocumentCategory] = ["cv", "non-cv"]
 
 

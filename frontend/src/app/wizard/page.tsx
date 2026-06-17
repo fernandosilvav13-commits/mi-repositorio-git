@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { api } from "@/lib/api";
-import { LucideIcon, Upload, Database, Layout, ShieldCheck, Cpu, FileSpreadsheet, Star, ChevronRight, ChevronLeft, Plus, Check, X, AlertCircle, Loader2 } from "lucide-react";
+import { LucideIcon, Upload, Database, Layout, ShieldCheck, Cpu, FileSpreadsheet, Star, ChevronRight, ChevronLeft, Plus, Check, X, AlertCircle, Loader2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import ConfiguratorCard from "@/components/apple/ConfiguratorCard";
 import PillChip from "@/components/apple/PillChip";
@@ -145,9 +145,9 @@ export default function WizardPage() {
   const [mappingVersion, setMappingVersion] = useState(0);
 
   useEffect(() => {
-    api.templates.list().then(setTemplates).catch(() => {});
-    api.rules.list().then(setRules).catch(() => {});
-    api.crossref.list().then(setCrossrefFiles).catch(() => {});
+    api.templates.list().then(setTemplates).catch(() => toast.error("Error al cargar plantillas"));
+    api.rules.list().then(setRules).catch(() => toast.error("Error al cargar reglas"));
+    api.crossref.list().then(setCrossrefFiles).catch(() => toast.error("Error al cargar archivos"));
   }, []);
 
   const goNext = () => {
@@ -826,6 +826,21 @@ export default function WizardPage() {
                                 className="text-[14px] font-medium text-action-blue hover:underline ml-2"
                             >
                                 Editar
+                            </button>
+                            <button
+                                onClick={() => {
+                                    if (!window.confirm("¿Eliminar plantilla? Esta acción no se puede deshacer.")) return;
+                                    api.templates.delete(t.id).then(() => {
+                                        api.templates.list().then(setTemplates);
+                                        toast.success("Plantilla eliminada");
+                                    }).catch(() => {
+                                        toast.error("Error al eliminar la plantilla");
+                                    });
+                                }}
+                                className="text-[14px] font-medium text-red-500 hover:underline ml-2"
+                            >
+                                <Trash2 size={14} className="inline mr-0.5" />
+                                Eliminar
                             </button>
                         </div>
                     </div>

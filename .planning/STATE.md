@@ -1,77 +1,67 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.4
-milestone_name: Extracción Inteligente
-status: shipped
-last_updated: "2026-06-16T00:00:00.000Z"
-last_activity: 2026-06-16
+milestone: v1.5
+milestone_name: Consolidación de Extracción
+status: active
+last_updated: "2026-06-17T00:00:00.000Z"
+last_activity: 2026-06-17
 progress:
-  total_phases: 7
-  completed_phases: 7
-  total_plans: 20
-  completed_plans: 20
-  percent: 100
+  total_phases: 6
+  completed_phases: 1
+  total_plans: 1
+  completed_plans: 1
+  percent: 17
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-06-16)
+See: .planning/PROJECT.md (updated 2026-06-17)
 
 **Core value:** Extract structured CV data with a beautiful, intuitive interface and export-ready results.
-**Current focus:** Planning next milestone
+**Current focus:** v1.5 Consolidación de Extracción
 
 ## Current Position
 
-Phase: —
-Plan: —
-Status: v1.4 milestone complete and shipped
-Last activity: 2026-06-16
+Phase: 17 (Deduplicate batch_process.py)
+Plan: N/A
+Status: v1.5 milestone active — Phase 16 complete (2026-06-17)
+Last activity: 2026-06-17
 
 ## Performance Metrics
 
 **Velocity:**
 
 - Total plans completed: 44 (across all milestones)
-- Average duration: N/A
-- Total execution time: N/A
+- Current milestone: 0/6 phases completed
 
-**By Phase:**
+**By Phase (v1.5):**
 
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| 1. Frontend Overhaul (Apple Design) | 4 | complete | N/A |
-| 2. Crossref Page Redesign | 3 | complete | ~2min |
-| 3. Wizard Cross-Reference Integration | 3 | complete | ~15min |
-| 4. Cross-Reference Export | 4 | complete | ~5min |
-| 5. Wizard Reordering | 1 | complete | ~2min |
-| 6. Preprocessor Proper Noun Fix | 1 | complete | ~2min |
-| 7. Post-Processing Pipeline | 1 | complete | ~2min |
-| 8. LLM Error Resilience & Retry | 1 | complete | ~2min |
-| 9. Prompt Infrastructure & Foundation | 2 | complete | ~10min |
-| 10. Advanced Preprocessing | 3 | complete | ~5min |
-| 11. Document Classification | 3 | complete | ~5min |
-| 12. Post-Processing Rules Expansion | 3 | complete | ~2min |
-| 13. Two-Pass Pipeline | 3 | complete | ~5min |
-| 14. OCR Augmentation | 4 | complete | ~10min |
-| 15. Close Gap — Register /api/classify in main.py | 2 | complete | ~2min |
+| Phase | Plans | Total | Status |
+|-------|-------|-------|--------|
+| 16. LLM Provider Abstraction | 6/6 UAT | Complete | 2026-06-17 |
+| 17. Deduplicate batch_process.py | — | pending | — |
+| 18. Config Orphans Cleanup | — | pending | — |
+| 19. Config Orphans Cleanup | — | pending | — |
+| 20. Real-CV Validation | — | pending | — |
+| 21. Post-Processing Refinement | — | pending | — |
 
 ## Accumulated Context
 
 ### Milestone Evolution
 
-- v1.4 shipped 2026-06-16 — 7 phases, 20 plans
-- Phase 15 inserted after milestone audit (urgent gap closure for classify router + two-pass activation)
-- 3 OCR requirements deferred to v1.5: PaddleOCR 3.0 (OCR-01), Tesseract+PaddleOCR fusion (OCR-02), PP-StructureV3 layout (OCR-03)
+- v1.5 Phase 16 completed 2026-06-17 — fix + UAT + commit
+  - Bug fixed: section_detector.py render() args + None guard
+  - 6/6 UAT tests passing
+  - All Phase 16 changes committed to main
 
 ### Deferred Items
 
-Items acknowledged and deferred at milestone close on 2026-06-16:
+Items deferred from v1.4:
 
 | Category | Item | Status |
 |----------|------|--------|
-| requirement | OCR-01 — PaddleOCR 3.0 integration | deferred to v1.5 |
-| requirement | OCR-02 — Tesseract+PaddleOCR fusion | deferred to v1.5 |
-| requirement | OCR-03 — PP-StructureV3 layout analysis | deferred to v1.5 |
-| tech_debt | Phase 9-15 process docs (VALIDATION.md, Nyquist) | deferred |
+| requirement | OCR-01 — PaddleOCR 3.0 integration | deferred post-v1.5 |
+| requirement | OCR-02 — Tesseract+PaddleOCR fusion | deferred post-v1.5 |
+| requirement | OCR-03 — PP-StructureV3 layout analysis | deferred post-v1.5 |

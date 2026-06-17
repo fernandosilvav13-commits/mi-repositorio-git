@@ -26,17 +26,24 @@ EXTRACTION_SCHEMA_FALLBACK = {
 
 
 def _match_version(version_expr: str, candidate: Version) -> bool:
-    expr = version_expr.strip().lstrip("v")
-    if expr.startswith("^"):
-        base = Version.parse(expr[1:])
+    expr = version_expr.strip()
+    prefix = ""
+    for p in ("^", "~", ">="):
+        if expr.startswith(p):
+            prefix = p
+            expr = expr[len(p):]
+            break
+    expr = expr.lstrip("v")
+    if prefix == "^":
+        base = Version.parse(expr)
         if base.major == 0:
             return candidate.major == 0 and candidate.minor == base.minor and candidate.patch >= base.patch
         return candidate.major == base.major and candidate >= base
-    elif expr.startswith("~"):
-        base = Version.parse(expr[1:])
+    elif prefix == "~":
+        base = Version.parse(expr)
         return candidate.major == base.major and candidate.minor == base.minor and candidate.patch >= base.patch
-    elif expr.startswith(">="):
-        return candidate >= Version.parse(expr[2:])
+    elif prefix == ">=":
+        return candidate >= Version.parse(expr)
     else:
         return candidate == Version.parse(expr)
 

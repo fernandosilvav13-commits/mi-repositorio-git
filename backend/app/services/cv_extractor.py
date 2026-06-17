@@ -66,7 +66,7 @@ async def extract_cv_data(raw_text: str, is_retry: bool = False, schema: dict | 
     processed = preprocess_cv_text(raw_text)
 
     active_schema = schema or EXTRACTION_SCHEMA
-    model = settings.gemini_model_retry if is_retry else settings.gemini_model_extract
+    model = settings.llm_model_retry if is_retry else settings.llm_model_extract
 
     cached_result = cache_service.get(processed, active_schema, model)
     if cached_result:
@@ -78,7 +78,7 @@ async def extract_cv_data(raw_text: str, is_retry: bool = False, schema: dict | 
             schema=active_schema,
             model=model,
             fallback_schema=EXTRACTION_SCHEMA if schema else None,
-            fallback_model=settings.gemini_model_retry,
+            fallback_model=settings.llm_model_retry,
         )
 
         if result:

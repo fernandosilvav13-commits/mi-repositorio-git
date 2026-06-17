@@ -35,7 +35,7 @@ class CrossrefService:
         }
         
         try:
-            result = await extract_fields(prompt, schema, model=settings.gemini_model_crossref)
+            result = await extract_fields(prompt, schema, model=settings.llm_model_crossref)
             return result
         except Exception:
             return {col: "NO ENCONTRADO" for col in output_columns}

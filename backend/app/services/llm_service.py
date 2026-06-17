@@ -1,27 +1,20 @@
 import json
 import re
-import asyncio
 import random
-import time
-from google import genai
 from app.core.config import settings
 from app.utils.logger import setup_logger
+from app.services.llm_provider import get_client, resolve_api_key, ModelClient
 
 logger = setup_logger("llm_service")
 
-client: genai.Client | None = None
-
-# TPM tracking
-_tpm_lock = asyncio.Lock()
-_tpm_tokens: list[tuple[float, int]] = []
-TPM_WINDOW = 60
-TPM_LIMIT = 600_000
+client: ModelClient | None = None
 
 
-def _get_client() -> genai.Client:
+def _get_client() -> ModelClient:
     global client
     if client is None:
-        client = genai.Client(api_key=settings.google_api_key)
+        api_key = resolve_api_key(settings)
+        client = get_client(api_key)
     return client
 
 
@@ -37,27 +30,13 @@ def _repair_json(raw: str) -> str:
     raw = re.sub(r"(?<=[{,:\[ ])'|'(?=[,:}\] \n])", '"', raw)
     return raw
 
-
-async def _track_tpm(estimated_tokens: int):
-    async with _tpm_lock:
-        now = time.time()
-        _tpm_tokens[:] = [(t, c) for t, c in _tpm_tokens if now - t < TPM_WINDOW]
-        window_tokens = sum(c for _, c in _tpm_tokens)
-        if window_tokens + estimated_tokens > TPM_LIMIT:
-            sleep_time = TPM_WINDOW - (now - _tpm_tokens[0][0]) if _tpm_tokens else 1
-            logger.warning("TPM limit approaching (%d/%d), sleeping %.1fs",
-                           window_tokens, TPM_LIMIT, sleep_time)
-            await asyncio.sleep(min(sleep_time, 5))
-        _tpm_tokens.append((time.time(), estimated_tokens))
-
-
 async def extract_fields(text: str, schema: dict, model: str | None = None,
                          fallback_schema: dict | None = None,
                          fallback_model: str | None = None,
                          prompt_override: str | None = None) -> dict:
     llm_client = _get_client()
-    model_name = model or settings.gemini_model_extract
-    retry_model = fallback_model or settings.gemini_model_retry
+    model_name = model or settings.llm_model_extract
+    retry_model = fallback_model or settings.llm_model_retry
     base_prompt = prompt_override or EXTRACTION_PROMPT
 
     for phase, current_schema, current_model, max_attempts in [
@@ -68,17 +47,15 @@ async def extract_fields(text: str, schema: dict, model: str | None = None,
             continue
         for attempt in range(max_attempts):
             try:
-                await _track_tpm(len(text) // 4 + len(json.dumps(current_schema)) // 4)
+                estimated = len(text) // 4 + len(json.dumps(current_schema)) // 4
+                llm_client.track_tpm(estimated)
                 prompt = f"{base_prompt}\nSchema: {json.dumps(current_schema)}\nText: {text}"
-                response = llm_client.models.generate_content(
-                    model=current_model,
+                raw = llm_client.generate(
                     contents=prompt,
-                    config={
-                        "response_mime_type": "application/json",
-                        "temperature": 0.1,
-                    },
+                    schema=current_schema,
+                    model=current_model,
+                    config={"temperature": 0.1},
                 )
-                raw = response.text.strip()
                 raw = _repair_json(raw)
                 result = json.loads(raw)
                 return result
@@ -89,6 +66,7 @@ async def extract_fields(text: str, schema: dict, model: str | None = None,
                         "LLM %s attempt %d/%d failed: %s. Retrying in %.1fs",
                         phase, attempt + 1, max_attempts, e, wait,
                     )
+                    import asyncio
                     await asyncio.sleep(wait)
                 else:
                     logger.warning(
@@ -104,9 +82,9 @@ async def is_document_legible(text: str) -> bool:
         return False
     llm_client = _get_client()
     prompt = f"El siguiente texto fue extraído de un documento. Responde SOLO 'SI' si el texto tiene contenido legible y coherente, o 'NO' si es basura, ilegible o está vacío.\n\n---\n{text[:1000]}"
-    response = llm_client.models.generate_content(
-        model=settings.gemini_model_extract,
+    response = llm_client.generate(
         contents=prompt,
+        model=settings.llm_model_extract,
         config={"temperature": 0.0},
     )
-    return response.text.strip().upper().startswith("SI")
+    return response.upper().startswith("SI")

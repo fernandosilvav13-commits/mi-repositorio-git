@@ -1,43 +1,32 @@
 """
-SectionDetector — uses Gemini API to detect document sections and noisy lines.
+SectionDetector — uses an LLM to detect document sections and noisy lines.
 
-Orchestrates the batched LLM call for section detection and noise identification
-using the google-genai SDK with structured Pydantic output.
+Uses the LLM provider abstraction (llm_provider) for auto-detected API key
+format. The provider can be Gemini, Anthropic, or OpenAI.
 """
 
 import logging
 from pathlib import Path
 
-from google import genai
-from google.genai import types
-
+from app.core.config import settings
 from app.schemas.preprocessing import DetectionResponse
 from app.services.prompt_resolver import PromptResolver
+from app.services.llm_provider import get_client, resolve_api_key, ModelClient
 
 logger = logging.getLogger(__name__)
 
-# Module-level singleton (matching existing PromptResolver pattern)
-# Points to backend/prompts/ by going up from services/ → app/ → backend/ → prompts/
 _prompt_resolver = PromptResolver(Path(__file__).resolve().parent.parent.parent / "prompts")
-_client: genai.Client | None = None  # Lazy-initialized — uses GEMINI_API_KEY or GOOGLE_API_KEY env var
+_client: ModelClient | None = None
 
-DEFAULT_MODEL = "gemini-2.5-flash-lite"
+DEFAULT_MODEL = "fast"
 DEFAULT_PROMPT_VERSION = "^v1.0.0"
 
 
-def _get_client() -> genai.Client:
-    """Get or create the lazy-initialized genai.Client.
-
-    The client validates the API key at construction time, so we defer
-    creation until the first detect() call. This allows the module to be
-    imported and tested without an API key being present.
-
-    Returns:
-        genai.Client instance configured from environment variables.
-    """
+def _get_client() -> ModelClient:
     global _client
     if _client is None:
-        _client = genai.Client()  # Reads GEMINI_API_KEY or GOOGLE_API_KEY from env
+        api_key = resolve_api_key(settings)
+        _client = get_client(api_key)
     return _client
 
 
@@ -80,27 +69,23 @@ class SectionDetector:
 
         # Resolve and render prompt template via PromptResolver
         resolved = _prompt_resolver.get("section-detection", prompt_version)
-        rendered = _prompt_resolver.render(resolved, {"document_text": text})
+        if resolved is None:
+            logger.warning("No matching section-detection prompt for %s — using inline fallback", prompt_version)
+            rendered = f"Analyze the following document and identify its sections and noisy lines:\n\n{text}"
+        else:
+            rendered = _prompt_resolver.render(resolved, document_text=text)
 
-        # Call Gemini with structured output schema
+        # Call LLM with structured output schema
         client = _get_client()
-        response = client.models.generate_content(
-            model=DEFAULT_MODEL,
+        schema_dict = DetectionResponse.model_json_schema()
+        response_text = client.generate(
             contents=rendered,
-            config=types.GenerateContentConfig(
-                response_mime_type="application/json",
-                response_schema=DetectionResponse,
-                temperature=0.1,
-            ),
+            schema=schema_dict,
+            model=DEFAULT_MODEL,
+            config={"temperature": 0.1},
         )
 
-        result: DetectionResponse = response.parsed
-
-        if result is None:
-            raise RuntimeError(
-                "Gemini API returned None for section-detection call. "
-                f"Response text: {response.text}"
-            )
+        result = DetectionResponse.model_validate_json(response_text)
 
         logger.info(
             "Detected %d sections, %d noisy lines, can_identify=%s",

@@ -10,12 +10,11 @@ backend/venv/
 *.pkl
 *.log
 everything-claude-code/
+Automatizacion-Ciclo/
 
 # Cache
 backend/.cache/
 outputs/
 *.xlsx
-*.log
-everything-claude-code/
 .tesseract/
 backend/local.db

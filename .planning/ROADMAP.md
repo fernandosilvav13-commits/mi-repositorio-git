@@ -7,6 +7,7 @@
 - ✅ **v1.2 Wizard Reordering** — Phase 5 (shipped 2026-05-17)
 - ✅ **v1.3 Bugfix Pipeline de Extracción** — Phases 6–8 (shipped 2026-05-19)
 - ✅ **v1.4 Extracción Inteligente** — Phases 9–15 (shipped 2026-06-16)
+- 🏗️ **v1.5 Consolidación de Extracción** — Phases 16–21 (active)
 
 ## Phases
 
@@ -46,9 +47,17 @@
 - [x] Phase 14: OCR Augmentation (4/4 plans) — completed 2026-05-25
 - [x] Phase 15: Close Gap — Register /api/classify in main.py (2/2 plans) — completed 2026-06-13
 
-**Deferred to v1.5:** OCR-01 (PaddleOCR 3.0), OCR-02 (Tesseract+PaddleOCR fusion), OCR-03 (PP-StructureV3 layout)
+**Deferred after v1.5:** OCR-01 (PaddleOCR 3.0), OCR-02 (Tesseract+PaddleOCR fusion), OCR-03 (PP-StructureV3 layout)
 
 See: `.planning/milestones/v1.4-ROADMAP.md` for full archive
+
+### 🏗️ v1.5 Consolidación de Extracción (Phases 16-21) — Active
+
+- [x] **Phase 16: LLM Provider Abstraction** — Multi-provider abstraction (Gemini, Anthropic, OpenAI) with auto-detection, factory, model resolution, TPM tracking, section_detector.py bugfix, and 6/6 UAT tests. Completed 2026-06-17.
+- [ ] **Phase 17: Deduplicate batch_process.py** — Refactor standalone script to reuse llm_service.extract_fields(), eliminate hardcoded prompt/schema.
+- [ ] **Phase 18: Config Orphans Cleanup** — Remove gemini_model_* legacy vars, unused llm_provider field, sanitize Settings.
+- [ ] **Phase 19: Real-CV Validation** — End-to-end test with 5+ real CVs through the wizard, fix discovered bugs.
+- [ ] **Phase 20: Post-Processing Refinement** — Improve gender inference, phone normalization, RUT formatting, evaluate shadow rules for promotion.
 
 ## Progress
 
@@ -68,4 +77,10 @@ See: `.planning/milestones/v1.4-ROADMAP.md` for full archive
 | 12. Post-Processing Rules Expansion | v1.4 | 3/3 | Shipped | 2026-05-24 |
 | 13. Two-Pass Pipeline | v1.4 | 3/3 | Shipped | 2026-05-24 |
 | 14. OCR Augmentation | v1.4 | 4/4 | Shipped | 2026-05-25 |
-| 15. Close Gap — Register /api/classify in main.py | v1.4 | 2/2 | Shipped | 2026-06-16 |
+| 15. Close Gap — Register /api/classify in main.py | v1.4 | 2/2 | Shipped | 2026-06-13 |
+| 16. LLM Provider Abstraction | v1.5 | 6/6 UAT | Complete | 2026-06-17 |
+| 17. Deduplicate batch_process.py | v1.5 | — | Pending | — |
+| 18. Config Orphans Cleanup | v1.5 | — | Pending | — |
+| 19. Config Orphans Cleanup | v1.5 | — | Pending | — |
+| 20. Real-CV Validation | v1.5 | — | Pending | — |
+| 21. Post-Processing Refinement | v1.5 | — | Pending | — |

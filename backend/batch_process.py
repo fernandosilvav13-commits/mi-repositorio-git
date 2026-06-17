@@ -16,14 +16,16 @@ from services.gender_service import infer_gender, infer_gender_from_text
 from services.experience_service import get_top_3_experiences
 from services.rules_service import apply_rules
 
+from app.core.config import settings as _app_settings
+from app.services.llm_provider import get_client, resolve_api_key, ModelClient
+
 CV_ROOT = Path(os.getenv("CV_ROOT", "/mnt/c/Users/ferna/OneDrive - Universidad de Chile/Documentos/Documentos Ciclo/Liceo Narciso Tondreau/concurso10434"))
 MINEDUC_CSV = Path(os.getenv("MINEDUC_CSV", "/home/fernandosilvav/Proyecto-Prueba/backend/mineduc_matricula.csv"))
 OUTPUT_DIR = Path(os.getenv("OUTPUT_DIR", "/home/fernandosilvav/Proyecto-Prueba/backend/outputs"))
 STATE_FILE = Path(os.getenv("STATE_FILE", os.path.join(str(OUTPUT_DIR), ".batch_state.pkl")))
-GEMINI_API_KEY = os.getenv("GOOGLE_API_KEY")
-if not GEMINI_API_KEY:
-    print("ERROR: GOOGLE_API_KEY no configurada. Crea un archivo .env con GOOGLE_API_KEY=tu_key")
-    sys.exit(1)
+
+_llm_api_key = resolve_api_key(_app_settings)
+_llm_client = get_client(_llm_api_key)
 MAX_TEXT_PER_CANDIDATE = 12000
 
 STATUS_FILE = OUTPUT_DIR / "batch_status.json"
@@ -213,10 +215,8 @@ def extract_candidate_text(cand_dir):
         combined = combined.replace(bad, good)
     return combined[:MAX_TEXT_PER_CANDIDATE]
 
-def extract_with_gemini(candidate_id, all_text, retries=3):
-    from google import genai
-    from google.genai import types
-    client = genai.Client(api_key=GEMINI_API_KEY)
+def extract_with_llm(candidate_id, all_text, retries=3):
+    client = _llm_client
 
     prompt = f"""Eres un extractor de datos de currículums chilenos. Analiza el CV y extrae la información solicitada.
 
@@ -236,16 +236,12 @@ Responde SOLO con este JSON exacto (sin markdown, ni etiquetas, solo JSON):
 
     for attempt in range(retries):
         try:
-            response = client.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=[prompt],
-                config=types.GenerateContentConfig(
-                    temperature=0.1,
-                    max_output_tokens=8192,
-                    response_mime_type="application/json",
-                )
+            response = client.generate(
+                contents=prompt,
+                model="accurate",
+                config={"temperature": 0.1, "max_output_tokens": 8192},
             )
-            return json.loads(response.text.strip())
+            return json.loads(response)
         except Exception as e:
             print(f"      [Retry {attempt+1}] {e}")
             if attempt < retries - 1:
@@ -268,16 +264,12 @@ Responde SOLO con este JSON exacto (sin markdown, ni etiquetas, solo JSON):
 
     for attempt in range(2):
         try:
-            response = client.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=[simple_prompt],
-                config=types.GenerateContentConfig(
-                    temperature=0.1,
-                    max_output_tokens=2048,
-                    response_mime_type="application/json",
-                )
+            response = client.generate(
+                contents=simple_prompt,
+                model="accurate",
+                config={"temperature": 0.1, "max_output_tokens": 2048},
             )
-            return json.loads(response.text.strip())
+            return json.loads(response)
         except Exception as e:
             print(f"      [Simple retry {attempt+1}] {e}")
             if attempt < 1:
@@ -335,7 +327,7 @@ for idx, cand_dir in enumerate(remaining):
         continue
 
     write_status(current_num, total, candidate_id, status_msg="enviando a Gemini...")
-    extracted = extract_with_gemini(candidate_id, text)
+    extracted = extract_with_llm(candidate_id, text)
     if extracted is None:
         elapsed = time.time() - tick
         print(f"FALLÓ Gemini ({elapsed:.1f}s)")

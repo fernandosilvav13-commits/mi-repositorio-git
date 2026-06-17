@@ -3,7 +3,6 @@ from pydantic import BaseModel
 
 from app.services.classifier import doc_classifier
 from app.services.preprocessor import preprocessing_pipeline
-from app.schemas.classification import ClassificationResult
 
 router = APIRouter()
 

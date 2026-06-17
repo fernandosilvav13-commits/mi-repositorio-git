@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from app.schemas.rules import RuleCreate, RuleResponse
 from app.core.database import require_supabase
 from app.services.rules_engine import RulesEngine
