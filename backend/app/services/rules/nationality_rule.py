@@ -41,4 +41,4 @@ class NationalityRule(BaseRule):
         return None
 
 
-rule_registry.register(NationalityRule())
+rule_registry.register(NationalityRule(enabled=True))

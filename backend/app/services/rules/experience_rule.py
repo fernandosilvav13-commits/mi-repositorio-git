@@ -9,6 +9,39 @@ MONTH_MAP = {
     "septiembre": 9, "octubre": 10, "noviembre": 11, "diciembre": 12,
 }
 
+EXPERIENCE_START = re.compile(
+    r"^(?:\s*)(?:EXPERIENCIA|ANTECEDENTES\s+LABORALES|WORK\s+EXPERIENCE|"
+    r"LABORAL\s+EXPERIENCE|PROFESSIONAL\s+EXPERIENCE|HISTORIAL\s+LABORAL)",
+    re.IGNORECASE,
+)
+
+SECTION_END = re.compile(
+    r"^(?:\s*)(?:FORMACION|EDUCACION|ESTUDIOS|DATOS\s+PERSONALES|"
+    r"NACIONALIDAD|IDIOMAS|HABILIDADES|SKILLS|COMPETENCIAS|CURSOS|"
+    r"CERTIFICACIONES|CAPACITACIONES|REFERENCIAS|RESUMEN|PERFIL|"
+    r"INFORMACION\s+(?:PERSONAL|ADICIONAL|COMPLEMENTARIA))",
+    re.IGNORECASE,
+)
+
+
+def _get_experience_section(text: str) -> str:
+    lines = text.split("\n")
+    in_section = False
+    section_lines = []
+
+    for line in lines:
+        if EXPERIENCE_START.search(line):
+            in_section = True
+        if in_section:
+            if SECTION_END.search(line):
+                break
+            section_lines.append(line)
+
+    if not section_lines:
+        return text
+
+    return "\n".join(section_lines)
+
 
 def _parse_year(text: str) -> int | None:
     text = text.strip()
@@ -66,8 +99,10 @@ class YearsExperienceRule(BaseRule):
         if existing and existing != "NO ENCONTRADO":
             return None
 
+        experience_text = _get_experience_section(text)
+
         total_years = 0
-        for line in text.split("\n"):
+        for line in experience_text.split("\n"):
             start, end = _normalize_date_range_line(line)
             if start is not None and end is not None and end > start:
                 total_years += end - start

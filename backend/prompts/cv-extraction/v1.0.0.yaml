@@ -6,7 +6,7 @@ system_prompt: |
   Extrae datos del texto según el esquema JSON.
   Responde SOLO con el JSON. Si falta algo, usa "NO ENCONTRADO".
   No inventes datos. Respeta nombres de claves.
-schema:
+prompt_schema:
   nombres: ""
   apellidos: ""
   rut: ""

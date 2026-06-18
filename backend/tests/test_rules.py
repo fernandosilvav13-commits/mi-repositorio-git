@@ -72,6 +72,72 @@ class TestYearsExperienceRule:
         result = rule.evaluate(text, {})
         assert result is None
 
+    def test_education_dates_not_counted(self):
+        rule = rule_registry.get("years_experience")
+        text = """
+EXPERIENCIA LABORAL
+Ingeniero | Empresa A | 2020 - 2024
+
+FORMACION ACADEMICA
+Universidad | 2015 - 2020
+        """
+        result = rule.evaluate(text, {})
+        assert result == "4"
+
+    def test_experience_section_only(self):
+        rule = rule_registry.get("years_experience")
+        text = """
+DATOS PERSONALES
+Nombre: Juan Perez
+
+EXPERIENCIA LABORAL
+Jefe de Proyecto | Empresa X | 2018 - 2022
+Analista | Empresa Y | 2022 - 2026
+
+IDIOMAS
+Ingles avanzado
+Frances basico
+        """
+        result = rule.evaluate(text, {})
+        assert result == "8"
+
+    def test_no_experience_section_fallback_to_full_text(self):
+        rule = rule_registry.get("years_experience")
+        text = """
+Trabajo como ingeniero desde 2018 hasta 2024 en diversas empresas.
+Anteriormente trabaje como analista 2015 - 2018.
+        """
+        result = rule.evaluate(text, {})
+        assert result == "9"
+
+    def test_mixed_sections_only_experience_counted(self):
+        rule = rule_registry.get("years_experience")
+        text = """
+EXPERIENCIA LABORAL
+Profesor | Colegio A | 2019 - 2024
+
+FORMACION
+Magister | Universidad | 2017 - 2019
+Pregrado | Universidad | 2013 - 2017
+
+CURSOS
+Curso de Python | 2023 - 2023
+        """
+        result = rule.evaluate(text, {})
+        assert result == "5"
+
+    def test_empty_experience_section_returns_none(self):
+        rule = rule_registry.get("years_experience")
+        text = """
+EXPERIENCIA LABORAL
+Sin fechas registradas
+
+FORMACION
+Universidad | 2015 - 2020
+        """
+        result = rule.evaluate(text, {})
+        assert result is None
+
 
 class TestEducationLevelRule:
     def test_doctorado_detected(self):

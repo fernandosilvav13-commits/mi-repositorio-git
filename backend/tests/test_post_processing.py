@@ -71,6 +71,8 @@ def test_post_process_rut_formatted():
     }
     result = processor._post_process(data)
     assert result["RUT"] == "12.345.678-9"
+    # 12345678-9: expected DV is 5, actual is 9 → invalid
+    assert result["RUT_VALIDO"] == "NO"
 
 
 def test_post_process_rut_already_formatted():
@@ -85,6 +87,8 @@ def test_post_process_rut_already_formatted():
     }
     result = processor._post_process(data)
     assert result["RUT"] == "12.345.678-9"
+    # 12345678-9: expected DV is 5, actual is 9 → invalid
+    assert result["RUT_VALIDO"] == "NO"
 
 
 # ── Unit tests for _post_process() — name capitalize ─────────────────────────
@@ -114,7 +118,7 @@ def test_process_full_pipeline():
     data = {
         "NOMBRES": "MARÍA FERNANDA",
         "APELLIDOS": "GARCÍA LÓPEZ",
-        "RUT": "18765432-1",
+        "RUT": "18765432-7",
         "GENERO": "NO ENCONTRADO",
         "TELEFONO_CELULAR": "09 8765 4321",
         "TELEFONO_FIJO": "",
@@ -122,8 +126,12 @@ def test_process_full_pipeline():
     }
     result = processor._post_process(data)
     assert result["GENERO"] == "FEMENINO"
+    assert result["GENERO_CONFIANZA"] == "1.0"
+    assert result["GENERO_FUENTE"] in ("compound", "name_map")
     assert result["TELEFONO_CELULAR"] == "+56987654321"
-    assert result["RUT"] == "18.765.432-1"
+    assert result["RUT"] == "18.765.432-7"
+    # 18765432-7: expected DV is 7, body 18765432
+    assert result["RUT_VALIDO"] == "SI"
     assert result["NOMBRES"] == "María Fernanda"
     assert result["APELLIDOS"] == "García López"
 

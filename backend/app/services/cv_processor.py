@@ -3,7 +3,7 @@ import asyncio
 from pathlib import Path
 from app.services.cv_extractor import extract_cv_data
 from app.services.extraction_pipeline import extraction_pipeline
-from app.services.gender_service import infer_gender
+from app.services.gender_service import infer_gender_scored
 from app.services.phone_service import normalize_phone
 from app.services.experience_service import get_top_3_experiences
 from app.utils.rut_formatter import RUTFormatter
@@ -59,7 +59,10 @@ class CVProcessor:
         if not genero or genero == "NO ENCONTRADO":
             nombres = data.get("NOMBRES", "")
             if nombres and nombres != "NO ENCONTRADO":
-                data["GENERO"] = infer_gender(nombres)
+                result = infer_gender_scored(nombres)
+                data["GENERO"] = result.gender
+                data["GENERO_CONFIANZA"] = str(result.confidence)
+                data["GENERO_FUENTE"] = result.source
 
         for phone_field in ("TELEFONO_CELULAR", "TELEFONO_FIJO"):
             val = data.get(phone_field, "")
@@ -71,6 +74,7 @@ class CVProcessor:
         rut = data.get("RUT", "")
         if rut and rut != "NO ENCONTRADO":
             data["RUT"] = RUTFormatter.format(rut)
+            data["RUT_VALIDO"] = "SI" if RUTFormatter.validate(rut) else "NO"
 
         for field in ("NOMBRES", "APELLIDOS"):
             val = data.get(field, "")

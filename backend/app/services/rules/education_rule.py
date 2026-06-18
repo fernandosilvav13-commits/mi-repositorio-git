@@ -44,4 +44,4 @@ class EducationLevelRule(BaseRule):
         return None
 
 
-rule_registry.register(EducationLevelRule())
+rule_registry.register(EducationLevelRule(enabled=True))

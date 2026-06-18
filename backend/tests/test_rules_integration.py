@@ -49,7 +49,7 @@ class TestRulesIntegration:
         result = processor._post_process(data, raw_text="")
         assert result is not None
 
-    def test_rules_all_run_in_shadow(self, processor):
+    def test_promoted_rules_write_values(self, processor):
         data = {
             "NOMBRES": "Maria",
             "APELLIDOS": "Garcia",
@@ -58,6 +58,7 @@ class TestRulesIntegration:
             "TELEFONO_CELULAR": "",
             "TELEFONO_FIJO": "",
             "EMAIL": "",
+            "NACIONALIDAD": "NO ENCONTRADO",
         }
         text = """
 EXPERIENCIA LABORAL
@@ -74,3 +75,6 @@ Fecha de Nacimiento: 15/03/1985
         """
         result = processor._post_process(data, raw_text=text)
         assert result["RUT"] == "12.345.678-9"
+        assert result["NACIONALIDAD"] == "Chilena"
+        assert result["FECHA_NACIMIENTO"] == "15/03/1985"
+        assert result["NIVEL_EDUCACION"] == "MAGISTER"

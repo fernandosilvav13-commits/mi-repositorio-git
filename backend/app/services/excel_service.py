@@ -22,6 +22,7 @@ class ExcelService:
         columns: list[str],
         rows: list[dict],
         rules_triggered: list[list[dict]] | None = None,
+        crossref_columns: list[str] | None = None,
     ) -> str:
         wb = Workbook()
         ws = wb.active
@@ -33,7 +34,10 @@ class ExcelService:
         header_font = Font(color="FFFFFF", bold=True)
 
         for col_idx, col_name in enumerate(columns, 1):
-            cell = ws.cell(row=1, column=col_idx, value=col_name)
+            display_name = col_name
+            if crossref_columns and col_name in crossref_columns:
+                display_name = f"[REF] {col_name}"
+            cell = ws.cell(row=1, column=col_idx, value=display_name)
             cell.fill = header_fill
             cell.font = header_font
             cell.alignment = Alignment(horizontal="center")
@@ -41,21 +45,23 @@ class ExcelService:
         for row_idx, row_data in enumerate(rows, 2):
             row_rules = rules_triggered[row_idx - 2] if rules_triggered else []
 
-            is_critical_failure = (
-                any(
-                    v == "NO ENCONTRADO" for v in row_data.values()
-                )
-                and all(v == "NO ENCONTRADO" for v in row_data.values())
+            has_no_encontrado = any(
+                v == "NO ENCONTRADO" for v in row_data.values()
+            )
+            all_no_encontrado = has_no_encontrado and all(
+                v == "NO ENCONTRADO" for v in row_data.values()
             )
 
             for col_idx, col_name in enumerate(columns, 1):
                 value = row_data.get(col_name, NO_ENCONTRADO_TEXT)
                 cell = ws.cell(row=row_idx, column=col_idx, value=value)
 
-                if is_critical_failure:
+                if all_no_encontrado:
                     cell.fill = RED_FILL
+                elif has_no_encontrado:
+                    cell.fill = YELLOW_FILL
 
-            if is_critical_failure:
+            if all_no_encontrado:
                 continue
 
             for rule in row_rules:

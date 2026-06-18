@@ -43,4 +43,4 @@ class EmailDomainRule(BaseRule):
         return None
 
 
-rule_registry.register(EmailDomainRule())
+rule_registry.register(EmailDomainRule(enabled=True))

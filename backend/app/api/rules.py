@@ -1,9 +1,10 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from app.schemas.rules import RuleCreate, RuleResponse
 from app.core.database import require_supabase
+from app.core.auth import require_auth
 from app.services.rules_engine import RulesEngine
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(require_auth)])
 engine = RulesEngine()
 
 

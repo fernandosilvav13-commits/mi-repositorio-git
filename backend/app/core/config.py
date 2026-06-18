@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     app_version: str = "1.0.0"
     debug: bool = False
     environment: str = "development"
+    frontend_url: str = "http://localhost:3000"
     max_upload_size_mb: int = 50
     upload_dir: str = "uploads"
     crossref_upload_dir: str = "uploads/crossref"

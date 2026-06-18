@@ -32,8 +32,42 @@ class OCRService:
         path = Path(file_path)
         if not path.exists():
             raise FileNotFoundError(f"Archivo no encontrado: {file_path}")
-        image = Image.open(file_path)
+        ext = path.suffix.lower()
+        if ext in (".docx", ".doc"):
+            image = self._docx_to_image(file_path)
+        else:
+            image = Image.open(file_path)
         return layout_analyzer.analyze(image)
+
+    def _docx_to_image(self, file_path: str) -> Image.Image:
+        import zipfile, io
+        try:
+            with zipfile.ZipFile(file_path) as z:
+                media_files = sorted(
+                    f for f in z.namelist()
+                    if f.startswith("word/media/") and f.lower().endswith(('.png', '.jpg', '.jpeg', '.tiff', '.bmp'))
+                )
+                if not media_files:
+                    raise ValueError("No media files found in DOCX")
+                images = []
+                for mf in media_files:
+                    data = z.read(mf)
+                    img = Image.open(io.BytesIO(data))
+                    if img.mode != "RGB":
+                        img = img.convert("RGB")
+                    images.append(img)
+                if len(images) == 1:
+                    return images[0]
+                total_w = sum(img.width for img in images)
+                max_h = max(img.height for img in images)
+                composite = Image.new("RGB", (total_w, max_h), (255, 255, 255))
+                x_offset = 0
+                for img in images:
+                    composite.paste(img, (x_offset, 0))
+                    x_offset += img.width
+                return composite
+        except Exception as e:
+            raise ValueError(f"Cannot convert DOCX to image: {e}")
 
     def extract_with_fallback(self, file_path: str) -> str:
         if not settings.ocr_enabled:

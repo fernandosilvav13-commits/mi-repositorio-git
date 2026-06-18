@@ -1,12 +1,27 @@
+import json
+from pathlib import Path
+from unittest.mock import patch, MagicMock
 import pytest
 from fastapi.testclient import TestClient
 from app.main import app
 
 client = TestClient(app)
 
-from unittest.mock import patch, MagicMock
 
-def test_export_api_with_compound_match_keys(client):
+@pytest.fixture
+def _setup_manifest():
+    manifest_dir = Path("uploads/crossref")
+    manifest_dir.mkdir(parents=True, exist_ok=True)
+    manifest_path = manifest_dir / "manifest.json"
+    manifest_path.write_text(json.dumps([
+        {"id": "mock-file-id", "name": "mock_crossref.csv"}
+    ]))
+    yield
+    if manifest_path.exists():
+        manifest_path.unlink()
+
+
+def test_export_api_with_compound_match_keys(_setup_manifest):
     """
     Test the /api/export/ endpoint with the new matchKeys structure.
     """
@@ -22,20 +37,22 @@ def test_export_api_with_compound_match_keys(client):
             "output_columns": ["Email"]
         }
     }
-    
-    with patch("app.api.export.require_supabase") as mock_supa:
-        # Mock template data
+
+    with (
+        patch("app.api.export.require_supabase") as mock_supa,
+        patch("app.api.export.crossref_service.load_file_data") as mock_load,
+    ):
         mock_supa.return_value.table.return_value.select.return_value.eq.return_value.execute.return_value.data = [
             {"id": "mock-template-id", "columns": [{"name": "Nombre"}, {"name": "Apellido"}, {"name": "RUT"}]}
         ]
-        
-        # This will fail because 'match_column' is missing in column_mapping
-        response = client.post("/api/export/", json=payload)
-        
-        # We expect a KeyError or similar if it tries to access column_mapping['match_column']
-        assert response.status_code == 500 or response.status_code == 400
+        mock_load.return_value = [
+            {"First Name": "Juan", "Last Name": "Perez", "Email": "juan@example.com"}
+        ]
 
-def test_export_api_missing_required_fields(client):
+        response = client.post("/api/export/", json=payload)
+        assert response.status_code == 200
+
+def test_export_api_missing_required_fields():
     """Test validation of required fields."""
     response = client.post("/api/export/", json={})
     assert response.status_code == 400

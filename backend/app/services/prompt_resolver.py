@@ -58,7 +58,7 @@ class PromptResolver:
     def _scan_all(self):
         self._cache.clear()
         for yaml_path in glob.glob(str(self.prompts_dir / "*" / "*.yaml"), recursive=False):
-            with open(yaml_path) as f:
+            with open(yaml_path, encoding="utf-8") as f:
                 data = yaml.safe_load(f)
             pv = PromptVersion(**data)
             key = f"{pv.type}@{pv.version}"
@@ -89,7 +89,7 @@ class PromptResolver:
     def render(self, pv: PromptVersion, document_text: str = "", **extra_context) -> str:
         context = {
             "document_text": document_text,
-            "schema": pv.schema,
+            "schema": pv.prompt_schema,
             **extra_context,
         }
         template = self._jinja_env.from_string(pv.system_prompt)

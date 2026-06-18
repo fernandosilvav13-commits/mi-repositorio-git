@@ -1,5 +1,66 @@
 import re
 import unicodedata
+from collections import namedtuple
+
+GenderResult = namedtuple("GenderResult", ["gender", "confidence", "source"])
+
+COMPOUND_OVERRIDES = {
+    "MARIA JOSE": "FEMENINO",
+    "MARIA JESUS": "FEMENINO",
+    "JOSE MARIA": "MASCULINO",
+    "MARIA DEL CARMEN": "FEMENINO",
+    "MARIA DE LOS ANGELES": "FEMENINO",
+    "MARIA DE LA LUZ": "FEMENINO",
+    "MARIA DEL PILAR": "FEMENINO",
+    "MARIA FERNANDA": "FEMENINO",
+    "MARIA TERESA": "FEMENINO",
+    "MARIA CRISTINA": "FEMENINO",
+    "MARIA ELENA": "FEMENINO",
+    "MARIA ANGELICA": "FEMENINO",
+    "MARIA ISABEL": "FEMENINO",
+    "MARIA LUISA": "FEMENINO",
+    "MARIA SOLEDAD": "FEMENINO",
+    "MARIA ANTONIA": "FEMENINO",
+    "MARIA EMILIA": "FEMENINO",
+    "MARIA ALEJANDRA": "FEMENINO",
+    "MARIA GRACIA": "FEMENINO",
+    "MARIA BELEN": "FEMENINO",
+    "MARIA VICTORIA": "FEMENINO",
+    "MARIA PAULA": "FEMENINO",
+    "MARIA JOSE DE": "FEMENINO",
+    "LUIS MARIA": "MASCULINO",
+    "JOSE LUIS": "MASCULINO",
+    "JOSE MANUEL": "MASCULINO",
+    "JOSE ANTONIO": "MASCULINO",
+    "JOSE MIGUEL": "MASCULINO",
+    "JOSE IGNACIO": "MASCULINO",
+    "JUAN CARLOS": "MASCULINO",
+    "JUAN PABLO": "MASCULINO",
+    "JUAN MANUEL": "MASCULINO",
+    "JUAN DIEGO": "MASCULINO",
+    "LUIS FERNANDO": "MASCULINO",
+    "LUIS ALBERTO": "MASCULINO",
+    "CARLOS ALBERTO": "MASCULINO",
+    "CARLOS ANDRES": "MASCULINO",
+    "PABLO ANDRES": "MASCULINO",
+    "FELIPE IGNACIO": "MASCULINO",
+    "FELIPE ANDRES": "MASCULINO",
+    "FRANCISCO JAVIER": "MASCULINO",
+    "MIGUEL ANGEL": "MASCULINO",
+    "VICTOR MANUEL": "MASCULINO",
+    "RAUL ALBERTO": "MASCULINO",
+    "EDUARDO ANTONIO": "MASCULINO",
+    "ALEXIS ANDRES": "MASCULINO",
+    "CLAUDIO ANDRES": "MASCULINO",
+    "CRISTIAN ANDRES": "MASCULINO",
+    "MAURICIO ANDRES": "MASCULINO",
+    "RODRIGO ANDRES": "MASCULINO",
+    "HECTOR MANUEL": "MASCULINO",
+    "SEBASTIAN IGNACIO": "MASCULINO",
+    "ENRIQUE ALBERTO": "MASCULINO",
+    "PEDRO ANTONIO": "MASCULINO",
+    "MARCO ANTONIO": "MASCULINO",
+}
 
 GENDER_MAP = {
     "JUAN": "MASCULINO",
@@ -227,24 +288,46 @@ GENDER_MAP = {
 }
 
 
+def _normalize(name: str) -> str:
+    return unicodedata.normalize("NFKD", name.upper()).encode("ascii", "ignore").decode()
+
+
 def infer_gender(nombres: str | None) -> str:
+    result = infer_gender_scored(nombres)
+    return result.gender
+
+
+def infer_gender_scored(nombres: str | None) -> GenderResult:
     if not nombres:
-        return "NO ENCONTRADO"
-    first_name = nombres.strip().split()[0]
-    # Strip accents for GENDER_MAP lookup (keys are unaccented uppercase)
-    first_name_clean = unicodedata.normalize("NFKD", first_name.upper())
-    first_name_clean = first_name_clean.encode("ascii", "ignore").decode()
-    return GENDER_MAP.get(first_name_clean, "NO ENCONTRADO")
+        return GenderResult(gender="NO ENCONTRADO", confidence=0.0, source="none")
+    parts = nombres.strip().split()
+    full_clean = _normalize(" ".join(parts))
+    # Check full name first (any word count), then 3-word, then 2-word
+    for n_words in (len(parts), 3, 2):
+        key = " ".join(full_clean.split()[:n_words])
+        if key in COMPOUND_OVERRIDES:
+            return GenderResult(gender=COMPOUND_OVERRIDES[key], confidence=1.0, source="compound")
+
+    first_name_clean = _normalize(parts[0])
+    if first_name_clean in GENDER_MAP:
+        return GenderResult(gender=GENDER_MAP[first_name_clean], confidence=1.0, source="name_map")
+
+    return GenderResult(gender="NO ENCONTRADO", confidence=0.0, source="none")
 
 
 def infer_gender_from_text(text: str) -> str:
+    result = infer_gender_from_text_scored(text)
+    return result.gender
+
+
+def infer_gender_from_text_scored(text: str) -> GenderResult:
     text_lower = text.lower()
     if re.search(r'\bsexo\s*:?\s*(masculino|m|varon|hombre)\b', text_lower):
-        return "MASCULINO"
+        return GenderResult(gender="MASCULINO", confidence=0.7, source="text_sexo")
     if re.search(r'\bsexo\s*:?\s*(femenino|f|mujer)\b', text_lower):
-        return "FEMENINO"
+        return GenderResult(gender="FEMENINO", confidence=0.7, source="text_sexo")
     if re.search(r'\b(sr\.?|don|señor)\s', text_lower):
-        return "MASCULINO"
+        return GenderResult(gender="MASCULINO", confidence=0.6, source="text_honorific")
     if re.search(r'\b(sra\.?|srita\.?|doña|señora)\s', text_lower):
-        return "FEMENINO"
-    return "NO ENCONTRADO"
+        return GenderResult(gender="FEMENINO", confidence=0.6, source="text_honorific")
+    return GenderResult(gender="NO ENCONTRADO", confidence=0.0, source="none")

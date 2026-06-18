@@ -1,9 +1,20 @@
 export const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
+const AUTH_ENABLED = !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+
+async function getAuthHeaders(): Promise<Record<string, string>> {
+  if (!AUTH_ENABLED) return {};
+  const { supabase } = await import("@/lib/supabase");
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
+  return token ? { "Authorization": `Bearer ${token}` } : {};
+}
+
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
+  const authHeaders = await getAuthHeaders();
   const isFormData = options?.body instanceof FormData;
   const res = await fetch(`${API_BASE}${path}`, {
-    headers: isFormData ? {} : { "Content-Type": "application/json", ...options?.headers },
+    headers: isFormData ? authHeaders : { "Content-Type": "application/json", ...authHeaders, ...options?.headers as Record<string, string> },
     ...options,
   });
   if (!res.ok) {
@@ -14,9 +25,10 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 }
 
 async function downloadBlob(path: string, data: any, filename: string = "resultado.xlsx"): Promise<void> {
+  const authHeaders = await getAuthHeaders();
   const res = await fetch(`${API_BASE}${path}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...authHeaders },
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error(await res.text());
@@ -31,15 +43,18 @@ async function downloadBlob(path: string, data: any, filename: string = "resulta
   setTimeout(() => URL.revokeObjectURL(url), 100);
 }
 
-const uploadWithProgress = (
+const uploadWithProgress = async (
   file: File,
   onProgress: (percent: number) => void
 ): Promise<any> => {
+  const authHeaders = await getAuthHeaders();
+  const token = authHeaders["Authorization"] || "";
   return new Promise((resolve, reject) => {
     const form = new FormData();
     form.append("file", file);
     const xhr = new XMLHttpRequest();
     xhr.open("POST", `${API_BASE}/api/crossref/upload`);
+    if (token) xhr.setRequestHeader("Authorization", token);
     xhr.upload.onprogress = (e: ProgressEvent) => {
       if (e.lengthComputable) {
         onProgress(Math.round((e.loaded / e.total) * 100));

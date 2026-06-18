@@ -1,14 +1,15 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import FileResponse
 from app.services.excel_service import ExcelService
 from app.services.rules_engine import RulesEngine
 from app.services.consolidator import Consolidator
 from app.services.crossref_service import CrossrefService
 from app.core.database import require_supabase
+from app.core.auth import require_auth
 from pathlib import Path
 import json
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(require_auth)])
 excel_service = ExcelService()
 rules_engine = RulesEngine()
 consolidator = Consolidator()
@@ -38,7 +39,7 @@ async def export_to_excel(data: dict):
     if rows and "Carpeta" in rows[0] and "Carpeta" not in columns:
         columns.insert(0, "Carpeta")
 
-    consolidated_rows, _ = consolidator.consolidate(columns, rows)
+    consolidated_rows, _, _ = consolidator.consolidate(columns, rows)
 
     if crossref_file_id and column_mapping:
         manifest_path = Path("uploads/crossref/manifest.json")
@@ -53,10 +54,18 @@ async def export_to_excel(data: dict):
             raise HTTPException(404, "Archivo de cruce no encontrado")
 
         full_data = crossref_service.load_file_data(entry["name"])
-        match_keys = [{
-            "extractionKey": column_mapping["match_column"],
-            "crossrefKey": column_mapping["crossref_match_column"],
-        }]
+
+        if "matchKeys" in column_mapping:
+            match_keys = [
+                {"extractionKey": mk["local"], "crossrefKey": mk["remote"]}
+                for mk in column_mapping["matchKeys"]
+            ]
+        else:
+            match_keys = [{
+                "extractionKey": column_mapping["match_column"],
+                "crossrefKey": column_mapping["crossref_match_column"],
+            }]
+
         merged_rows = crossref_service.merge_data(
             rows=consolidated_rows,
             crossref_rows=full_data,
@@ -79,7 +88,8 @@ async def export_to_excel(data: dict):
         triggered = rules_engine.evaluate_rules(rules.data, row)
         rules_triggered.append(triggered)
 
-    file_path = excel_service.generate(columns, final_rows, rules_triggered)
+    crossref_cols = column_mapping.get("output_columns") if column_mapping else None
+    file_path = excel_service.generate(columns, final_rows, rules_triggered, crossref_cols)
     return FileResponse(
         file_path,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

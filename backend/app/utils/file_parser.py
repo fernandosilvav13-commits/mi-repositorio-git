@@ -21,6 +21,9 @@ if _lib_dir and os.path.isdir(_lib_dir):
 if _tessdata_dir:
     os.environ["TESSDATA_PREFIX"] = _tessdata_dir
 
+if hasattr(settings, "tesseract_cmd") and settings.tesseract_cmd:
+    pytesseract.pytesseract.tesseract_cmd = settings.tesseract_cmd
+
 
 class FileParser:
     @staticmethod
@@ -58,7 +61,17 @@ class FileParser:
     @staticmethod
     def _parse_docx(file_path: str) -> str:
         doc = DocxDocument(file_path)
-        text = "\n".join(p.text for p in doc.paragraphs if p.text.strip())
+        paragraphs = "\n".join(p.text for p in doc.paragraphs if p.text.strip())
+        tables = "\n".join(
+            cell.text.strip()
+            for table in doc.tables
+            for row in table.rows
+            for cell in row.cells
+            if cell.text.strip()
+        )
+        text = paragraphs
+        if tables:
+            text = text + "\n" + tables if text else tables
         if text.strip():
             return text
         try:
@@ -78,7 +91,35 @@ class FileParser:
                 return text.strip()
         except Exception:
             pass
+        if not text.strip():
+            text = FileParser._ocr_docx(file_path)
         return text
+
+    @staticmethod
+    def _ocr_docx(file_path: str) -> str:
+        import zipfile
+        import io
+        if hasattr(settings, "tesseract_cmd") and settings.tesseract_cmd:
+            pytesseract.pytesseract.tesseract_cmd = settings.tesseract_cmd
+        texts = []
+        try:
+            with zipfile.ZipFile(file_path) as z:
+                media_files = sorted(
+                    f for f in z.namelist()
+                    if f.startswith("word/media/") and f.lower().endswith(('.png', '.jpg', '.jpeg', '.tiff', '.bmp'))
+                )
+                for media_path in media_files:
+                    try:
+                        image_data = z.read(media_path)
+                        image = Image.open(io.BytesIO(image_data))
+                        ocr_text = pytesseract.image_to_string(image, lang="spa+eng")
+                        if ocr_text.strip():
+                            texts.append(ocr_text.strip())
+                    except Exception:
+                        continue
+        except Exception:
+            pass
+        return "\n".join(texts)
 
     @staticmethod
     def _parse_doc_ole(file_path: str) -> str:
@@ -109,7 +150,21 @@ class FileParser:
                     text += c
                 i += 1
         lines = [l.strip() for l in text.split("\n") if l.strip()]
-        result = "\n".join(lines)
+        clean = []
+        for line in lines:
+            if len(line) <= 2:
+                continue
+            alpha = sum(1 for c in line if c.isalpha())
+            space = sum(1 for c in line if c.isspace())
+            good = alpha + space
+            ratio = good / len(line) if line else 0
+            if ratio < 0.5:
+                continue
+            lower = sum(1 for c in line if c.islower())
+            if alpha > 0 and lower / alpha < 0.2 and alpha < 5:
+                continue
+            clean.append(line)
+        result = "\n".join(clean)
         if len(result) > 30:
             return result
         raise ValueError("No se encontro texto legible en el .doc")
@@ -121,6 +176,13 @@ class FileParser:
         except Exception:
             pass
         try:
+            return FileParser._parse_doc_ole(file_path)
+        except Exception:
+            pass
+        import os as _os
+        try:
+            if _os.path.getsize(file_path) > 500 * 1024:
+                raise ValueError("File too large for HTML fallback")
             with open(file_path, "r", encoding="utf-8", errors="replace") as f:
                 content = f.read()
             body_match = re.search(r"<body[^>]*>(.*?)</body>", content, re.DOTALL | re.IGNORECASE)
@@ -132,10 +194,6 @@ class FileParser:
             text = re.sub(r"\s+", " ", text).strip()
             if len(text) > 20:
                 return text
-        except Exception:
-            pass
-        try:
-            return FileParser._parse_doc_ole(file_path)
         except Exception:
             pass
         raise ValueError(

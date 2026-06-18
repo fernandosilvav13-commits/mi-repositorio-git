@@ -21,6 +21,7 @@ import OutputColumnPicker from "@/components/apple/OutputColumnPicker";
 import MatchSummaryBar from "@/components/apple/MatchSummaryBar";
 import MatchTable from "@/components/apple/MatchTable";
 import { cn } from "@/lib/utils";
+import { AuthGuard } from "@/components/auth/AuthGuard";
 
 const SUPPORTED_EXTS = new Set([".pdf", ".docx", ".doc", ".xlsx", ".csv", ".jpg", ".jpeg", ".png", ".ppt", ".pptx"]);
 
@@ -465,6 +466,7 @@ export default function WizardPage() {
   }, [matchKeys, outputColumns]);
 
   return (
+    <AuthGuard>
     <div className="min-h-screen bg-parchment flex flex-col items-center pt-[104px] pb-24 overflow-x-hidden">
       {/* Global Nav Placeholder */}
       <div className="fixed top-0 left-0 w-full h-[44px] bg-black z-[100] flex items-center justify-center">
@@ -1228,5 +1230,6 @@ export default function WizardPage() {
         </div>
       </main>
     </div>
+    </AuthGuard>
   );
 }

@@ -1,10 +1,11 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
 from app.services.classifier import doc_classifier
 from app.services.preprocessor import preprocessing_pipeline
+from app.core.auth import require_auth
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(require_auth)])
 
 
 class ClassifyRequest(BaseModel):

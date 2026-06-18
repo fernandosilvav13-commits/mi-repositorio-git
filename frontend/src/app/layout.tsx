@@ -5,6 +5,7 @@ import { Toaster } from "sonner";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import GlobalNav from "@/components/layout/GlobalNav";
 import SubNav from "@/components/layout/SubNav";
+import { AuthProvider } from "@/lib/auth-context";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -24,12 +25,14 @@ export default function RootLayout({
   return (
     <html lang="es" className={`${inter.className} antialiased`}>
       <body className="min-h-screen bg-white text-ink">
-        <GlobalNav />
-        <SubNav />
-        <main>
-          <ErrorBoundary>{children}</ErrorBoundary>
-        </main>
-        <Toaster richColors position="top-right" />
+        <AuthProvider>
+          <GlobalNav />
+          <SubNav />
+          <main>
+            <ErrorBoundary>{children}</ErrorBoundary>
+          </main>
+          <Toaster richColors position="top-right" />
+        </AuthProvider>
       </body>
     </html>
   );

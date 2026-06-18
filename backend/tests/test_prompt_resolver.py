@@ -12,7 +12,7 @@ class TestPromptVersion:
             description="test",
             author="dev",
             system_prompt="Extract data according to schema.",
-            schema={"fields": ["name"]},
+            prompt_schema={"fields": ["name"]},
             model_params={"model": "gemini", "temperature": 0.1, "tags": ["cv"]},
             tags=["cv"],
         )
@@ -29,7 +29,7 @@ class TestPromptVersion:
                     description="test",
                     author="dev",
                     system_prompt="test",
-                    schema={"fields": ["name"]},
+                    prompt_schema={"fields": ["name"]},
                     model_params={"model": "gemini", "temperature": 0.1, "tags": ["cv"]},
                     tags=["cv"],
                 )
@@ -42,20 +42,20 @@ class TestPromptVersion:
                 description="test",
                 author="dev",
                 system_prompt="",
-                schema={"fields": ["name"]},
+                prompt_schema={"fields": ["name"]},
                 model_params={"model": "gemini", "temperature": 0.1, "tags": ["cv"]},
                 tags=["cv"],
             )
 
     def test_prompt_version_empty_schema(self):
-        with pytest.raises(ValueError, match="schema must be a non-empty dict"):
+        with pytest.raises(ValueError, match="prompt_schema must be a non-empty dict"):
             PromptVersion(
                 type="cv-extraction",
                 version="1.0.0",
                 description="test",
                 author="dev",
                 system_prompt="test",
-                schema={},
+                prompt_schema={},
                 model_params={"model": "gemini", "temperature": 0.1, "tags": ["cv"]},
                 tags=["cv"],
             )
@@ -67,7 +67,7 @@ version: 1.0.0
 description: Test prompt
 author: tester
 system_prompt: Extract data.
-schema:
+prompt_schema:
   name: ""
   age: ""
 model_params:
@@ -90,7 +90,7 @@ type: cv-extraction
 version: 1.0.0
 description: Missing system_prompt
 author: tester
-schema:
+prompt_schema:
   name: ""
 model_params:
   model: gemini
@@ -111,7 +111,7 @@ version: 1.0.0
 description: Invalid schema
 author: tester
 system_prompt: Extract.
-schema: "not a dict"
+prompt_schema: "not a dict"
 model_params:
   model: gemini
   temperature: 0.0
@@ -129,11 +129,11 @@ from app.services.prompt_resolver import PromptResolver, _match_version, EXTRACT
 
 
 class TestPromptResolver:
-    def _make_yaml(self, path, type="cv-extraction", version="1.0.0", system_prompt="Extract data.", schema=None, **kw):
+    def _make_yaml(self, path, type="cv-extraction", version="1.0.0", system_prompt="Extract data.", prompt_schema=None, **kw):
         data = {
             "type": type, "version": version, "description": "test", "author": "tester",
             "system_prompt": system_prompt,
-            "schema": schema or {"name": ""},
+            "prompt_schema": prompt_schema or {"name": ""},
             "model_params": {"model": "gemini", "temperature": 0.1},
             "tags": ["test"],
             **kw,
@@ -212,7 +212,7 @@ class TestPromptResolver:
         d.mkdir(parents=True)
         self._make_yaml(d / "v1.0.0.yaml", version="1.0.0",
                         system_prompt="Schema: {{ schema | tojson }}",
-                        schema={"key": "val"})
+                        prompt_schema={"key": "val"})
         r = PromptResolver(str(tmp_path))
         pv = r.get("cv-extraction", "1.0.0")
         assert pv is not None
@@ -237,7 +237,7 @@ type: cv-extraction
 version: 1.0.0
 description: Missing system_prompt
 author: tester
-schema:
+prompt_schema:
   name: ""
 model_params:
   model: gemini

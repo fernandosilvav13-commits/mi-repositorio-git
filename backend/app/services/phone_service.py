@@ -21,6 +21,12 @@ def normalize_phone(raw: str | None) -> tuple[str, str]:
 
     cleaned = raw.strip()
 
+    # Detect non-Chilean international numbers early
+    if re.match(r"^\+", cleaned) and not re.match(r"^\+0*\s*56", cleaned, re.IGNORECASE):
+        intl_digits = re.sub(r"\D", "", cleaned)
+        if len(intl_digits) >= 8:
+            return ("TELEFONO_EXTRANJERO", "+" + intl_digits.lstrip("0"))
+
     cleaned = cleaned.lower()
     prefixes = [
         "cel:", "celular:", "fono:", "tel:", "telefono:",
@@ -39,6 +45,7 @@ def normalize_phone(raw: str | None) -> tuple[str, str]:
     if not digits:
         return ("NO ENCONTRADO", "NO ENCONTRADO")
 
+    # Mobile: must have 8 digits after the 9
     if digits.startswith("09") and len(digits) == 10:
         formatted = "+569" + digits[2:]
         return ("TELEFONO_CELULAR", formatted)
@@ -47,17 +54,22 @@ def normalize_phone(raw: str | None) -> tuple[str, str]:
         formatted = "+569" + digits[1:]
         return ("TELEFONO_CELULAR", formatted)
 
-    if len(digits) == 9 and digits.startswith("9"):
-        formatted = "+569" + digits[1:]
-        return ("TELEFONO_CELULAR", formatted)
+    # Reject mobile with wrong length
+    if digits.startswith("9"):
+        return ("FORMATO_INVALIDO", raw.strip())
 
     sorted_codes = sorted(FIXO_AREA_CODES.keys(), key=len, reverse=True)
     for code in sorted_codes:
         if digits.startswith(code):
             rest = digits[len(code):]
-            if 6 <= len(rest) <= 8:
+            expected = 8 if code == "2" else (7 if code in ("32", "33", "34", "35", "41", "42", "43", "45", "51", "52", "53", "55", "57", "58", "61", "63", "64", "65", "66", "67", "71", "72", "73", "75") else 6)
+            if len(rest) == expected:
                 formatted = "+56" + code + rest
                 return ("TELEFONO_FIJO", formatted)
+
+    # International via 00 prefix
+    if digits.startswith("00") and len(digits) >= 10:
+        return ("TELEFONO_EXTRANJERO", "+" + digits[2:])
 
     return ("NO ENCONTRADO", "NO ENCONTRADO")
 
@@ -67,8 +79,8 @@ def extract_phone_from_text(text: str) -> tuple[str, str]:
         return ("NO ENCONTRADO", "NO ENCONTRADO")
 
     patterns = [
-        r'(?:cel|celular|movil|móvil|whatsapp|wp|contacto)\s*[:\s]*(\+?56?\s*9\s*[\d\s\-\.]{7,12})',
-        r'(?:fono|tel|telefono|teléfono|fijo)\s*[:\s]*(\+?56?\s*[2-9]\s*[\d\s\-\.]{6,11})',
+        r'(?:cel|celular|movil|móvil|whatsapp|wp|contacto)\s*[:\s]*(\+?5?6?\s*9\s*[\d\s\-\.]{7,12})',
+        r'(?:fono|tel|telefono|teléfono|fijo)\s*[:\s]*(\+?5?6?\s*[2-9]\s*[\d\s\-\.]{6,11})',
         r'(\+569[\d\s\-\.]{7,9})',
         r'(\+562[\d\s\-\.]{6,8})',
         r'(09[\d\s\-\.]{7,9})',
