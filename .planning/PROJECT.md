@@ -2,24 +2,22 @@
 
 ## Current State
 
-**Shipped:** v1.4 Extracción Inteligente (2026-06-16)
-**Active:** v1.5 Consolidación de Extracción (started 2026-06-17)
+**Shipped:** v1.5 Consolidación de Extracción (2026-06-18)
+**Active:** v1.6 (planning)
 
 v1.4 dramatically improved extraction accuracy through: version-controlled prompt infrastructure with PromptResolver, advanced preprocessing pipeline (SectionDetector, NoiseFilter, LayoutNormalizer), document classification (TF-IDF + SVM), 5 new post-processing inference rules in shadow mode, two-pass pipeline (classify → type-specific extraction), OCR augmentation with Tesseract + layout analysis, and gap closure wiring the classify router into production. 7 phases, 20 plans, 184+ tests.
 
-v1.5 picks up from Phase 16 (llm-provider) — a multi-provider LLM abstraction (Anthropic, OpenAI, Gemini with auto-detection) that was implemented but never UAT-tested or committed. The milestone stabilizes the extraction pipeline: UAT signoff, deduplication of batch_process.py, config cleanup, real-CV validation, and post-processing refinement.
+v1.5 stabilized the extraction pipeline: multi-provider LLM abstraction (Anthropic, OpenAI, Gemini) with full UAT signoff, deduplication of batch_process.py, config orphans cleanup, real-CV validation (6 CVs, 4 bugs fixed), post-processing refinement (gender, phone, RUT, shadow rules promotion), and authentication infrastructure (backend auth hardening + frontend login/signup). 7 phases, 269 tests.
 
-## Current Milestone: v1.5 Consolidación de Extracción (Active)
+## Current Milestone: v1.6 (Planning)
 
-**Goal:** Cerrar Phase 16 (llm-provider), consolidar el pipeline de extracción eliminando duplicación y config legacy, validar con documentos reales, y refinar post-procesamiento.
+**Goal:** TBD — next milestone starts with requirements definition.
 
-**Target features:**
-- ✅ Phase 16 (llm-provider) — code complete (provider abstraction, bugfixes, model resolution)
-- ⏳ Phase 17: UAT execution + commit of Phase 16
-- ⏳ Phase 18: Deduplicate batch_process.py extraction logic
-- ⏳ Phase 19: Config orphans cleanup (remove gemini_model_* legacy vars)
-- ⏳ Phase 20: End-to-end validation with real CV documents
-- ⏳ Phase 21: Post-processing refinement (gender, phone, RUT, shadow rules)
+**Candidate areas:**
+- Performance optimization (caching, query pagination)
+- Deployment/DevOps (Docker, CI/CD)
+- Enhanced analytics dashboard
+- Multi-tenancy / organization support
 
 ## What This Is
 
@@ -52,14 +50,21 @@ Extract structured CV data with a beautiful, intuitive interface and export-read
 - ✓ 5 inference rules (nationality, DOB, experience, education, email) in shadow mode — v1.4
 - ✓ Two-pass pipeline (classify → type-specific extraction) — v1.4
 - ✓ OCR augmentation (Tesseract + layout analysis, fallback chain) — v1.4
+- ✓ Multi-provider LLM abstraction (Anthropic, OpenAI, Gemini) with factory, auto-detection, model resolution — v1.5
+- ✓ Deduplicated batch_process.py extraction logic — uses llm_service.extract_fields() — v1.5
+- ✓ Config orphans cleanup (gemini_model_*, llm_provider removed) — v1.5
+- ✓ Real-CV validation: 6 CVs tested, 4 critical/major bugs fixed — v1.5
+- ✓ Gender inference with confidence scoring + 50+ compound name overrides — v1.5
+- ✓ Phone normalization (Chilean +56 & international) — v1.5
+- ✓ RUT formatting with módulo 11 validation and RUT_VALIDO flag — v1.5
+- ✓ 4 shadow rules promoted to active (nationality, DOB, education, email) — v1.5
+- ✓ Backend auth hardening: require_auth on rules/export/classify/auth_endpoint — v1.5
+- ✓ Frontend auth pages: login, signup, AuthContext, AuthGuard, GlobalNav auth links — v1.5
+- ✓ Rate limiting with slowapi (60 req/60s, production only) — v1.5
 
-### Active (v1.5)
+### Active (v1.6)
 
-- UAT signoff for Phase 16 (llm-provider): provider auto-detection, factory, section detector, model resolution
-- Deduplicate extraction logic in batch_process.py — reuse llm_service.extract_fields()
-- Remove legacy config orphans (gemini_model_*, unused llm_provider field)
-- End-to-end validation with 5+ real CV documents through the wizard
-- Improve post-processing precision: gender inference, phone normalization, RUT formatting, shadow rules (nationality, DOB, experience, education, email)
+_TBD — next milestone requirements to be defined._
 
 ### Deferred (post-v1.5)
 
@@ -118,4 +123,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-17 — v1.5 Consolidación de Extracción started*
+*Last updated: 2026-06-18 — v1.5 Consolidación de Extracción shipped*

@@ -25,3 +25,5 @@ pytest-asyncio
 pyyaml
 jinja2
 semver
+olefile>=0.47
+slowapi>=0.1.10

@@ -7,7 +7,7 @@
 - ✅ **v1.2 Wizard Reordering** — Phase 5 (shipped 2026-05-17)
 - ✅ **v1.3 Bugfix Pipeline de Extracción** — Phases 6–8 (shipped 2026-05-19)
 - ✅ **v1.4 Extracción Inteligente** — Phases 9–15 (shipped 2026-06-16)
-- 🏗️ **v1.5 Consolidación de Extracción** — Phases 16–21 (active)
+- ✅ **v1.5 Consolidación de Extracción** — Phases 16–21 (shipped 2026-06-18)
 
 ## Phases
 
@@ -31,13 +31,16 @@
 - [x] Phase 5: Wizard Reordering (1/1 plans) — completed 2026-05-17
 </details>
 
-### ✅ v1.3 Bugfix Pipeline de Extracción (Shipped)
+<details>
+<summary>✅ v1.3 Bugfix Pipeline de Extracción (Phases 6-8) — SHIPPED 2026-05-19</summary>
 
-- [x] **Phase 6: Preprocessor Proper Noun Fix** — clean_text() preserves proper noun casing instead of blanket lowercasing
-- [x] **Phase 7: Post-Processing Pipeline** — CVProcessor applies gender inference, phone normalization, and RUT formatting after LLM extraction
-- [x] **Phase 8: LLM Error Resilience & Retry** — Robust JSON parsing, schema fallback, and bounded retries within TPM limits
+- [x] Phase 6: Preprocessor Proper Noun Fix — completed 2026-05-18
+- [x] Phase 7: Post-Processing Pipeline — completed 2026-05-18
+- [x] Phase 8: LLM Error Resilience & Retry — completed 2026-05-19
+</details>
 
-### ✅ v1.4 Extracción Inteligente (Phases 9-15) — SHIPPED 2026-06-16
+<details>
+<summary>✅ v1.4 Extracción Inteligente (Phases 9-15) — SHIPPED 2026-06-16</summary>
 
 - [x] Phase 9: Prompt Infrastructure & Foundation (2/2 plans) — completed 2026-05-21
 - [x] Phase 10: Advanced Preprocessing (3/3 plans) — completed 2026-05-22
@@ -46,19 +49,23 @@
 - [x] Phase 13: Two-Pass Pipeline (3/3 plans) — completed 2026-05-24
 - [x] Phase 14: OCR Augmentation (4/4 plans) — completed 2026-05-25
 - [x] Phase 15: Close Gap — Register /api/classify in main.py (2/2 plans) — completed 2026-06-13
+</details>
 
-**Deferred after v1.5:** OCR-01 (PaddleOCR 3.0), OCR-02 (Tesseract+PaddleOCR fusion), OCR-03 (PP-StructureV3 layout)
+<details>
+<summary>✅ v1.5 Consolidación de Extracción (Phases 16-21) — SHIPPED 2026-06-18</summary>
 
-See: `.planning/milestones/v1.4-ROADMAP.md` for full archive
+- [x] Phase 16: LLM Provider Abstraction — completed 2026-06-17
+- [x] Phase 17: Deduplicate batch_process.py — completed 2026-06-17
+- [x] Phase 18: Config Orphans Cleanup — completed 2026-06-17
+- [x] Phase 19: Real-CV Validation (discovery) — completed 2026-06-17
+- [x] Phase 19b: Bugfix Pipeline — completed 2026-06-18
+- [x] Phase 20: Post-Processing Refinement — completed 2026-06-18
+- [x] Phase 21: Auth & User Session — completed 2026-06-18
+</details>
 
-### 🏗️ v1.5 Consolidación de Extracción (Phases 16-21) — Active
+**Deferred:** OCR-01 (PaddleOCR 3.0), OCR-02 (Tesseract+PaddleOCR fusion), OCR-03 (PP-StructureV3 layout) — post-v1.5
 
-- [x] **Phase 16: LLM Provider Abstraction** — Multi-provider abstraction (Gemini, Anthropic, OpenAI) with auto-detection, factory, model resolution, TPM tracking, section_detector.py bugfix, and 6/6 UAT tests. Completed 2026-06-17.
-- [x] **Phase 17: Deduplicate batch_process.py** — Refactored to use llm_service.extract_fields(), removed hardcoded prompt/retry/JSON repair. Completed 2026-06-17.
-- [x] **Phase 18: Config Orphans Cleanup** — Removed gemini_model_* legacy vars, unused llm_provider field. Completed 2026-06-17.
-- [x] **Phase 19: Real-CV Validation (discovery)** — Manual validation with 6 real CVs. 6 bugs documented (2 Critical, 2 Major, 2 Minor). Completed 2026-06-17.
-- [ ] **Phase 19b: Bugfix Pipeline** — Fix BUG-001 (classifier), BUG-002 (DOC accents), BUG-003 (OCR fallback), BUG-004 (DOCX images). See `.planning/BUGS.md` and `.planning/Phase_19b_Bugfix_Pipeline.md`.
-- [ ] **Phase 20: Post-Processing Refinement** — Improve gender inference, phone normalization, RUT formatting, evaluate shadow rules for promotion.
+See: `.planning/milestones/v1.5-ROADMAP.md` for full archive
 
 ## Progress
 
@@ -83,5 +90,6 @@ See: `.planning/milestones/v1.4-ROADMAP.md` for full archive
 | 17. Deduplicate batch_process.py | v1.5 | 1/1 | Complete | 2026-06-17 |
 | 18. Config Orphans Cleanup | v1.5 | 1/1 | Complete | 2026-06-17 |
 | 19. Real-CV Validation (discovery) | v1.5 | 1/1 | Complete | 2026-06-17 |
-| 19b. Bugfix Pipeline | v1.5 | — | Pending | — |
-| 20. Post-Processing Refinement | v1.5 | — | Pending | — |
+| 19b. Bugfix Pipeline | v1.5 | 4/4 bugs | Complete | 2026-06-18 |
+| 20. Post-Processing Refinement | v1.5 | 4/4 areas | Complete | 2026-06-18 |
+| 21. Auth & User Session | v1.5 | 5/5 plans | Complete | 2026-06-18 |
